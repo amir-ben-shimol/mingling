@@ -20,20 +20,8 @@
 			],
 			"ignoreBinaries": ["eas", "pod"]
 		},
-		"apps/web": {
-			"ignore": [
-				"_templates/**/*",
-				"@types/next/index.d.ts",
-				"src/components/wrappers/RedPurppleGradientFullWrapper.tsx",
-				"src/components/ui/**/*",
-				"src/app/playground/**/*",
-				"@types/**/*",
-				"src/app/branch-request/lib/hooks/createBranchRequest.tsx",
-				"src/lib/utils/image-generator/generate-route-nav-image.ts",
-				"src/lib/utils/image-generator/index.ts",
-				"src/lib/hooks/useLoader.tsx"
-			],
-			"ignoreDependencies": ["postcss-nesting", "sharp", "ts-mock-api"]
+		"apps/backend": {
+			"ignoreDependencies": ["ts-node"]
 		}
 	}
 }

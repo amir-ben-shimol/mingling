@@ -1,0 +1,15 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"display": "@mingling/backend",
+	"compilerOptions": {
+		"target": "ESNext",
+		"module": "CommonJS",
+		"rootDir": "src",
+		"outDir": "dist",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"typeRoots": ["./@types"]
+	}
+}
