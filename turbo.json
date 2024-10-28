@@ -1,0 +1,46 @@
+{
+	"$schema": "https://turborepo.org/schema.json",
+	"tasks": {
+		"start": {
+			"outputs": []
+		},
+		"build": {
+			"inputs": ["$TURBO_DEFAULT$", "lib/**"],
+			"outputs": ["dist/**"],
+			"dependsOn": ["^build"]
+		},
+
+		"build:dev": {
+			"dependsOn": ["build"],
+			"cache": false,
+			"inputs": ["$TURBO_DEFAULT$", "src/**"],
+			"outputs": [".next/**", "!.next/cache/**", "node_modules/.cache/metro/**"]
+		},
+		"local": {
+			"dependsOn": ["^build"],
+			"persistent": true,
+			"outputs": []
+		},
+		"dev": {
+			"dependsOn": ["^build"],
+			"persistent": true,
+			"outputs": []
+		},
+		"qa": {
+			"dependsOn": ["^build"],
+			"persistent": true,
+			"outputs": []
+		},
+		"prod": {
+			"dependsOn": ["^build"],
+			"persistent": true,
+			"outputs": []
+		},
+		"lint": {
+			"outputs": []
+		},
+		"type-check": {
+			"outputs": []
+		}
+	}
+}

@@ -1,0 +1,39 @@
+{
+	"ignore": ["inflint.config.cjs", "cnb.config.ts", "intro.config.ts"],
+	"ignoreWorkspaces": ["packages/types"],
+	"ignoreDependencies": ["cnb"],
+	"workspaces": {
+		"apps/mobile": {
+			"entry": "src/**/*",
+			"ignore": ["metro.config.js", "app.config.ts", "reactotron-config.js"],
+			"ignoreDependencies": [
+				"metro-cache",
+				"expo-dev-client",
+				"expo-font",
+				"@expo/config",
+				"expo-build-properties",
+				"dotenv",
+				"expo-localization",
+				"reactotron-plugin-zustand",
+				"reactotron-react-native",
+				"ts-mock-api"
+			],
+			"ignoreBinaries": ["eas", "pod"]
+		},
+		"apps/web": {
+			"ignore": [
+				"_templates/**/*",
+				"@types/next/index.d.ts",
+				"src/components/wrappers/RedPurppleGradientFullWrapper.tsx",
+				"src/components/ui/**/*",
+				"src/app/playground/**/*",
+				"@types/**/*",
+				"src/app/branch-request/lib/hooks/createBranchRequest.tsx",
+				"src/lib/utils/image-generator/generate-route-nav-image.ts",
+				"src/lib/utils/image-generator/index.ts",
+				"src/lib/hooks/useLoader.tsx"
+			],
+			"ignoreDependencies": ["postcss-nesting", "sharp", "ts-mock-api"]
+		}
+	}
+}
