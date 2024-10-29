@@ -6,7 +6,7 @@
 	"license": "ISC",
 	"scripts": {
 		"postinstall": "pnpm run build:packages",
-		"prepare": "run-s husky git:config intro",
+		"prepare": "run-s husky",
 		"husky": "husky",
 		"git:config": "git config --local include.path ../.gitconfig",
 		"intro": "intro",

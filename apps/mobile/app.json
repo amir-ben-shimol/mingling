@@ -1,0 +1,160 @@
+{
+	"expo": {
+		"name": "mingling",
+		"slug": "mingling-mobile-app",
+		"orientation": "portrait",
+		"icon": "./src/assets/images/global/leumit-store-logo.png",
+		"scheme": "myapp",
+		"userInterfaceStyle": "automatic",
+		"assetBundlePatterns": ["./src/assets/**/*"],
+		"jsEngine": "hermes",
+		"bundler": "metro",
+		"packagerOpts": {
+			"assetExts": ["png", "jpg", "jpeg", "gif", "webp", "svg", "otf", "ttf", "woff", "woff2"]
+		},
+		"runtimeVersion": {
+			"policy": "appVersion"
+		},
+		"splash": {
+			"image": "./src/assets/images/global/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+		"extra": {
+			"supportsRTL": false,
+			"forcesRTL": false,
+			"router": {
+				"origin": false
+			},
+			"eas": {
+				"projectId": "37d266a8-faad-47ae-bec2-466e30ee6c54"
+			}
+		},
+		"ios": {
+			"bundleIdentifier": "leumit.co.il.mobile-dev",
+			"supportsTablet": true,
+			"infoPlist": {
+				"ExpoLocalization_supportsRTL": false,
+				"ITSAppUsesNonExemptEncryption": false,
+				"NSAppTransportSecurity": {
+					"NSAllowsArbitraryLoads": true
+				},
+				"UIBackgroundModes": ["fetch", "remote-notification"],
+				"ExpoLocalization_forcesRTL": false
+			},
+			"config": {
+				"googleMapsApiKey": "AIzaSyBFm8NOrSpDOPPsBo_vnbg8uUmq3PNbjW0"
+			}
+		},
+		"android": {
+			"package": "il.co.leumit.mobile",
+			"adaptiveIcon": {
+				"foregroundImage": "./src/assets/images/global/leumit-store-logo.png",
+				"backgroundColor": "#ffffff"
+			},
+			"permissions": [
+				"android.permission.USE_BIOMETRIC",
+				"android.permission.USE_FINGERPRINT",
+				"android.permission.RECEIVE_BOOT_COMPLETED",
+				"android.permission.READ_EXTERNAL_STORAGE",
+				"android.permission.WRITE_EXTERNAL_STORAGE",
+				"android.permission.INTERNET",
+				"android.permission.ACCESS_COARSE_LOCATION",
+				"android.permission.ACCESS_FINE_LOCATION",
+				"android.permission.CAMERA",
+				"android.permission.RECORD_AUDIO"
+			],
+			"useNextNotificationsApi": true
+		},
+		"plugins": [
+			"expo-router",
+			"expo-document-picker",
+			"expo-file-system",
+			"expo-localization",
+			[
+				"@config-plugins/react-native-webrtc",
+				{
+					"cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+					"microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
+				}
+			],
+			[
+				"expo-local-authentication",
+				{
+					"faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
+				}
+			],
+			[
+				"expo-secure-store",
+				{
+					"faceIDPermission": "Allow $(PRODUCT_NAME) to access your Face ID biometric data."
+				}
+			],
+			[
+				"expo-font",
+				{
+					"fonts": [
+						"./src/assets/fonts/Rubik-Black.ttf",
+						"./src/assets/fonts/Rubik-Bold.ttf",
+						"./src/assets/fonts/Rubik-ExtraBold.ttf",
+						"./src/assets/fonts/Rubik-Light.ttf",
+						"./src/assets/fonts/Rubik-Medium.ttf",
+						"./src/assets/fonts/Rubik-Regular.ttf",
+						"./src/assets/fonts/Rubik-SemiBold.ttf"
+					]
+				}
+			],
+			[
+				"expo-asset",
+				{
+					"assets": []
+				}
+			],
+			[
+				"expo-location",
+				{
+					"locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+				}
+			],
+			[
+				"expo-dev-launcher",
+				{
+					"launchMode": "most-recent"
+				}
+			],
+			[
+				"expo-notifications",
+				{
+					"icon": "./src/assets/images/global/leumit-store-logo.png",
+					"color": "#ffffff",
+					"defaultChannel": {
+						"name": "default",
+						"importance": "max",
+						"vibrationPattern": [0, 250, 250, 250],
+						"sound": true
+					}
+				}
+			],
+			[
+				"expo-build-properties",
+				{
+					"android": {
+						"usesCleartextTraffic": true
+					}
+				}
+			],
+			[
+				"expo-camera",
+				{
+					"cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+					"microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+					"recordAudioAndroid": true
+				}
+			]
+		],
+		"experiments": {
+			"typedRoutes": true
+		},
+		"owner": "amir-ben-shimol"
+	}
+}
