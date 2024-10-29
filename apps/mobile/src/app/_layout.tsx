@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 
-import { SessionProvider } from '@/providers/sessionProvider';
 import { LoaderProvider } from '@/providers/loaderProvider';
 import ErrorBoundary from '@/wrappers/ErrorBoundary';
 import { cacheImages } from '@/lib/helpers/cache';
 
 import AppWrapper from '@/wrappers/AppWrapper';
+import { AuthProvider } from '@/lib/providers/authProvider';
+import { SocketProvider } from '@/lib/providers/socketProvider';
+import { WebRTCProvider } from '@/lib/providers/webRTCProvider';
+import { ThemeProvider } from '@/lib/providers/themeProvider';
 
 const RootLayout = () => {
 	const [appIsReady, setAppIsReady] = useState(false);
@@ -44,11 +47,17 @@ const RootLayout = () => {
 
 	return (
 		<ErrorBoundary>
-			<LoaderProvider>
-				<SessionProvider>
-					<AppWrapper />
-				</SessionProvider>
-			</LoaderProvider>
+			<ThemeProvider>
+				<LoaderProvider>
+					<AuthProvider>
+						<SocketProvider>
+							<WebRTCProvider>
+								<AppWrapper />
+							</WebRTCProvider>
+						</SocketProvider>
+					</AuthProvider>
+				</LoaderProvider>
+			</ThemeProvider>
 		</ErrorBoundary>
 	);
 };
