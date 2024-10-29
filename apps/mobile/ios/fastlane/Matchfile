@@ -1,0 +1,10 @@
+git_url("https://github.com/amir-ben-shimol/fastlane-leumit-certificates.git")
+
+storage_mode("git")
+
+type("development") # The default type, can be: appstore, adhoc, enterprise or development
+app_identifier("leumit.co.il.mobile-dev") # Bundle identifier
+username("webmaster@leumit.co.il") # Apple Developer Portal username
+team_id("869Y96474U") # Developer Portal Team ID
+
+# git_bearer_authorization(ENV['MATCH_GIT_TOKEN']) # Use git_bearer_authorization with environment variable
