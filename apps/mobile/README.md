@@ -77,7 +77,7 @@ code-push-standalone deployment ls Leumit-iOS --displayKeys
 
 8. Configure the deployment keys based on the environment
 
-On iOS: Edit ./iOS/LeumitDev/Info.plist and paste the deployment key under CodePushDeploymentKey.
+On iOS: Edit ./iOS/mingling/Info.plist and paste the deployment key under CodePushDeploymentKey.
 
 On Android:
 
@@ -93,7 +93,7 @@ Edit Android/app/src/main/res/values/strings.xml and change the value of CodePus
 
 ### iOS
 
-Edit iOS/LeumitDev/Info.plist and change the value of CodePushServerURL to your current URL.
+Edit iOS/mingling/Info.plist and change the value of CodePushServerURL to your current URL.
 
 10. To push OTA (over the air) update
 
