@@ -1,0 +1,13 @@
+{
+	"extends": ["../../tsconfig.base.json", "./tsconfig.paths.json"],
+	"display": "@leumit/app-mobile",
+	"compilerOptions": {
+		"module": "esnext",
+		"baseUrl": "./",
+		"allowJs": true,
+		"jsx": "react-native",
+		"lib": ["DOM", "ESNext"],
+		"target": "ESNext",
+		"typeRoots": ["./@types"]
+	}
+}
