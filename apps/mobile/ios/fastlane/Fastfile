@@ -20,8 +20,8 @@ platform :ios do
     )
 
     build_app(
-      workspace: "LeumitDev.xcworkspace", 
-      scheme: "LeumitDev",
+      workspace: "mingling.xcworkspace", 
+      scheme: "mingling",
       export_options: {
         method: "app-store",
         provisioningProfiles: {
@@ -48,11 +48,11 @@ platform :ios do
   lane :beta do
     setup_ci # Refer to issue [https://github.com/fastlane/fastlane/issues/15290]
   
-    # increment_build_number(xcodeproj: "LeumitDev.xcodeproj")
+    # increment_build_number(xcodeproj: "mingling.xcodeproj")
 
     increment_version_number(
       bump_type: "patch", # Use "patch", "minor", or "major" based on your needs
-      xcodeproj: "LeumitDev.xcodeproj"
+      xcodeproj: "mingling.xcodeproj"
     )
 
     api_key = app_store_connect_api_key(
@@ -70,8 +70,8 @@ platform :ios do
     )
   
     build_app(
-      workspace: "LeumitDev.xcworkspace", 
-      scheme: "LeumitDev",
+      workspace: "mingling.xcworkspace", 
+      scheme: "mingling",
       export_options: {
         method: "app-store", # Or "ad-hoc"
         provisioningProfiles: {
@@ -95,8 +95,8 @@ platform :ios do
   lane :build_development do
     match(type: "development", app_identifier: "leumit.co.il.mobile-dev")
     build_app(
-      workspace: "LeumitDev.xcworkspace",
-      scheme: "LeumitDev",
+      workspace: "mingling.xcworkspace",
+      scheme: "mingling",
       export_options: {
         method: "development",
         provisioningProfiles: {
@@ -111,11 +111,11 @@ platform :ios do
 
   desc "Push a new release build to the App Store"
   lane :release do
-    increment_build_number(xcodeproj: "LeumitDev.xcodeproj")
+    increment_build_number(xcodeproj: "mingling.xcodeproj")
     match(type: "appstore", app_identifier: "leumit.co.il.mobile-dev")
     build_app(
-      workspace: "LeumitDev.xcworkspace", 
-      scheme: "LeumitDev",
+      workspace: "mingling.xcworkspace", 
+      scheme: "mingling",
       export_options: {
         method: "app-store",
         provisioningProfiles: {

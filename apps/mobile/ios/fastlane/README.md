@@ -23,6 +23,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 Build the app for app store
 
+### ios developer_build
+
+```sh
+[bundle exec] fastlane ios developer_build
+```
+
+Build the app for development with Expo Dev Client
+
 ### ios beta
 
 ```sh
