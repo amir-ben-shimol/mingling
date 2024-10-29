@@ -1,23 +1,43 @@
+// server.ts
 import http from 'node:http';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
 import { configureSockets } from './config/socket-config';
+import userRoutes from './routes/user-routes';
+
+dotenv.config();
 
 const app = express();
+
+app.use(express.json()); // This middleware parses JSON bodies
+
 const server = http.createServer(app);
 
 const io = new SocketIOServer(server, {
 	cors: {
-		origin: '*', // Set your frontend origin here
+		origin: '*', // Replace with your frontend URL in production
 		methods: ['GET', 'POST'],
 	},
 });
+
+// Connect to MongoDB
+const mongoUri = process.env.MONGODB_URI as string;
+
+mongoose
+	.connect(mongoUri)
+	.then(() => console.log('Connected to MongoDB'))
+	.catch((error) => console.error('Error connecting to MongoDB:', error));
 
 app.get('/', (_, res) => {
 	res.send('WebRTC Signaling Server is running');
 });
 
-// Configure Socket.io
+// Use user routes
+app.use('/api/users', userRoutes);
+
+// Configure Socket.io with custom socket events
 configureSockets(io);
 
 const PORT = 3000;

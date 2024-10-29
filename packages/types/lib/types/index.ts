@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export type User = {
-	id: string;
+	_id: string;
 	firstName: string;
 	lastName: string;
 	email: string;
