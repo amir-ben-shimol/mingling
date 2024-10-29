@@ -1,12 +1,12 @@
 import { Redirect } from 'expo-router';
 import UnauthorizedDrawer from '@/layouts/AppDrawers/UnauthorizedDrawer';
-import { useSession } from '@/lib/providers/sessionProvider';
 import { UnauthorizedDrawerProvider } from '@/lib/providers/unauthorizedDrawerProvider';
+import { useAuth } from '@/lib/providers/authProvider';
 
-const LoginLayout = () => {
-	const { session } = useSession();
+const Layout = () => {
+	const { user } = useAuth();
 
-	if (session) return <Redirect href="/" />;
+	if (user) return <Redirect href="/" />;
 
 	return (
 		<UnauthorizedDrawerProvider>
@@ -15,4 +15,4 @@ const LoginLayout = () => {
 	);
 };
 
-export default LoginLayout;
+export default Layout;
