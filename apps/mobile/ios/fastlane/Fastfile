@@ -1,0 +1,155 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build the app for app store"
+  lane :build do
+    setup_ci # Refer to issue [https://github.com/fastlane/fastlane/issues/15290]
+
+    api_key = app_store_connect_api_key(
+      key_id: "Z2XR8K6M4H",
+      issuer_id: "69a6de75-35f6-47e3-e053-5b8c7c11a4d1",
+      key_filepath: File.join(Dir.pwd, "./keys/AuthKey.p8"),
+      in_house: false # Set to true for an enterprise account
+    )
+
+    match(
+      type: "appstore",
+      app_identifier: "leumit.co.il.mobile-dev",
+      git_basic_authorization: ENV["BASE_64_KEY"],
+      api_key: api_key
+    )
+
+    build_app(
+      workspace: "LeumitDev.xcworkspace", 
+      scheme: "LeumitDev",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "leumit.co.il.mobile-dev" => "match AppStore leumit.co.il.mobile-dev"
+        }
+      },
+      export_xcargs: "-allowProvisioningUpdates",
+      include_bitcode: false,
+      output_directory: "./builds/appstore"
+    )
+    notify_on_slack
+
+    upload_to_app_store(
+      api_key: api_key,
+      force: true, # Skip HTMl report verification
+      skip_metadata: true,
+      skip_screenshots: true,
+      skip_binary_upload: true,
+      run_precheck_before_submit: false
+    )
+  end
+
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    setup_ci # Refer to issue [https://github.com/fastlane/fastlane/issues/15290]
+  
+    # increment_build_number(xcodeproj: "LeumitDev.xcodeproj")
+
+    increment_version_number(
+      bump_type: "patch", # Use "patch", "minor", or "major" based on your needs
+      xcodeproj: "LeumitDev.xcodeproj"
+    )
+
+    api_key = app_store_connect_api_key(
+      key_id: "Z2XR8K6M4H",
+      issuer_id: "69a6de75-35f6-47e3-e053-5b8c7c11a4d1",
+      key_filepath: File.join(Dir.pwd, "./keys/AuthKey.p8"),
+      in_house: false # Set to true for an enterprise account
+    )
+  
+    match(
+      type: "appstore",
+      app_identifier: "leumit.co.il.mobile-dev",
+      git_basic_authorization: ENV["BASE_64_KEY"],
+      api_key: api_key
+    )
+  
+    build_app(
+      workspace: "LeumitDev.xcworkspace", 
+      scheme: "LeumitDev",
+      export_options: {
+        method: "app-store", # Or "ad-hoc"
+        provisioningProfiles: {
+          "leumit.co.il.mobile-dev" => "match AppStore leumit.co.il.mobile-dev"
+        }
+      },
+      export_xcargs: "-allowProvisioningUpdates",
+      include_bitcode: false,
+      output_directory: "./builds/testflight",
+      )
+    
+    upload_to_testflight(
+      api_key: api_key,
+      skip_waiting_for_build_processing: true
+    )
+    
+    notify_on_slack
+  end
+
+  desc "Build the app for development"
+  lane :build_development do
+    match(type: "development", app_identifier: "leumit.co.il.mobile-dev")
+    build_app(
+      workspace: "LeumitDev.xcworkspace",
+      scheme: "LeumitDev",
+      export_options: {
+        method: "development",
+        provisioningProfiles: {
+          "leumit.co.il.mobile-dev" => "match Development leumit.co.il.mobile-dev"
+        }
+      },
+      export_xcargs: "-allowProvisioningUpdates",
+      include_bitcode: false,
+      output_directory: "./builds/development"
+    )
+  end
+
+  desc "Push a new release build to the App Store"
+  lane :release do
+    increment_build_number(xcodeproj: "LeumitDev.xcodeproj")
+    match(type: "appstore", app_identifier: "leumit.co.il.mobile-dev")
+    build_app(
+      workspace: "LeumitDev.xcworkspace", 
+      scheme: "LeumitDev",
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "leumit.co.il.mobile-dev" => "match AppStore leumit.co.il.mobile-dev"
+        }
+      },
+      export_xcargs: "-allowProvisioningUpdates",
+      include_bitcode: false
+    )
+    upload_to_app_store(
+      username: ENV['FASTLANE_USER']
+    )
+  end
+
+  desc "Upload existing build to App Store"
+  lane :upload_only do
+    upload_to_app_store(
+      username: ENV['FASTLANE_USER'],
+      ipa: "build-1720690131534.ipa"  # Update this path to the location of your existing .ipa file
+    )
+  end
+
+  desc "Notify on Slack"
+  lane :notify_on_slack do
+    slack(
+      message: "Build successfully completed!",
+      channel: "#leumit-mobile-app",
+      success: true,
+      slack_url: "https://hooks.slack.com/services/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",
+      payload: {
+        "Build Date" => Time.new.to_s,
+        "Built by" => "Amir Ben Shimol",
+      },
+      default_payloads: [:git_branch, :git_author]
+    )
+  end
+end

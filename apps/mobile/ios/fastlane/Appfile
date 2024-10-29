@@ -1,0 +1,5 @@
+app_identifier("leumit.co.il.mobile-dev") # Bundle identifier
+apple_id("webmaster@leumit.co.il") # Apple Developer Portal username
+
+itc_team_id("816042") # App Store Connect Team ID
+team_id("869Y96474U") # Developer Portal Team ID
