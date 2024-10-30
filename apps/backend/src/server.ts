@@ -22,8 +22,7 @@ const io = new SocketIOServer(server, {
 	},
 });
 
-// Connect to MongoDB
-const mongoUri = process.env.MONGODB_URI as string;
+const mongoUri = process.env.DATABASE_URL;
 
 mongoose
 	.connect(mongoUri)
@@ -40,7 +39,7 @@ app.use('/api/users', userRoutes);
 // Configure Socket.io with custom socket events
 configureSockets(io);
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, () => {
 	console.log(`Server is running on http://localhost:${PORT}`);

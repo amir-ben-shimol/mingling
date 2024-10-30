@@ -16,7 +16,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 	const [socket, setSocket] = useState<Socket | null>(null);
 
 	useEffect(() => {
-		const newSocket = io('http://10.0.0.1:3000'); // Replace with your server URL
+		const newSocket = io('http://10.0.0.16:8080'); // Replace with your server URL
 
 		setSocket(newSocket);
 
