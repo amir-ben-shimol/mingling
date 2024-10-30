@@ -22,7 +22,6 @@
 			"outputs": []
 		},
 		"dev": {
-			"dependsOn": ["^build"],
 			"persistent": true,
 			"outputs": []
 		},
@@ -34,6 +33,9 @@
 		"prod": {
 			"dependsOn": ["^build"],
 			"persistent": true,
+			"outputs": []
+		},
+		"start:docker": {
 			"outputs": []
 		},
 		"lint": {

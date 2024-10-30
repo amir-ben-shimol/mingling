@@ -11,6 +11,7 @@
 	],
 	"scripts": {
 		"build": "tsc --project ./tsconfig.build.json",
+		"start:docker": "tsc --project ./tsconfig.build.json --watch",
 		"lint": "eslint -c ./.eslintrc.cjs --ignore-path ./.eslintignore \"./**/*.ts\"",
 		"type-check": "tsc --project ./tsconfig.json"
 	},

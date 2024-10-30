@@ -7,7 +7,7 @@
 	"author": "",
 	"license": "ISC",
 	"scripts": {
-		"start:dev": "nodemon"
+		"dev": "nodemon"
 	},
 	"dependencies": {
 		"@mingling/types": "workspace:*",
