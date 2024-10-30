@@ -1,0 +1,93 @@
+services:
+    mongo_launcher:
+        container_name: mongo_launcher
+        image: mongo:7.0.4
+        restart: on-failure
+        networks:
+            - app_network
+        volumes:
+            - ./docker/scripts/mongo-setup.sh:/scripts/mongo-setup.sh
+        entrypoint: ['sh', '/scripts/mongo-setup.sh']
+    mongo_replica_1:
+        container_name: mongo_replica_1
+        image: mongo:7.0.4
+        ports:
+            - 27017:27017
+        restart: always
+        entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'dbrs', '--dbpath', '/data/db', '--port', '27017']
+        volumes:
+            - ./.volumes/mongo/replica1:/data/db
+            - ./.volumes/mongo/replica1/configdb:/data/configdb
+        networks:
+            - app_network
+    mongo_replica_2:
+        container_name: mongo_replica_2
+        image: mongo:7.0.4
+        ports:
+            - 27018:27018
+        restart: always
+        entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'dbrs', '--dbpath', '/data/db', '--port', '27018']
+        volumes:
+            - ./.volumes/mongo/replica2:/data/db
+            - ./.volumes/mongo/replica2/configdb:/data/configdb
+        networks:
+            - app_network
+    mongo_replica_3:
+        container_name: mongo_replica_3
+        image: mongo:7.0.4
+        ports:
+            - 27019:27019
+        restart: always
+        entrypoint: ['/usr/bin/mongod', '--bind_ip_all', '--replSet', 'dbrs', '--dbpath', '/data/db', '--port', '27019']
+        volumes:
+            - ./.volumes/mongo/replica3:/data/db
+            - ./.volumes/mongo/replica3/configdb:/data/configdb
+        networks:
+            - app_network
+    types:
+        container_name: types
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.types-dev
+        restart: always
+        networks:
+            - app_network
+        volumes:
+            - type: bind
+              source: ./packages/types/lib
+              target: /app/packages/types/lib
+            - type: bind
+              source: ./packages/types/dist
+              target: /app/packages/types/dist
+            # - /app/node_modules
+            # - /app/packages/types/node_modules
+
+    backend:
+        container_name: backend
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.backend-dev
+        env_file:
+            - ./apps/backend/.env
+        ports:
+            - 8080:8080
+        restart: always
+        depends_on:
+            - mongo_replica_1
+            - mongo_replica_2
+            - mongo_replica_3
+            - types
+        networks:
+            - app_network
+        volumes:
+            - type: bind
+              source: ./apps/backend/src
+              target: /app/apps/backend/src
+            - type: bind
+              source: ./packages/types/dist
+              target: /app/packages/types/dist
+            # - /app/node_modules
+            # - /app/apps/backend/node_modules
+networks:
+    app_network:
+        driver: bridge
