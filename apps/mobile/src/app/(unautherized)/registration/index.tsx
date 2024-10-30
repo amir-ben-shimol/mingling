@@ -22,7 +22,7 @@ const RegisterScreen = () => {
 		}
 
 		try {
-			const response = await fetch('http://10.0.0.1:3000/api/users/register', {
+			const response = await fetch('http://10.0.0.16:8080/api/users/register', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
