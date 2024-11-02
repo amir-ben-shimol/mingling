@@ -7,8 +7,6 @@ import { cacheImages } from '@/lib/helpers/cache';
 
 import AppWrapper from '@/wrappers/AppWrapper';
 import { AuthProvider } from '@/lib/providers/authProvider';
-import { SocketProvider } from '@/lib/providers/socketProvider';
-import { WebRTCProvider } from '@/lib/providers/webRTCProvider';
 import { ThemeProvider } from '@/lib/providers/themeProvider';
 
 const RootLayout = () => {
@@ -50,11 +48,7 @@ const RootLayout = () => {
 			<ThemeProvider>
 				<LoaderProvider>
 					<AuthProvider>
-						<SocketProvider>
-							<WebRTCProvider>
-								<AppWrapper />
-							</WebRTCProvider>
-						</SocketProvider>
+						<AppWrapper />
 					</AuthProvider>
 				</LoaderProvider>
 			</ThemeProvider>

@@ -7,6 +7,7 @@ export type User = {
 	country: string;
 	gender: 'male' | 'female' | 'other';
 	age: number;
+	sessionToken?: string;
 };
 
 export type ChatMessage = {

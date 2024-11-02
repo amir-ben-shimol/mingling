@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
+import type { User } from '@mingling/types';
 import { router } from 'expo-router';
 import { View, Text, TextInput, Button, Alert } from 'react-native';
 import { useAuth } from '@/lib/providers/authProvider';
+import { BackendService } from '@/lib/utils/backend-service';
 
 const LoginScreen = () => {
 	const { login } = useAuth();
@@ -12,19 +13,12 @@ const LoginScreen = () => {
 
 	const handleLogin = async () => {
 		try {
-			const response = await fetch('http://10.0.0.16:8080/api/users/login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email, password }),
-			});
-
-			const data: any = await response.json();
+			const response = await BackendService.post<{ user: User }>('/api/users/login', { email, password });
 
 			if (response.ok) {
-				Alert.alert('Success', 'Login successful');
-				login(data.user);
+				login(response.data.user);
 			} else {
-				Alert.alert('Error', data.error || 'Failed to login');
+				Alert.alert('Error', response.message || 'Failed to login');
 			}
 		} catch (error) {
 			Alert.alert('Error', 'An error occurred during login');
