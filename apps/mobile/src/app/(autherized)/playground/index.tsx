@@ -16,8 +16,6 @@ const PlaygroundPage: React.FC = () => {
 
 	useFocusEffect(
 		useCallback(() => {
-			console.log('inside useFocusEffect');
-
 			if (!socket || !user) return;
 
 			socket.emit('joinPlayground', user._id);

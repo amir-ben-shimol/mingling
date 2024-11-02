@@ -1,6 +1,4 @@
-import { Redirect } from 'expo-router';
-import UnauthorizedDrawer from '@/layouts/AppDrawers/UnauthorizedDrawer';
-import { UnauthorizedDrawerProvider } from '@/lib/providers/unauthorizedDrawerProvider';
+import { Redirect, Slot } from 'expo-router';
 import { useAuth } from '@/lib/providers/authProvider';
 
 const Layout = () => {
@@ -8,11 +6,7 @@ const Layout = () => {
 
 	if (user) return <Redirect href="/" />;
 
-	return (
-		<UnauthorizedDrawerProvider>
-			<UnauthorizedDrawer />
-		</UnauthorizedDrawerProvider>
-	);
+	return <Slot />;
 };
 
 export default Layout;

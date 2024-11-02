@@ -33,26 +33,6 @@ module.exports = {
 				error: `rgb(${colors.error} / <alpha-value>)`,
 				success: `rgb(${colors.success} / <alpha-value>)`,
 			},
-			// boxShadow: {
-			// 	modal: '0px -6px 20px 0px rgba(0, 0, 0, 0.00)',
-			// 	loginForm: '0px 0px 20px 0px rgba(149, 173, 201, 0.25)',
-			// 	card: '0px 0px 20px 0px rgba(149, 173, 201, 0.25)',
-			// 	shadowButton: '0px 2px 10px 0px rgba(154, 63, 130, 0.30)',
-			// },
-			height: {
-				'voice-recorder-height': '50px',
-				'100%': '100%',
-			},
-			borderRadius: {
-				'20': '20px',
-				'button': '44px',
-				'4xl': '30px',
-			},
-			backgroundColor: {
-				card: 'rgba(245, 239, 245, 0.5)',
-				lightGray: '#f8f8f8',
-				lightPurple: '#f5eff5',
-			},
 		},
 	},
 	plugins: [],
