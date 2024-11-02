@@ -1,3 +1,4 @@
+version: '3.8'
 services:
     mongo_launcher:
         container_name: mongo_launcher
@@ -59,9 +60,6 @@ services:
             - type: bind
               source: ./packages/types/dist
               target: /app/packages/types/dist
-            # - /app/node_modules
-            # - /app/packages/types/node_modules
-
     backend:
         container_name: backend
         build:
@@ -86,8 +84,29 @@ services:
             - type: bind
               source: ./packages/types/dist
               target: /app/packages/types/dist
-            # - /app/node_modules
-            # - /app/apps/backend/node_modules
+    # mobile:
+    #     container_name: mobile
+    #     build:
+    #         context: .
+    #         dockerfile: ./docker/Dockerfile.mobile-dev
+    #     ports:
+    #         - 19000:19000 # Expo port
+    #         - 19001:19001 # WebSocket port
+    #         - 19002:19002 # Debugging port
+    #     network_mode: host # Add this line
+    #     # environment:
+    #     #     - REACT_NATIVE_PACKAGER_HOSTNAME=10.0.0.16
+    #     stdin_open: true # Keep STDIN open to allow interactive CLI
+    #     tty: true # Enable terminal mode
+    #     # networks:
+    #     #     - app_network
+    #     volumes:
+    #         - type: bind
+    #           source: ./apps/mobile/src
+    #           target: /app/apps/mobile/src
+    #         - type: bind
+    #           source: ./packages/types/dist
+    #           target: /app/packages/types/dist
 networks:
     app_network:
         driver: bridge

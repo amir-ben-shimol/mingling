@@ -1,86 +1,102 @@
-// src/components/Chat.tsx
-import { View, TextInput, Text, FlatList, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+// src/screens/components/Chat.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import { useSocket } from '@/providers/socketProvider';
+import dayjs from 'dayjs';
+import { View, TextInput, FlatList, Text, Pressable, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
+import { useSocket } from '@/lib/providers/socketProvider';
+import { useAuth } from '@/lib/providers/authProvider';
 
-type Message = {
-	id: string;
-	text: string;
-	sender: 'self' | 'other';
-	time: string;
+type ChatProps = {
+	connectedUser: string;
 };
 
-const Chat: React.FC = () => {
+type Message = {
+	sender: string;
+	content: string;
+	timestamp: number;
+};
+
+const Chat: React.FC<ChatProps> = ({ connectedUser }) => {
 	const { socket } = useSocket();
+	const { user } = useAuth();
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState('');
-	const [connectedUser, setConnectedUser] = useState<string | null>(null);
+
 	const flatListRef = useRef<FlatList>(null);
 
-	// Listen for the connection start to get the recipient ID
 	useEffect(() => {
-		socket?.on('start-connection', ({ to }) => {
-			setConnectedUser(to);
-		});
-	}, [socket]);
+		if (!socket) return;
 
-	// Listen for incoming messages and update state
-	useEffect(() => {
-		const handleIncomingMessage = (data: { from: string; message: string }) => {
-			const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-			setMessages((prev) => [...prev, { id: data.from, text: data.message, sender: 'other', time }]);
+		const handleMessage = (message: Message) => {
+			setMessages((prev) => [...prev, message]);
 		};
 
-		socket?.on('message', handleIncomingMessage);
+		socket.on('chatMessage', handleMessage);
 
 		return () => {
-			socket?.off('message', handleIncomingMessage);
+			socket.off('chatMessage', handleMessage);
 		};
 	}, [socket]);
 
+	useEffect(() => {
+		flatListRef.current?.scrollToEnd({ animated: true });
+	}, [messages]);
+
 	const sendMessage = () => {
-		if (socket && input && connectedUser) {
-			const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+		if (!input.trim() || !user) return;
 
-			const newMessage: Message = {
-				id: socket.id || 'unknown', // Fallback to 'unknown' if socket.id is undefined
-				text: input,
-				sender: 'self',
-				time,
-			};
+		const message: Message = {
+			sender: user._id,
+			content: input.trim(),
+			timestamp: Date.now(),
+		};
 
-			setMessages((prev) => [...prev, newMessage]);
+		socket?.emit('chatMessage', { to: connectedUser, message });
+		setMessages((prev) => [...prev, message]);
+		setInput('');
+		Keyboard.dismiss(); // Hide the keyboard
+	};
 
-			// Emit message to the other user
-			socket.emit('message', { to: connectedUser, message: input });
-			setInput('');
-		}
+	const renderItem = ({ item }: { item: Message }) => {
+		const isSentByUser = item.sender === user?._id;
+
+		return (
+			<View className={`my-1 max-w-[80%] rounded-md p-2 ${isSentByUser ? 'self-end bg-blue-500' : 'self-start bg-gray-300'}`}>
+				<Text className={`${isSentByUser ? 'text-white' : 'text-black'}`}>{item.content}</Text>
+				<Text className={`mt-1 text-xs ${isSentByUser ? 'text-white' : 'text-gray-600'}`}>{dayjs(item.timestamp).format('HH:mm')}</Text>
+			</View>
+		);
 	};
 
 	return (
-		<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} className="flex-1">
-			<View className="flex-1 bg-gray-100 p-4">
+		<KeyboardAvoidingView
+			className="flex-1"
+			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+		>
+			<View className="flex-1">
 				<FlatList
 					ref={flatListRef}
 					data={messages}
-					renderItem={({ item }) => (
-						<View className={`my-1 max-w-[70%] rounded-lg p-3 ${item.sender === 'self' ? 'self-end bg-blue-500' : 'self-start bg-gray-300'}`}>
-							<Text className={`${item.sender === 'self' ? 'text-white' : 'text-black'}`}>{item.text}</Text>
-							<Text className={`mt-1 text-xs ${item.sender === 'self' ? 'self-end text-gray-100' : 'text-gray-500'}`}>{item.time}</Text>
-						</View>
-					)}
 					keyExtractor={(_, index) => index.toString()}
-					contentContainerStyle={{ flexGrow: 1, paddingBottom: 80 }}
-					onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
+					renderItem={renderItem}
+					contentContainerStyle={{
+						flexGrow: 1,
+						paddingHorizontal: 8,
+						paddingBottom: 60,
+					}}
 				/>
-			</View>
-
-			<View className="absolute bottom-0 w-full flex-row items-center bg-gray-200 p-4">
-				<TextInput value={input} placeholder="Type a message" className="flex-1 rounded-lg bg-white p-3" onChangeText={setInput} />
-				<TouchableOpacity className="ml-2 rounded-lg bg-blue-500 p-3" onPress={sendMessage}>
-					<Text className="text-white">Send</Text>
-				</TouchableOpacity>
+				<View className="absolute bottom-0 left-0 right-0 flex-row items-center border-t border-gray-200 bg-white p-2">
+					<TextInput
+						className="flex-1 rounded-md border border-gray-300 p-2"
+						value={input}
+						placeholder="Type a message"
+						multiline
+						onChangeText={setInput}
+					/>
+					<Pressable className="ml-2 rounded-md bg-blue-500 p-2" onPress={sendMessage}>
+						<Text className="text-white">Send</Text>
+					</Pressable>
+				</View>
 			</View>
 		</KeyboardAvoidingView>
 	);
