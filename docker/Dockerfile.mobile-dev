@@ -1,0 +1,26 @@
+# Dockerfile.mobile
+FROM node:20.17.0
+
+# Install dependencies and Expo CLI globally
+RUN npm install -g pnpm@9.12.2 expo-cli @expo/ngrok@^4.1.0
+# Set working directory
+WORKDIR /app
+
+# Copy necessary files
+COPY ./package.json ./pnpm-workspace.yaml ./.npmrc ./
+COPY ./apps/mobile/package.json ./apps/mobile/
+COPY ./packages/types/package.json ./packages/types/
+COPY ./tsconfig.base.json ./turbo.json ./
+COPY ./pnpm-lock.yaml ./
+
+# Install all dependencies
+RUN pnpm install --no-frozen-lockfile
+
+# Copy the mobile app files
+COPY ./apps/mobile/ ./apps/mobile/
+
+# Expose the port for the Expo server
+EXPOSE 19000 19001 19002
+
+# Start Expo in interactive mode
+CMD ["npx", "expo", "start", "--tunnel"]

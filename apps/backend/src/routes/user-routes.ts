@@ -71,27 +71,4 @@ router.post('/login', async (req: Request, res: Response) => {
 	}
 });
 
-// Update user playground status
-router.post('/enter-playground', async (req: Request, res: Response) => {
-	const { userId } = req.body;
-
-	try {
-		await User.findByIdAndUpdate(userId, { isOnline: true, inPlayground: true });
-		res.status(200).send('User entered playground');
-	} catch (error: any) {
-		res.status(400).json({ error: error.message });
-	}
-});
-
-// Get available users in the playground
-router.get('/available-users', async (_req: Request, res: Response) => {
-	try {
-		const users = await User.find({ isOnline: true, inPlayground: true });
-
-		res.status(200).json(users);
-	} catch (error: any) {
-		res.status(400).json({ error: error.message });
-	}
-});
-
 export default router;
