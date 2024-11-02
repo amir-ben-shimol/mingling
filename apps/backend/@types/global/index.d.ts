@@ -3,6 +3,7 @@ declare global {
 		interface ProcessEnv {
 			readonly DATABASE_URL: string;
 			readonly PORT: string;
+			readonly SECRET_TOKEN_KEY: string;
 		}
 	}
 }

@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // routes/userRoutes.ts
 import express, { type Request, type Response } from 'express';
+import jwt from 'jsonwebtoken';
+
 import bcrypt from 'bcrypt';
 import { User } from '../models/user';
+import { authenticate } from '../middleware/auth';
 
 const router = express.Router();
 
-// Register user
 router.post('/register', async (req: Request, res: Response) => {
-	console.log('inside of register route', req.body);
 	const { firstName, lastName, email, country, gender, age, password } = req.body;
 
 	if (!firstName || !lastName || !email || !country || !gender || !age || !password) {
@@ -18,11 +19,9 @@ router.post('/register', async (req: Request, res: Response) => {
 	}
 
 	try {
-		// Hash the password
 		const saltRounds = 10;
 		const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-		// Create a new user with hashed password
 		const newUser = new User({ firstName, lastName, email, country, gender, age, password: hashedPassword });
 
 		await newUser.save();
@@ -35,7 +34,6 @@ router.post('/register', async (req: Request, res: Response) => {
 	}
 });
 
-// Login route
 router.post('/login', async (req: Request, res: Response) => {
 	const { email, password } = req.body;
 
@@ -46,29 +44,29 @@ router.post('/login', async (req: Request, res: Response) => {
 	}
 
 	try {
-		// Find user by email
 		const user = await User.findOne({ email });
 
-		if (!user) {
+		if (!user || !(await bcrypt.compare(password, user.password))) {
 			res.status(400).json({ error: 'Invalid email or password' });
 
 			return;
 		}
 
-		// Check password
-		const isPasswordValid = await bcrypt.compare(password, user.password);
+		const sessionToken = jwt.sign({ id: user._id }, process.env.SECRET_TOKEN_KEY as string, { expiresIn: '30m' });
 
-		if (!isPasswordValid) {
-			res.status(400).json({ error: 'Invalid email or password' });
+		user.sessionToken = sessionToken;
+		await user.save();
 
-			return;
-		}
+		res.setHeader('x-access-token', sessionToken);
 
-		// Send success response
-		res.status(200).json({ message: 'Login successful', user });
+		res.status(200).json({ message: 'Login successful', ok: true, data: { user } });
 	} catch (error) {
-		res.status(500).json({ error: 'An error occurred during login' });
+		res.status(500).json({ error: (error as any).message });
 	}
+});
+
+router.get('/is-auth', authenticate, (_req, res) => {
+	res.status(200).json({ message: 'OK' });
 });
 
 export default router;

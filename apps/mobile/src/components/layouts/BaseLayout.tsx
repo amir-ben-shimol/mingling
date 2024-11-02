@@ -1,42 +1,21 @@
-import React, { useCallback } from 'react';
-import { Slot, useFocusEffect } from 'expo-router';
+import React from 'react';
+import { Slot } from 'expo-router';
 import { View } from 'react-native';
-import { useTheme } from '@/providers/themeProvider';
+import { UINotifications } from '@/ui/UINotifications';
 
-type PageProps = {
-	readonly theme?: 'light' | 'dark';
+type Props = {
 	readonly className?: string;
-	readonly header?: boolean;
-	readonly navBack?: boolean;
 };
 
-const BaseLayout: React.FC<PageProps> = ({ theme = 'light', className = '', header = true }) => {
-	const { setTheme } = useTheme();
-
-	useFocusEffect(
-		useCallback(() => {
-			//TODO: change for cleaner solution
-			setTimeout(() => {
-				setTheme(theme);
-			}, 100);
-		}, [theme]),
-	);
-
+const BaseLayout = (props: Props) => {
 	return (
-		<View className={`flex-1 bg-white ${className}`}>
-			{/* <View className={`flex h-full px-4 ${theme === 'light' ? 'mt-8' : 'mt-12'}`}> */}
-			<Slot
-				screenOptions={{
-					headerShown: header,
-					Animation: 'fade',
-					AnimationEffect: 'fade',
-					AnimationDuration: 300,
-					AnimationEasing: 'ease-in-out',
-					scrollEnabled: true,
-				}}
-			/>
+		<View className={`mt-14 flex-1 ${props.className}`}>
+			<View className="flex h-full flex-1 flex-col">
+				<UINotifications />
+
+				<Slot />
+			</View>
 		</View>
-		// </View>
 	);
 };
 
