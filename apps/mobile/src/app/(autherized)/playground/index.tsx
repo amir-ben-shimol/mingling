@@ -1,6 +1,7 @@
 // src/screens/PlaygroundPage.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Alert, Pressable } from 'react-native';
+import React, { useCallback } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { View, Pressable } from 'react-native';
 import { useWebRTC } from '@/providers/webRTCProvider';
 import { UIText } from '@/ui/UIText';
 import { useSocket } from '@/lib/providers/socketProvider';
@@ -11,64 +12,66 @@ import VideoStreams from './components/VideoStreams';
 const PlaygroundPage: React.FC = () => {
 	const { user } = useAuth();
 	const { socket } = useSocket();
-	const { initializeConnection, endConnection } = useWebRTC();
-	const [connectedUser, setConnectedUser] = useState<string | null>(null);
+	const { localStream, remoteStream, setupWebRTC, setupLocalStream, endCall, partnerSocketId } = useWebRTC();
 
-	useEffect(() => {
-		if (!socket) return;
+	useFocusEffect(
+		useCallback(() => {
+			console.log('inside useFocusEffect');
 
-		// Join the playground and start looking for a match
-		socket.emit('join-playground', socket.id);
+			if (!socket || !user) return;
 
-		// Listen for when a match is found
-		socket.on('start-connection', ({ to }) => {
-			setConnectedUser(to);
-			console.log(`${user?.firstName} Connected to user`, to);
+			socket.emit('joinPlayground', user._id);
 
-			// Initialize WebRTC connection with the matched user
-			initializeConnection(to);
-		});
+			setupLocalStream();
 
-		// // Listen for incoming signaling data
-		// socket.on('signal', async ({ from, signal }) => {
-		// 	await handleIncomingSignal(signal);
-		// });
+			const handleMatched = ({ partnerSocketId }: { partnerSocketId: string }) => {
+				setupWebRTC(partnerSocketId);
+			};
 
-		// Cleanup on unmount
-		return () => {
-			socket.off('start-connection');
-			socket.off('signal');
-		};
-	}, [socket, initializeConnection]);
+			const handlePartnerLeft = () => {
+				endCall();
+				// User stays in playground and waits for a new match
+			};
+
+			socket.on('matched', handleMatched);
+			socket.on('partnerLeft', handlePartnerLeft);
+
+			return () => {
+				socket.emit('leavePlayground');
+				socket.off('matched', handleMatched);
+				socket.off('partnerLeft', handlePartnerLeft);
+				endCall();
+			};
+		}, [socket, user]),
+	);
 
 	const handleNextUser = () => {
-		socket?.emit('next-user');
-		setConnectedUser(null);
-		endConnection();
+		socket?.emit('nextUser');
+		endCall();
 	};
 
+	// src/screens/PlaygroundPage.tsx
 	const handleEndSession = () => {
-		socket?.emit('leave-playground');
-		setConnectedUser(null);
-		endConnection();
-		Alert.alert('Session Ended', 'You have left the playground.');
+		socket?.emit('leavePlayground');
+		endCall();
+		router.push('/'); // Navigate to the "/" page
 	};
 
 	return (
 		<View className="flex h-full">
-			<VideoStreams />
-			<Chat />
+			<VideoStreams localStream={localStream as unknown as MediaStream} remoteStream={remoteStream as unknown as MediaStream} />
+			{partnerSocketId && <Chat connectedUser={partnerSocketId} />}
 
-			{connectedUser && (
-				<View className="mt-auto flex h-12 w-full flex-row justify-between">
-					<Pressable className="flex w-1/2 items-center justify-center bg-red-700" onPress={handleEndSession}>
-						<UIText className="p-2 text-center text-2xl text-white">End Session</UIText>
-					</Pressable>
-					<Pressable className="flex w-1/2 items-center justify-center bg-green-700" onPress={handleNextUser}>
+			<View className="mt-auto flex h-12 w-full flex-row">
+				<Pressable className="flex-1 items-center justify-center bg-red-700" onPress={handleEndSession}>
+					<UIText className="p-2 text-center text-2xl text-white">End Session</UIText>
+				</Pressable>
+				{partnerSocketId && (
+					<Pressable className="flex-1 items-center justify-center bg-green-700" onPress={handleNextUser}>
 						<UIText className="p-2 text-center text-2xl text-white">Next User</UIText>
 					</Pressable>
-				</View>
-			)}
+				)}
+			</View>
 		</View>
 	);
 };
