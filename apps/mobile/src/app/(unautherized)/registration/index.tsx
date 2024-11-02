@@ -1,4 +1,5 @@
 // src/screens/RegisterScreen.tsx
+import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert } from 'react-native';
 
@@ -13,8 +14,6 @@ const RegisterScreen = () => {
 	const [confirmPassword, setConfirmPassword] = useState('');
 
 	const handleRegister = async () => {
-		console.log(' inside of handledr register', firstName, lastName, email, country);
-
 		if (password !== confirmPassword) {
 			Alert.alert('Error', 'Passwords do not match');
 
@@ -46,6 +45,10 @@ const RegisterScreen = () => {
 		} catch (error) {
 			Alert.alert('Error', 'An error occurred while registering');
 		}
+	};
+
+	const navToLogin = () => {
+		router.push('/login');
 	};
 
 	return (
@@ -107,6 +110,7 @@ const RegisterScreen = () => {
 			</View>
 
 			<Button title="Register" color="#4F46E5" onPress={handleRegister} />
+			<Button title="Login" color="#4F46E5" onPress={navToLogin} />
 		</View>
 	);
 };

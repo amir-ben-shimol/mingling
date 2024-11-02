@@ -9,6 +9,7 @@ export type IUser = Document & {
 	gender: 'male' | 'female' | 'other';
 	age: number;
 	password: string;
+	sessionToken?: string;
 };
 
 const UserSchema: Schema = new Schema({
@@ -19,6 +20,7 @@ const UserSchema: Schema = new Schema({
 	gender: { type: String, enum: ['male', 'female', 'other'], required: true },
 	age: { type: Number, required: true },
 	password: { type: String, required: true },
+	sessionToken: { type: String, required: false },
 });
 
 export const User = mongoose.model<IUser>('User', UserSchema);

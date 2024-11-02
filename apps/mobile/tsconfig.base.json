@@ -1,6 +1,6 @@
 {
 	"extends": ["../../tsconfig.base.json", "./tsconfig.paths.json"],
-	"display": "@leumit/app-mobile",
+	"display": "@mingling/mobile",
 	"compilerOptions": {
 		"module": "esnext",
 		"baseUrl": "./",
@@ -8,6 +8,7 @@
 		"jsx": "react-native",
 		"lib": ["DOM", "ESNext"],
 		"target": "ESNext",
-		"typeRoots": ["./@types"]
+		"types": ["node"], // Ensure "node" is included here
+		"typeRoots": ["./@types", "../../node_modules/@types"]
 	}
 }
