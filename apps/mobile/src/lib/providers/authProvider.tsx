@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User } from '@mingling/types';
+import { BackendService } from '../utils/backend-service';
+import { ErrorResponseEnum } from '../types/enums/http';
 
 type AuthContextType = {
 	user: User | null;
@@ -21,7 +23,6 @@ const EXPIRATION_TIME = 30 * 60 * 1000; // 30 minutes in milliseconds
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	const [user, setUser] = useState<User | null>(null);
 
-	// Login function that caches the user with a timestamp
 	const login = async (userData: User) => {
 		const timestamp = Date.now();
 		const userWithTimestamp = { ...userData, timestamp };
@@ -30,30 +31,50 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(userWithTimestamp));
 	};
 
-	// Logout function that clears user data and cache
 	const logout = async () => {
 		setUser(null);
 		await AsyncStorage.removeItem(CACHE_KEY);
+		await AsyncStorage.removeItem('token');
 	};
 
-	// Load the user from AsyncStorage if it's within the valid timestamp
-	useEffect(() => {
-		const loadCachedUser = async () => {
-			const cachedUserString = await AsyncStorage.getItem(CACHE_KEY);
+	const loadCachedUser = async () => {
+		const cachedUserString = await AsyncStorage.getItem(CACHE_KEY);
 
-			if (cachedUserString) {
-				const cachedUser = JSON.parse(cachedUserString) as User & { timestamp: number };
-				const isCacheValid = Date.now() - cachedUser.timestamp < EXPIRATION_TIME;
+		if (cachedUserString) {
+			const cachedUser = JSON.parse(cachedUserString) as User & { timestamp: number };
+			const isCacheValid = Date.now() - cachedUser.timestamp < EXPIRATION_TIME;
 
-				if (isCacheValid) {
-					setUser(cachedUser);
-				} else {
-					await AsyncStorage.removeItem(CACHE_KEY); // Remove expired cache
-				}
+			if (isCacheValid) {
+				setUser(cachedUser);
+			} else {
+				await AsyncStorage.removeItem(CACHE_KEY);
 			}
-		};
+		}
+	};
 
+	const checkAuth = async () => {
+		const token = await AsyncStorage.getItem('token');
+
+		if (!token) {
+			logout();
+
+			return;
+		}
+
+		try {
+			const response = await BackendService.get('/api/users/is-auth');
+
+			if (response.status === ErrorResponseEnum.Unauthorized) {
+				logout();
+			}
+		} catch (error) {
+			logout();
+		}
+	};
+
+	useEffect(() => {
 		loadCachedUser();
+		checkAuth();
 	}, []);
 
 	return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
