@@ -3,13 +3,13 @@ import React, { useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import { Image } from 'expo-image';
 import { type DrawerContentComponentProps, DrawerContentScrollView } from '@react-navigation/drawer';
-import { useSession } from '@/lib/providers/sessionProvider';
 import { UILinearGradient } from '@/ui/UILinearGradient';
 import { UISvg } from '@/ui/UISvg';
 import { UIText } from '@/ui/UIText';
+import { useAuth } from '@/lib/providers/authProvider';
 
 const DrawerContent = (props: DrawerContentComponentProps) => {
-	const { signOut } = useSession();
+	const { logout } = useAuth();
 	const [isAllActions, setIsAllActions] = useState(false);
 
 	const onToggleAllActions = () => setIsAllActions((prev) => !prev);
@@ -66,7 +66,7 @@ const DrawerContent = (props: DrawerContentComponentProps) => {
 				)}
 			</DrawerContentScrollView>
 			<View className="border-t border-gray-200">
-				<TouchableOpacity className="flex items-start px-2 py-4" onPress={signOut}>
+				<TouchableOpacity className="flex items-start px-2 py-4" onPress={logout}>
 					<UIText className="font-RubikBold text-grayPrimary text-base">התנתקות</UIText>
 				</TouchableOpacity>
 			</View>

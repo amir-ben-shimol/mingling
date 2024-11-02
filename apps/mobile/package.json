@@ -5,7 +5,6 @@
 	"main": "index.ts",
 	"private": true,
 	"scripts": {
-		"postinstall": "cd ../.. && pnpm build:packages",
 		"submit": "eas submit --platform ios",
 		"version:patch": "npm version patch --no-git-tag-version",
 		"android": "expo run:android",
@@ -48,6 +47,7 @@
 		"@react-navigation/drawer": "6.6.15",
 		"@react-navigation/native": "^6.0.2",
 		"babel-preset-expo": "11.0.11",
+		"dayjs": "1.11.13",
 		"dotenv": "16.4.5",
 		"expo": "~51.0.38",
 		"expo-asset": "~10.0.10",
