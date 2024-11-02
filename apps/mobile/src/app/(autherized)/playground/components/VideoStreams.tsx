@@ -1,26 +1,34 @@
-// src/components/VideoStreams.tsx
+// src/screens/components/VideoStreams.tsx
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Image } from 'expo-image';
+import { View } from 'react-native';
 import { RTCView } from 'react-native-webrtc';
-import { useWebRTC } from '@/providers/webRTCProvider';
+import StaticGlitchGif from '@/assets/gifs/static-glitch.gif';
 
-const VideoStreams = () => {
-	const { localStream, remoteStream } = useWebRTC();
+type MediaStreamWithToURL = MediaStream & {
+	toURL(): string;
+};
 
+type VideoStreamsProps = {
+	localStream: MediaStream | null;
+	remoteStream: MediaStream | null;
+};
+
+const VideoStreams: React.FC<VideoStreamsProps> = ({ localStream, remoteStream }) => {
 	return (
-		<View>
-			{localStream ? (
-				<RTCView streamURL={localStream.toURL()} className="flex h-[250px] w-full" objectFit="cover" />
-			) : (
-				<Text>No local stream available</Text>
-			)}
-
+		<View className="relative max-h-[60%] flex-1">
 			{remoteStream ? (
-				<RTCView streamURL={remoteStream.toURL()} className="flex h-[250px] w-full" objectFit="cover" />
+				<RTCView streamURL={(remoteStream as MediaStreamWithToURL).toURL()} className="flex-1" objectFit="cover" mirror={false} />
 			) : (
-				<View className="flex h-[250px] w-full items-center justify-center bg-gray-400">
-					<Text>No remote stream available</Text>
-				</View>
+				<Image source={StaticGlitchGif} className="flex-1" />
+			)}
+			{localStream && (
+				<RTCView
+					streamURL={(localStream as MediaStreamWithToURL).toURL()}
+					className="absolute bottom-2 right-2 z-10 h-24 w-16 border-2"
+					objectFit="cover"
+					mirror
+				/>
 			)}
 		</View>
 	);

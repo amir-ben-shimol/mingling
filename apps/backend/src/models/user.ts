@@ -9,8 +9,6 @@ export type IUser = Document & {
 	gender: 'male' | 'female' | 'other';
 	age: number;
 	password: string;
-	isOnline: boolean;
-	inPlayground: boolean;
 };
 
 const UserSchema: Schema = new Schema({
@@ -20,9 +18,7 @@ const UserSchema: Schema = new Schema({
 	country: { type: String, required: true },
 	gender: { type: String, enum: ['male', 'female', 'other'], required: true },
 	age: { type: Number, required: true },
-	password: { type: String, required: true }, // New password field
-	isOnline: { type: Boolean, default: false },
-	inPlayground: { type: Boolean, default: false },
+	password: { type: String, required: true },
 });
 
 export const User = mongoose.model<IUser>('User', UserSchema);

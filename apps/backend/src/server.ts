@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 
-app.use(express.json()); // This middleware parses JSON bodies
+app.use(express.json());
 
 const server = http.createServer(app);
 
