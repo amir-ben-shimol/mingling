@@ -46,7 +46,7 @@ const AppErrorHandler = () => {
 	}
 
 	return (
-		<UIModal isOpen={hasError} scrollable={false} presist size="custom" customSize="93%" onClose={onCloseErrorModal}>
+		<UIModal isVisible={hasError} scrollable={false} presist size="custom" customSize="93%" onClose={onCloseErrorModal}>
 			<View className="flex h-[96%] w-full items-center justify-center px-3">
 				<Image style={{ height: 250 }} className="w-full" source="not-found" />
 				{errorMessages?.title && <UITitle isGradient>{errorMessages.title}</UITitle>}
