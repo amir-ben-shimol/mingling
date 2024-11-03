@@ -8,6 +8,7 @@ import { useSocket } from '@/lib/providers/socketProvider';
 import { useAuth } from '@/lib/providers/authProvider';
 import Chat from './components/Chat';
 import VideoStreams from './components/VideoStreams';
+import { Actions } from './components/Actions';
 
 const PlaygroundPage: React.FC = () => {
 	const { user } = useAuth();
@@ -59,6 +60,7 @@ const PlaygroundPage: React.FC = () => {
 		<View className="flex h-full">
 			<VideoStreams localStream={localStream as unknown as MediaStream} remoteStream={remoteStream as unknown as MediaStream} />
 			{partnerSocketId && <Chat connectedUser={partnerSocketId} />}
+			{partnerSocketId && <Actions partnerSocketId={partnerSocketId} />}
 
 			<View className="mt-auto flex h-12 w-full flex-row">
 				<Pressable className="flex-1 items-center justify-center bg-red-700" onPress={handleEndSession}>

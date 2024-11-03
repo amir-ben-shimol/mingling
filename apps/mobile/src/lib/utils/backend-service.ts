@@ -35,15 +35,15 @@ async function fetcher<R = unknown, D = unknown>(path: string, method: HttpMetho
 	}
 
 	if (response.status === ErrorResponseEnum.Unauthorized) {
-		// logout();
+		throw new Error('Unauthorized');
+	}
 
-		return {
-			data: undefined as unknown as R,
-			ok: false,
-			status: response.status,
-			error: ErrorResponseEnum.Unauthorized,
-			message: 'אינך מורשה לבצע פעולה זו',
-		};
+	if (response.status === ErrorResponseEnum.NotFound) {
+		throw new Error('End point not found');
+	}
+
+	if (response.status === ErrorResponseEnum.BadRequest) {
+		throw new Error('Bad request');
 	}
 
 	// else if (response.status === ErrorResponseEnum.NetworkError && retryCount >= MAX_RETRY_COUNT) {
@@ -51,6 +51,8 @@ async function fetcher<R = unknown, D = unknown>(path: string, method: HttpMetho
 	// }
 
 	setIsRetrying(false);
+
+	console.log('response -----> ', response);
 
 	const responseData = (await response.json()) as ResponseData<R>;
 

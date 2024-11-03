@@ -1,72 +1,23 @@
 /* eslint-disable react/jsx-props-no-spreading */
-/* eslint-disable max-lines */
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
-import { View, TouchableOpacity, Image, Linking, BackHandler, type ViewStyle } from 'react-native';
+import { View, TouchableOpacity, BackHandler, type ViewStyle, type NativeSyntheticEvent, type NativeScrollEvent } from 'react-native';
 import { BottomSheetModal, BottomSheetScrollView, BottomSheetView, type BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
-import type { icons } from '@leumit/common';
-import { type ScrollEvent } from '@/lib/types/ui/scroll';
 import { UISvg } from './UISvg';
-import { UIButton } from './UIButton';
 import { UITitle } from './UITitle';
-import { UIText } from './UIText';
 
 type Props = {
-	readonly isOpen?: boolean;
-	readonly href?: string;
+	readonly isVisible?: boolean;
 	readonly title?: string;
-	readonly modalHeaderTitle?: string;
-	readonly text?: React.ReactNode | string;
-	readonly buttonLabel?: string;
-	readonly bottomButtonText?: string;
-	readonly bottomButtonHref?: string;
-	readonly imageSrc?: string;
 	readonly children?: React.ReactNode;
-	readonly icon?: keyof typeof icons;
-	readonly svgIconClassName?: string;
 	readonly size?: 'extra-small' | 'small' | 'medium' | 'large' | 'custom';
 	readonly customSize?: string;
 	readonly scrollable?: boolean;
 	readonly className?: string;
-	readonly bottomButtonClassName?: string;
 	readonly style?: ViewStyle;
 	readonly presist?: boolean;
 	readonly onClick?: () => void;
 	readonly onClose?: () => void;
-	readonly bottomButtonOnClick?: () => void;
-};
-
-const ModalBody = (props: Props) => {
-	return (
-		<>
-			{props.imageSrc && <Image source={{ uri: props.imageSrc }} className="resize-cover mb-4 h-52 w-full" />}
-			{props.icon && (
-				<View className="mb-4 items-center justify-center">
-					<View className="bg-blueSecondery rounded-full p-4">
-						<UISvg name={props.icon} className={`h-12 w-12 ${props.svgIconClassName}`} />
-					</View>
-				</View>
-			)}
-			{props.title && <UIText className="font-RubikBold my-4 text-center text-xl">{props.title}</UIText>}
-			{props.text && <UIText className="mb-4 text-base">{props.text}</UIText>}
-			{props.children}
-
-			{props.href && (
-				<TouchableOpacity className="mb-4 text-blue-500 underline" onPress={() => Linking.openURL(props.href ?? '')}>
-					<UIText>{props.buttonLabel}</UIText>
-				</TouchableOpacity>
-			)}
-			{props.onClick && (
-				<UIButton
-					className={props.bottomButtonClassName}
-					label={props.buttonLabel}
-					varient="gradientPinkPurple"
-					buttonSize="large"
-					onClick={props.onClick}
-				/>
-			)}
-		</>
-	);
 };
 
 export const UIModal = (props: Props) => {
@@ -97,12 +48,12 @@ export const UIModal = (props: Props) => {
 	}, [props.size]);
 
 	const handlePresentModal = useCallback(() => {
-		if (props.isOpen) {
+		if (props.isVisible) {
 			bottomSheetModalRef.current?.present();
 		} else {
 			bottomSheetModalRef.current?.dismiss();
 		}
-	}, [props.isOpen]);
+	}, [props.isVisible]);
 
 	const onDismiss = () => {
 		if (props.presist) return;
@@ -115,7 +66,7 @@ export const UIModal = (props: Props) => {
 		handlePresentModal();
 
 		const backHandler = () => {
-			if (props.isOpen) {
+			if (props.isVisible) {
 				props.onClose?.();
 
 				return true;
@@ -124,14 +75,14 @@ export const UIModal = (props: Props) => {
 			return false;
 		};
 
-		if (props.isOpen) {
+		if (props.isVisible) {
 			BackHandler.addEventListener('hardwareBackPress', backHandler);
 		}
 
 		return () => {
 			BackHandler.removeEventListener('hardwareBackPress', backHandler);
 		};
-	}, [props.isOpen, props.onClose, handlePresentModal]);
+	}, [props.isVisible, props.onClose, handlePresentModal]);
 
 	const CustomBackdrop: React.FC<BottomSheetBackdropProps> = ({ animatedIndex, style }) => {
 		const containerAnimatedStyle = useAnimatedStyle(() => ({
@@ -161,7 +112,7 @@ export const UIModal = (props: Props) => {
 		);
 	};
 
-	const handleScroll = (event: ScrollEvent) => {
+	const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
 		const offsetY = event.nativeEvent.contentOffset.y;
 
 		setHeaderShadow(offsetY > 5);
@@ -180,9 +131,9 @@ export const UIModal = (props: Props) => {
 			onDismiss={onDismiss}
 		>
 			<View className={`flex-row items-center justify-between px-3 pb-4 ${headerShadow ? 'shadow' : ''}`} style={{ backgroundColor: 'white' }}>
-				{props.modalHeaderTitle && (
+				{props.title && (
 					<UITitle size="large" isGradient>
-						{props.modalHeaderTitle}
+						{props.title}
 					</UITitle>
 				)}
 				{!props.presist && (
@@ -193,7 +144,7 @@ export const UIModal = (props: Props) => {
 			</View>
 			{props.scrollable === false ? (
 				<BottomSheetView className={props.className} style={[{ padding: 12 }, props.style]}>
-					<ModalBody {...props} />
+					{props.children}
 				</BottomSheetView>
 			) : (
 				<BottomSheetScrollView
@@ -202,25 +153,9 @@ export const UIModal = (props: Props) => {
 					style={props.style}
 					onScroll={handleScroll}
 				>
-					<ModalBody {...props} />
+					{props.children}
 				</BottomSheetScrollView>
 			)}
-
-			<View className="mt-2">
-				{props.bottomButtonText && props.bottomButtonHref && (
-					<TouchableOpacity
-						className="mb-2 rounded-lg bg-blue-500 p-4 text-center text-white"
-						onPress={() => Linking.openURL(props.bottomButtonHref ?? '')}
-					>
-						<UIText>{props.bottomButtonText}</UIText>
-					</TouchableOpacity>
-				)}
-				{props.bottomButtonText && props.bottomButtonOnClick && (
-					<TouchableOpacity className="mb-2 rounded-lg bg-blue-500 p-4 text-center text-white" onPress={props.bottomButtonOnClick}>
-						<UIText>{props.bottomButtonText}</UIText>
-					</TouchableOpacity>
-				)}
-			</View>
 		</BottomSheetModal>
 	);
 };
