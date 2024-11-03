@@ -2,6 +2,7 @@
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert } from 'react-native';
+import { BackendService } from '@/lib/utils/backend-service';
 
 const RegisterScreen = () => {
 	const [firstName, setFirstName] = useState('');
@@ -21,27 +22,17 @@ const RegisterScreen = () => {
 		}
 
 		try {
-			const response = await fetch('http://10.0.0.16:8080/api/users/register', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					firstName,
-					lastName,
-					email,
-					country,
-					gender,
-					age: Number(age),
-					password,
-				}),
+			await BackendService.post('/api/users/register', {
+				firstName,
+				lastName,
+				email,
+				country,
+				gender,
+				age: Number(age),
+				password,
 			});
 
-			const data = await response.json();
-
-			if (response.ok) {
-				Alert.alert('Success', 'User registered successfully');
-			} else {
-				Alert.alert('Error', data.error || 'Failed to register');
-			}
+			Alert.alert('Success', 'User registered successfully');
 		} catch (error) {
 			Alert.alert('Error', 'An error occurred while registering');
 		}

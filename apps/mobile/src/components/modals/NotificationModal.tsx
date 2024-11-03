@@ -1,5 +1,6 @@
 import type { Notification } from '@mingling/types';
-import { Pressable, TouchableOpacity, View } from 'react-native';
+import { Feather } from '@expo/vector-icons'; // Assuming you're using Expo and have vector icons installed
+import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { useNotificationsStore } from '@/lib/store/useNotificationsStore';
 import { BackendService } from '@/lib/utils/backend-service';
 import { UIModal } from '@/ui/UIModal';
@@ -44,34 +45,45 @@ export const NotificationModal = (props: Props) => {
 
 	return (
 		<UIModal title="Notifications" isVisible={props.isVisible} onClose={props.onHideModal}>
-			{userNotifications.map((notification) => (
-				<View key={notification.id} className="w-full border-b p-2">
-					<View className="flex w-full flex-row justify-between">
-						<View className="flex">
-							<UIText className="font-bold">{notification.title}</UIText>
-							<UIText>{notification.content}</UIText>
-						</View>
-						<Pressable onPress={() => onRemoveNotification(notification)}>
-							<UIText className="text-blue-600">Dismiss</UIText>
-						</Pressable>
+			<ScrollView className="max-h-96 w-full">
+				{userNotifications.length === 0 ? (
+					<View className="p-4">
+						<UIText className="text-center text-gray-500">No notifications at this time.</UIText>
 					</View>
+				) : (
+					userNotifications.map((notification) => (
+						<View key={notification.id} className="border-b border-gray-200 p-4">
+							<View className="flex-row items-center justify-between">
+								<View className="flex-1 pr-2">
+									<UIText className="text-lg font-bold">{notification.title}</UIText>
+									<UIText className="text-gray-600">{notification.content}</UIText>
+								</View>
+								<TouchableOpacity onPress={() => onRemoveNotification(notification)}>
+									<Feather name="x-circle" size={24} color="#4B5563" />
+								</TouchableOpacity>
+							</View>
 
-					{/* Display Accept/Decline buttons for friend requests */}
-					{notification.type === 'friend-request' && (
-						<View className="mt-2 flex flex-row">
-							<TouchableOpacity
-								className="mr-2 rounded bg-green-500 px-2 py-1"
-								onPress={() => handleFriendRequestResponse(notification, 'approved')}
-							>
-								<UIText className="text-white">Accept</UIText>
-							</TouchableOpacity>
-							<TouchableOpacity className="rounded bg-red-500 px-2 py-1" onPress={() => handleFriendRequestResponse(notification, 'declined')}>
-								<UIText className="text-white">Decline</UIText>
-							</TouchableOpacity>
+							{/* Display Accept/Decline buttons for friend requests */}
+							{notification.type === 'friend-request' && (
+								<View className="mt-4 flex-row">
+									<TouchableOpacity
+										className="mr-2 flex-1 rounded-md bg-green-500 py-2"
+										onPress={() => handleFriendRequestResponse(notification, 'approved')}
+									>
+										<UIText className="text-center font-semibold text-white">Accept</UIText>
+									</TouchableOpacity>
+									<TouchableOpacity
+										className="flex-1 rounded-md bg-red-500 py-2"
+										onPress={() => handleFriendRequestResponse(notification, 'declined')}
+									>
+										<UIText className="text-center font-semibold text-white">Decline</UIText>
+									</TouchableOpacity>
+								</View>
+							)}
 						</View>
-					)}
-				</View>
-			))}
+					))
+				)}
+			</ScrollView>
 		</UIModal>
 	);
 };

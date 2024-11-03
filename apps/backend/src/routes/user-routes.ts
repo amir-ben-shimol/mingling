@@ -69,4 +69,22 @@ router.get('/is-auth', authenticate, (_req, res) => {
 	res.status(200).json({ message: 'OK' });
 });
 
+router.get('/user/:id', async (req: Request, res: Response) => {
+	const { id } = req.params;
+
+	try {
+		const user = await User.findById(id).select('-password -sessionToken -friendsList -notifications').exec();
+
+		if (!user) {
+			res.status(404).json({ error: 'User not found' });
+
+			return;
+		}
+
+		res.status(200).json({ data: { user } });
+	} catch (error) {
+		res.status(500).json({ error: (error as any).message });
+	}
+});
+
 export default router;
