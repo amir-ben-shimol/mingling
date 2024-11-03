@@ -1,8 +1,9 @@
 // src/screens/components/Actions.tsx
 import React, { useState } from 'react';
 import { View, Modal, Pressable, Text, Alert } from 'react-native';
+import { Feather } from '@expo/vector-icons';
 import { useAuth } from '@/lib/providers/authProvider';
-import { UISvg } from '@/ui/UISvg';
+
 import { BackendService } from '@/lib/utils/backend-service';
 
 type ActionsProps = {
@@ -18,8 +19,6 @@ export const Actions: React.FC<ActionsProps> = ({ partnerSocketId }) => {
 
 		try {
 			await BackendService.post('/api/friends/request', { partnerSocketId: partnerSocketId });
-
-			Alert.alert('Friend Request Sent', 'Your friend request has been sent successfully.');
 		} catch (error) {
 			Alert.alert('Error', 'Failed to send friend request. Please try again.');
 			console.error('Friend request error:', error);
@@ -31,7 +30,7 @@ export const Actions: React.FC<ActionsProps> = ({ partnerSocketId }) => {
 	return (
 		<View className="absolute right-4 top-4">
 			<Pressable className="items-center justify-center rounded-full bg-blue-600 p-2" onPress={() => setModalVisible(true)}>
-				<UISvg name="arrow" className="h-6 w-6" />
+				<Feather name="menu" size={24} color="#ffff" />
 			</Pressable>
 
 			<Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
