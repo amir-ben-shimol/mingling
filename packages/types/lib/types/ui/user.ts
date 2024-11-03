@@ -4,7 +4,7 @@ export type FriendStatus = 'pending' | 'incoming' | 'declined' | 'approved';
 
 export type Friend = {
 	readonly userId: string;
-	readonly status: FriendStatus;
+	status: FriendStatus;
 };
 
 export type FriendDetails = {
@@ -21,7 +21,7 @@ export type User = {
 	readonly gender: 'male' | 'female' | 'other';
 	readonly age: number;
 	readonly password: string;
-	readonly sessionToken?: string;
-	readonly friendsList: Friend[];
-	readonly notifications: Notification[];
+	sessionToken?: string;
+	friendsList: Friend[];
+	notifications: Notification[];
 };
