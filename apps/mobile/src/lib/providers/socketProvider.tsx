@@ -1,6 +1,7 @@
 // src/context/SocketProvider.tsx
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { io, type Socket } from 'socket.io-client';
+import useSocketListeners from '../hook/useSocketListeners';
 
 type SocketContextType = {
 	socket: Socket | null;
@@ -16,7 +17,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 	const [socket, setSocket] = useState<Socket | null>(null);
 
 	useEffect(() => {
-		const newSocket = io('http://10.0.0.16:8080'); // Replace with your server URL
+		const newSocket = io(process.env.EXPO_PUBLIC_BACKEND_URL);
 
 		setSocket(newSocket);
 
@@ -24,6 +25,8 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 			newSocket.disconnect();
 		};
 	}, []);
+
+	useSocketListeners(socket);
 
 	return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
 };

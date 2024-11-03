@@ -1,4 +1,4 @@
-export type NotificationType = 'info' | 'success' | 'warning' | 'error';
+export type NotificationType = 'info' | 'success' | 'warning' | 'error' | 'system' | 'friendRequest';
 
 export type NotificationWithTimeout = Notification & {
 	timeoutId?: NodeJS.Timeout;
@@ -12,5 +12,6 @@ export type Notification = {
 	readonly title: string;
 	readonly duration: number;
 	readonly content?: string;
+	readonly fromUserId?: string; // Add fromUserId here to specify the sender
 	readonly isUnmounting?: boolean;
 };
