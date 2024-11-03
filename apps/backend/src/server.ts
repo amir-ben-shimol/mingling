@@ -6,6 +6,8 @@ import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
 import { configureSockets } from './config/socket-config';
 import userRoutes from './routes/user-routes';
+import { createFriendRoutes } from './routes/friend-routes';
+import notificationsRoutes from './routes/notifications-routes';
 
 dotenv.config();
 
@@ -35,6 +37,8 @@ app.get('/', (_, res) => {
 
 // Use user routes
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationsRoutes);
+app.use('/api/friends', createFriendRoutes(io)); // Pass `io` to friend routes
 
 // Configure Socket.io with custom socket events
 configureSockets(io);

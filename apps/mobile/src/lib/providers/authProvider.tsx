@@ -3,7 +3,6 @@ import React, { createContext, useContext, useState, useEffect, type ReactNode }
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { User } from '@mingling/types';
 import { BackendService } from '../utils/backend-service';
-import { ErrorResponseEnum } from '../types/enums/http';
 
 type AuthContextType = {
 	user: User | null;
@@ -62,11 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		}
 
 		try {
-			const response = await BackendService.get('/api/users/is-auth');
-
-			if (response.status === ErrorResponseEnum.Unauthorized) {
-				logout();
-			}
+			await BackendService.get('/api/users/is-auth');
 		} catch (error) {
 			logout();
 		}
