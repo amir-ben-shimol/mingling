@@ -5,6 +5,7 @@ import { router, Tabs } from 'expo-router';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
 import { UILinearGradient } from '@/ui/UILinearGradient';
+import { Notifications } from '@/modules/Notifications';
 
 const BottomTabsNavigator: React.FC = () => {
 	const rotation = useSharedValue(0);
@@ -50,11 +51,14 @@ const BottomTabsNavigator: React.FC = () => {
 					tabBarActiveTintColor: '#3b82f6',
 					tabBarIconStyle: { marginBottom: -15 },
 					tabBarLabelStyle: { fontSize: 12, position: 'absolute', bottom: -12, fontWeight: '500' },
-					headerShown: false,
+					headerShown: true,
 					unmountOnBlur: true,
 					tabBarStyle: {
 						display: router.route.name === 'playground' ? 'none' : 'flex',
 					},
+
+					headerRight: () => <Notifications />,
+					headerTitle: '',
 				})}
 			>
 				<Tabs.Screen
@@ -82,6 +86,7 @@ const BottomTabsNavigator: React.FC = () => {
 							</Pressable>
 						),
 						tabBarLabel: 'Playground',
+						headerShown: false,
 					}}
 				/>
 				<Tabs.Screen
