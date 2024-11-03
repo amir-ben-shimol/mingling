@@ -1,28 +1,35 @@
 // models/User.ts
 import mongoose, { type Document, Schema } from 'mongoose';
-import type { Notification } from '@mingling/types';
+import type { User as UserType } from '@mingling/types';
 
-type FriendStatus = 'pending' | 'incoming' | 'declined' | 'approved';
+export type IUser = Document & UserType;
 
-export type Friend = {
-	userId: string;
-	status: FriendStatus;
-};
+const FriendSchema = new Schema(
+	{
+		userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Reference to User model
+		status: {
+			type: String,
+			enum: ['pending', 'incoming', 'declined', 'approved'],
+			required: true,
+		},
+	},
+	{ _id: false }, // Disable automatic _id creation for subdocuments if not needed
+);
 
-export type IUser = Document & {
-	_id: string;
-	firstName: string;
-	lastName: string;
-	email: string;
-	country: string;
-	gender: 'male' | 'female' | 'other';
-	age: number;
-	password: string;
-	sessionToken?: string;
-	friendsList: Friend[];
-	notifications: Notification[];
-};
+// Define the NotificationSchema as a subschema (optional but recommended for consistency)
+const NotificationSchema = new Schema(
+	{
+		id: { type: String, required: true },
+		type: { type: String, enum: ['friend-request', 'system'], required: true },
+		title: { type: String, required: true },
+		content: { type: String, required: true },
+		fromUserId: { type: String },
+		timestamp: { type: Date, default: Date.now },
+	},
+	{ _id: false }, // Disable automatic _id creation for subdocuments
+);
 
+// Define the UserSchema
 const UserSchema: Schema = new Schema({
 	firstName: { type: String, required: true },
 	lastName: { type: String, required: true },
@@ -32,23 +39,8 @@ const UserSchema: Schema = new Schema({
 	age: { type: Number, required: true },
 	password: { type: String, required: true },
 	sessionToken: { type: String, required: false },
-	friendsList: [
-		{
-			userId: { type: String, required: true },
-			status: { type: String, enum: ['pending', 'incoming', 'declined', 'approved'], required: true },
-		},
-	],
-	notifications: [
-		{
-			_id: false,
-			id: { type: String, required: true },
-			type: { type: String, enum: ['friend-request', 'system'], required: true },
-			title: { type: String, required: true },
-			content: { type: String, required: true },
-			fromUserId: { type: String },
-			timestamp: { type: Date, default: Date.now },
-		},
-	],
+	friendsList: [FriendSchema], // Use the FriendSchema here
+	notifications: [NotificationSchema], // Use the NotificationSchema here
 });
 
 export const User = mongoose.model<IUser>('User', UserSchema);

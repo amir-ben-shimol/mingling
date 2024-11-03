@@ -119,8 +119,8 @@ const Notification = (notification: TNotification) => {
 			<Animated.View style={slideInStyle} className={containerClasses()}>
 				<View className="w-full">
 					<View className="w-full px-4 py-2">
-						<Text className={cn('z-10 text-sm font-bold', textColorClasses(notification.varient))}>{notification.title}</Text>
-						<Text className={cn('z-10 text-xs', textColorClasses(notification.varient))}>{notification.content}</Text>
+						<Text className={cn('z-10 text-lg font-bold', textColorClasses(notification.varient))}>{notification.title}</Text>
+						<Text className={cn('z-10 text-base', textColorClasses(notification.varient))}>{notification.content}</Text>
 					</View>
 					<Animated.View style={backgroundStyle} className={timerBackgroundClasses(notification.varient)} />
 				</View>
@@ -135,7 +135,7 @@ export const UINotifications = () => {
 	if (pushedNotifications.length === 0) return null;
 
 	return (
-		<View className="absolute bottom-0 z-30 flex w-full flex-col self-center">
+		<View className="absolute bottom-0 z-30 flex w-full flex-col self-center px-2">
 			{pushedNotifications.map((notification) => {
 				if (!notification.id) return null;
 

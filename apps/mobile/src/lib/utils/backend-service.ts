@@ -52,8 +52,6 @@ async function fetcher<R = unknown, D = unknown>(path: string, method: HttpMetho
 
 	setIsRetrying(false);
 
-	console.log('response -----> ', response);
-
 	const responseData = (await response.json()) as ResponseData<R>;
 
 	const responseToken = response.headers.get('x-access-token');

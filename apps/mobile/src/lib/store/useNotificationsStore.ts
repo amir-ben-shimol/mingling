@@ -1,6 +1,4 @@
 import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import type { Notification, NotificationWithTimeout } from '@mingling/types';
 import { DEFAULT_NOTIFICATION_DURATION, UNMOUNTING_NOTIFICATION_DURATION } from '../data/consts/notifications';
@@ -24,120 +22,114 @@ type Action = {
 
 type NotificationsStore = State & Action;
 
-const notificationsStore = persist<NotificationsStore>(
-	(set, get) => ({
-		userNotifications: [],
-		pushedNotifications: [],
+const useNotificationsStore = create<NotificationsStore>((set, get) => ({
+	userNotifications: [],
+	pushedNotifications: [],
 
-		showNotification: (notification) => {
-			const notificationId = notification.id ?? Date.now().toString();
+	showNotification: (notification) => {
+		const notificationId = notification.id ?? Date.now().toString();
 
-			const newNotification: NotificationWithTimeout = {
-				...notification,
-				id: notificationId,
-				isUnmounting: false,
-				duration: notification.duration || DEFAULT_NOTIFICATION_DURATION,
-				startTime: Date.now(),
-				remainingDuration: notification.duration || DEFAULT_NOTIFICATION_DURATION,
+		const newNotification: NotificationWithTimeout = {
+			...notification,
+			id: notificationId,
+			isUnmounting: false,
+			duration: notification.duration || DEFAULT_NOTIFICATION_DURATION,
+			startTime: Date.now(),
+			remainingDuration: notification.duration || DEFAULT_NOTIFICATION_DURATION,
+		};
+
+		set((state) => ({
+			pushedNotifications: [...state.pushedNotifications, newNotification],
+		}));
+
+		newNotification.timeoutId = setTimeout(() => {
+			get().unmountNotification(notificationId);
+		}, newNotification.duration);
+
+		get().addUserNotification(notification);
+	},
+
+	addUserNotification: (notification) => {
+		set((state) => ({
+			userNotifications: [...state.userNotifications, notification],
+		}));
+	},
+
+	updateUserNotification: (notification) => {
+		set((state) => ({
+			userNotifications: state.userNotifications.map((n) => (n.id === notification.id ? notification : n)),
+		}));
+	},
+
+	removeUserNotification: (id) => {
+		set((state) => ({
+			userNotifications: state.userNotifications.filter((n) => n.id !== id),
+		}));
+	},
+
+	unmountNotification: (id) => {
+		set((state) => ({
+			pushedNotifications: state.pushedNotifications.map((n) => (n.id === id ? { ...n, isUnmounting: true } : n)),
+		}));
+
+		setTimeout(() => {
+			set((state) => ({
+				pushedNotifications: state.pushedNotifications.filter((n) => n.id !== id),
+			}));
+		}, UNMOUNTING_NOTIFICATION_DURATION);
+	},
+
+	pauseHidingNotification: (id) => {
+		set((state) => {
+			const currentTime = Date.now();
+
+			return {
+				pushedNotifications: state.pushedNotifications.map((n) => {
+					if (n.id === id) {
+						clearTimeout(n.timeoutId);
+
+						return {
+							...n,
+							remainingDuration: n.remainingDuration - (currentTime - n.startTime),
+						};
+					}
+
+					return n;
+				}),
 			};
+		});
+	},
 
-			set((state) => ({
-				pushedNotifications: [...state.pushedNotifications, newNotification],
-			}));
+	resumeHidingNotification: (id) => {
+		set((state) => {
+			const notification = state.pushedNotifications.find((n) => n.id === id);
 
-			newNotification.timeoutId = setTimeout(() => {
-				get().unmountNotification(notificationId);
-			}, newNotification.duration);
-
-			get().addUserNotification(notification);
-		},
-
-		addUserNotification: (notification) => {
-			set((state) => ({
-				userNotifications: [...state.userNotifications, notification],
-			}));
-		},
-
-		updateUserNotification: (notification) => {
-			set((state) => ({
-				userNotifications: state.userNotifications.map((n) => (n.id === notification.id ? notification : n)),
-			}));
-		},
-
-		removeUserNotification: (id) => {
-			set((state) => ({
-				userNotifications: state.userNotifications.filter((n) => n.id !== id),
-			}));
-		},
-
-		unmountNotification: (id) => {
-			set((state) => ({
-				pushedNotifications: state.pushedNotifications.map((n) => (n.id === id ? { ...n, isUnmounting: true } : n)),
-			}));
-
-			setTimeout(() => {
-				set((state) => ({
-					pushedNotifications: state.pushedNotifications.filter((n) => n.id !== id),
-				}));
-			}, UNMOUNTING_NOTIFICATION_DURATION);
-		},
-
-		pauseHidingNotification: (id) => {
-			set((state) => {
-				const currentTime = Date.now();
+			if (notification && notification.remainingDuration > 0) {
+				const newTimeoutId = setTimeout(() => {
+					get().unmountNotification(id);
+				}, notification.remainingDuration);
 
 				return {
 					pushedNotifications: state.pushedNotifications.map((n) => {
 						if (n.id === id) {
-							clearTimeout(n.timeoutId);
-
 							return {
 								...n,
-								remainingDuration: n.remainingDuration - (currentTime - n.startTime),
+								timeoutId: newTimeoutId,
+								startTime: Date.now(),
 							};
 						}
 
 						return n;
 					}),
 				};
-			});
-		},
+			}
 
-		resumeHidingNotification: (id) => {
-			set((state) => {
-				const notification = state.pushedNotifications.find((n) => n.id === id);
-
-				if (notification && notification.remainingDuration > 0) {
-					const newTimeoutId = setTimeout(() => {
-						get().unmountNotification(id);
-					}, notification.remainingDuration);
-
-					return {
-						pushedNotifications: state.pushedNotifications.map((n) => {
-							if (n.id === id) {
-								return {
-									...n,
-									timeoutId: newTimeoutId,
-									startTime: Date.now(),
-								};
-							}
-
-							return n;
-						}),
-					};
-				}
-
-				return state;
-			});
-		},
-		resetStore: () => {
-			set({ pushedNotifications: [], userNotifications: [] });
-		},
-	}),
-	{
-		name: 'notificationsStore',
-		storage: createJSONStorage(() => AsyncStorage),
+			return state;
+		});
 	},
-);
+	resetStore: () => {
+		set({ pushedNotifications: [], userNotifications: [] });
+	},
+}));
 
-export const useNotificationsStore = create<NotificationsStore>()(notificationsStore);
+export { useNotificationsStore };
