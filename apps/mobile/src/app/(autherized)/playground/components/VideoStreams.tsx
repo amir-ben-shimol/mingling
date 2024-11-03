@@ -25,7 +25,7 @@ const VideoStreams: React.FC<VideoStreamsProps> = ({ localStream, remoteStream }
 			{localStream && (
 				<RTCView
 					streamURL={(localStream as MediaStreamWithToURL).toURL()}
-					className="absolute bottom-2 right-2 z-10 h-24 w-16 border-2"
+					className="absolute bottom-2 right-2 z-10 h-24 w-16 rounded border-2 border-red-500"
 					objectFit="cover"
 					mirror
 				/>
