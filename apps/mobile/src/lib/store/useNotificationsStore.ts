@@ -2,18 +2,23 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type { Notification, NotificationWithTimeout } from '../types/ui/notification';
+import type { Notification, NotificationWithTimeout } from '@mingling/types';
 import { DEFAULT_NOTIFICATION_DURATION, UNMOUNTING_NOTIFICATION_DURATION } from '../data/consts/notifications';
+// import { BackendService } from '../utils/backend-service';
 
 type State = {
-	readonly notifications: NotificationWithTimeout[];
+	readonly userNotifications: Notification[];
+	readonly pushedNotifications: NotificationWithTimeout[];
 };
 
 type Action = {
 	readonly showNotification: (notification: Notification) => void;
-	readonly unmountNotification: (id: number) => void;
-	readonly pauseHidingNotification: (id: number) => void;
-	readonly resumeHidingNotification: (id: number) => void;
+	readonly addUserNotification: (notification: Notification) => void;
+	readonly updateUserNotification: (notification: Notification) => void;
+	readonly removeUserNotification: (id: string) => void;
+	readonly unmountNotification: (id: string) => void;
+	readonly pauseHidingNotification: (id: string) => void;
+	readonly resumeHidingNotification: (id: string) => void;
 	readonly resetStore: () => void;
 };
 
@@ -21,10 +26,11 @@ type NotificationsStore = State & Action;
 
 const notificationsStore = persist<NotificationsStore>(
 	(set, get) => ({
-		notifications: [],
+		userNotifications: [],
+		pushedNotifications: [],
 
 		showNotification: (notification) => {
-			const notificationId = Date.now();
+			const notificationId = notification.id ?? Date.now().toString();
 
 			const newNotification: NotificationWithTimeout = {
 				...notification,
@@ -36,22 +42,42 @@ const notificationsStore = persist<NotificationsStore>(
 			};
 
 			set((state) => ({
-				notifications: [...state.notifications, newNotification],
+				pushedNotifications: [...state.pushedNotifications, newNotification],
 			}));
 
 			newNotification.timeoutId = setTimeout(() => {
 				get().unmountNotification(notificationId);
 			}, newNotification.duration);
+
+			get().addUserNotification(notification);
+		},
+
+		addUserNotification: (notification) => {
+			set((state) => ({
+				userNotifications: [...state.userNotifications, notification],
+			}));
+		},
+
+		updateUserNotification: (notification) => {
+			set((state) => ({
+				userNotifications: state.userNotifications.map((n) => (n.id === notification.id ? notification : n)),
+			}));
+		},
+
+		removeUserNotification: (id) => {
+			set((state) => ({
+				userNotifications: state.userNotifications.filter((n) => n.id !== id),
+			}));
 		},
 
 		unmountNotification: (id) => {
 			set((state) => ({
-				notifications: state.notifications.map((n) => (n.id === id ? { ...n, isUnmounting: true } : n)),
+				pushedNotifications: state.pushedNotifications.map((n) => (n.id === id ? { ...n, isUnmounting: true } : n)),
 			}));
 
 			setTimeout(() => {
 				set((state) => ({
-					notifications: state.notifications.filter((n) => n.id !== id),
+					pushedNotifications: state.pushedNotifications.filter((n) => n.id !== id),
 				}));
 			}, UNMOUNTING_NOTIFICATION_DURATION);
 		},
@@ -61,7 +87,7 @@ const notificationsStore = persist<NotificationsStore>(
 				const currentTime = Date.now();
 
 				return {
-					notifications: state.notifications.map((n) => {
+					pushedNotifications: state.pushedNotifications.map((n) => {
 						if (n.id === id) {
 							clearTimeout(n.timeoutId);
 
@@ -79,7 +105,7 @@ const notificationsStore = persist<NotificationsStore>(
 
 		resumeHidingNotification: (id) => {
 			set((state) => {
-				const notification = state.notifications.find((n) => n.id === id);
+				const notification = state.pushedNotifications.find((n) => n.id === id);
 
 				if (notification && notification.remainingDuration > 0) {
 					const newTimeoutId = setTimeout(() => {
@@ -87,7 +113,7 @@ const notificationsStore = persist<NotificationsStore>(
 					}, notification.remainingDuration);
 
 					return {
-						notifications: state.notifications.map((n) => {
+						pushedNotifications: state.pushedNotifications.map((n) => {
 							if (n.id === id) {
 								return {
 									...n,
@@ -105,7 +131,7 @@ const notificationsStore = persist<NotificationsStore>(
 			});
 		},
 		resetStore: () => {
-			set({ notifications: [] });
+			set({ pushedNotifications: [], userNotifications: [] });
 		},
 	}),
 	{
