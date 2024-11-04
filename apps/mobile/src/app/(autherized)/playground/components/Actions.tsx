@@ -1,10 +1,11 @@
 // src/screens/components/Actions.tsx
 import React, { useState } from 'react';
-import { View, Modal, Pressable, Text, Alert } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import { View, Pressable, Alert } from 'react-native';
+import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '@/lib/providers/authProvider';
 
 import { BackendService } from '@/lib/utils/backend-service';
+import { UIModal } from '@/ui/UIModal';
 
 type ActionsProps = {
 	partnerSocketId: string;
@@ -23,7 +24,7 @@ export const Actions: React.FC<ActionsProps> = ({ partnerSocketId }) => {
 			Alert.alert('Error', 'Failed to send friend request. Please try again.');
 			console.error('Friend request error:', error);
 		} finally {
-			setModalVisible(false); // Close the modal after action
+			setModalVisible(false);
 		}
 	};
 
@@ -33,16 +34,22 @@ export const Actions: React.FC<ActionsProps> = ({ partnerSocketId }) => {
 				<Feather name="menu" size={24} color="#ffff" />
 			</Pressable>
 
-			<Modal transparent animationType="fade" visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
-				<Pressable className="flex-1 items-center justify-center bg-black bg-opacity-50" onPress={() => setModalVisible(false)}>
-					<View className="w-48 items-center rounded-lg bg-white p-4">
-						<Text className="mb-2 text-lg font-bold">Actions</Text>
-						<Pressable className="py-2" onPress={sendFriendRequest}>
-							<Text className="text-base text-blue-600">Send Friend Request</Text>
-						</Pressable>
-					</View>
-				</Pressable>
-			</Modal>
+			<UIModal title="actions" customSize="25" isVisible={modalVisible} onClose={() => setModalVisible(false)}>
+				<View className="flex w-full flex-row justify-around px-2">
+					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
+						<Feather name="user-plus" size={60} color="#ffff" />
+					</Pressable>
+					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
+						<MaterialIcons name="join-full" size={60} color="#fff" />
+					</Pressable>
+					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
+						<Feather name="user-plus" size={60} color="#ffff" />
+					</Pressable>
+					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
+						<Feather name="user-plus" size={60} color="#ffff" />
+					</Pressable>
+				</View>
+			</UIModal>
 		</View>
 	);
 };

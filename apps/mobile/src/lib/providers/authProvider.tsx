@@ -31,9 +31,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	};
 
 	const logout = async () => {
+		await Promise.allSettled([BackendService.post('/api/users/logout'), AsyncStorage.removeItem(CACHE_KEY), AsyncStorage.removeItem('token')]);
 		setUser(null);
-		await AsyncStorage.removeItem(CACHE_KEY);
-		await AsyncStorage.removeItem('token');
 	};
 
 	const loadCachedUser = async () => {
