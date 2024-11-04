@@ -16,6 +16,7 @@ type Message = {
 };
 
 const Chat: React.FC<ChatProps> = ({ connectedUser }) => {
+	console.log('Inside Chat component', connectedUser);
 	const { socket } = useSocket();
 	const { user } = useAuth();
 	const [messages, setMessages] = useState<Message[]>([]);
