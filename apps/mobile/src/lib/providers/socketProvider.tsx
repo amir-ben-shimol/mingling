@@ -9,22 +9,40 @@ type SocketContextType = {
 
 type SocketProviderProps = {
 	children: ReactNode;
+	userId: string; // Accept userId as a prop
 };
 
 const SocketContext = createContext<SocketContextType | undefined>(undefined);
 
-export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
+export const SocketProvider: React.FC<SocketProviderProps> = ({ children, userId }) => {
 	const [socket, setSocket] = useState<Socket | null>(null);
 
 	useEffect(() => {
-		const newSocket = io(process.env.EXPO_PUBLIC_BACKEND_URL);
+		const newSocket = io(process.env.EXPO_PUBLIC_BACKEND_URL, {
+			reconnection: true, // Enables automatic reconnection
+			reconnectionAttempts: 5, // Limits reconnection attempts
+			timeout: 10000, // Sets timeout for initial connection
+		});
+
+		// Emit login event with userId when socket connects
+		newSocket.on('connect', () => {
+			if (userId) {
+				newSocket.emit('login', { userId });
+			}
+		});
+
+		// Handle connection errors
+		newSocket.on('connect_error', (error) => {
+			console.error('Socket connection error:', error);
+		});
 
 		setSocket(newSocket);
 
+		// Cleanup on unmount
 		return () => {
 			newSocket.disconnect();
 		};
-	}, []);
+	}, [userId]); // Ensure effect reruns if userId changes
 
 	useSocketListeners(socket);
 

@@ -39,6 +39,7 @@ const UserSchema: Schema = new Schema({
 	age: { type: Number, required: true },
 	password: { type: String, required: true },
 	sessionToken: { type: String, required: false },
+	isOnline: { type: Boolean, default: false },
 	friendsList: [FriendSchema], // Use the FriendSchema here
 	notifications: [NotificationSchema], // Use the NotificationSchema here
 });

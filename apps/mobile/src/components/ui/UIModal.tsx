@@ -25,6 +25,10 @@ export const UIModal = (props: Props) => {
 	const [headerShadow, setHeaderShadow] = useState(false);
 
 	const snapPoints = useMemo(() => {
+		if (props.customSize) {
+			return [props.customSize];
+		}
+
 		switch (props.size) {
 			case 'extra-small': {
 				return ['35%'];
@@ -37,9 +41,6 @@ export const UIModal = (props: Props) => {
 			}
 			case 'large': {
 				return ['80%'];
-			}
-			case 'custom': {
-				return [props.customSize || '80%'];
 			}
 			default: {
 				return ['75%'];

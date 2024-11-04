@@ -7,9 +7,11 @@ export type Friend = {
 	status: FriendStatus;
 };
 
+export type UserDetails = Friend & Omit<User, 'password' | 'sessionToken' | 'friendsList' | 'notifications'>;
+
 export type FriendDetails = {
 	readonly status: FriendStatus;
-	readonly userDetails: Friend & Omit<User, 'password' | 'sessionToken' | 'friendsList' | 'notifications'>;
+	readonly userDetails: UserDetails;
 };
 
 export type User = {
@@ -21,6 +23,7 @@ export type User = {
 	readonly gender: 'male' | 'female' | 'other';
 	readonly age: number;
 	readonly password: string;
+	isOnline: boolean;
 	sessionToken?: string;
 	friendsList: Friend[];
 	notifications: Notification[];

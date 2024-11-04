@@ -11,7 +11,7 @@ const AppLayout = () => {
 	if (!user) return <Redirect href="/login" />;
 
 	return (
-		<SocketProvider>
+		<SocketProvider userId={user._id}>
 			<WebRTCProvider>
 				<BottomTabsNavigator />
 			</WebRTCProvider>
