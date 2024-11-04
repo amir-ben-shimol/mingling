@@ -23,13 +23,19 @@ export const FriendsList = () => {
 		fetchFriends();
 	}, []);
 
+	console.log('friendsList', friendsList);
+
 	return (
 		<View className="flex-1 bg-white p-4">
 			<FlatList
-				data={friendsList.filter((friend) => friend.status === 'approved')}
-				keyExtractor={(item) => item.userDetails._id}
+				data={friendsList.filter((friend) => friend.status === 'approved').sort((a) => (a.userDetails.isOnline ? -1 : 1))}
+				keyExtractor={(item, index) => `${item.userDetails._id}-${index}`}
 				renderItem={({ item }) => {
-					const initials = `${item.userDetails.firstName.charAt(0)}${item.userDetails.lastName.charAt(0)}`.toUpperCase();
+					if (!item) return null;
+
+					console.log('PRINTING ITEM', item);
+
+					const initials = `${(item.userDetails.firstName?.[0], item.userDetails.lastName?.[0])}`.toUpperCase();
 
 					return (
 						<TouchableOpacity className="mb-2 flex-row items-center rounded-lg bg-gray-100 p-4">
@@ -41,6 +47,7 @@ export const FriendsList = () => {
 								<UIText className="text-gray-600">{item.userDetails.email}</UIText>
 								<UIText className="text-gray-600">{item.userDetails.country}</UIText>
 							</View>
+							<View className={`ml-auto h-4 w-4 rounded-full ${item.userDetails.isOnline ? 'bg-green-500' : 'bg-red-500'} `} />
 						</TouchableOpacity>
 					);
 				}}

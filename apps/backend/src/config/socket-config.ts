@@ -1,10 +1,6 @@
-/* eslint-disable padding-line-between-statements */
-/* eslint-disable @typescript-eslint/no-use-before-define */
 // config/socket-config.ts
 import type { Server, Socket } from 'socket.io';
-
-const socketUserMap = new Map<string, string>(); // socketId -> userId map
-const userSocketMap = new Map<string, string>(); // userId -> socketId map
+import { deleteSocketUser, setSocketUser, setUserSocket, getUserIdBySocketId } from '../helpers/redis-helpers';
 
 type UserSocketData = {
 	userId: string;
@@ -18,63 +14,23 @@ export function configureSockets(io: Server) {
 	const availableUsers = new Set<string>();
 
 	io.on('connection', (socket: Socket) => {
-		socket.on('joinPlayground', (userId: string) => {
-			// Map socketId to userId
-			socketUserMap.set(socket.id, userId);
-			userSocketMap.set(userId, socket.id);
-
-			users.set(socket.id, {
-				userId,
-				inPlayground: true,
-				inChat: false,
-				chatPartnerId: null,
-			});
-			availableUsers.add(socket.id);
-			matchUsers();
-		});
-
-		socket.on('leavePlayground', () => {
-			handleUserLeaving(socket);
-			socketUserMap.delete(socket.id); // Remove mapping on leave
-			const userId = socketUserMap.get(socket.id);
-			if (userId) userSocketMap.delete(userId); // Remove reverse mapping
-		});
-
-		socket.on('nextUser', () => {
-			handleUserLeaving(socket, true);
-			users.get(socket.id)!.inPlayground = true;
-			availableUsers.add(socket.id);
-			matchUsers();
-		});
-
-		socket.on('signal', ({ to, data }) => {
-			io.to(to).emit('signal', { from: socket.id, data });
-		});
-
-		socket.on('disconnect', () => {
-			handleUserLeaving(socket);
-			users.delete(socket.id);
-			const userId = socketUserMap.get(socket.id);
-			if (userId) userSocketMap.delete(userId); // Remove reverse mapping on disconnect
-			socketUserMap.delete(socket.id); // Remove mapping on disconnect
-		});
-
-		socket.on('chatMessage', ({ to, message }) => {
-			io.to(to).emit('chatMessage', message);
-		});
-
+		// Function to handle when a user leaves the playground or disconnects
 		function handleUserLeaving(socket: Socket, isNextUser = false) {
 			const userData = users.get(socket.id);
+
 			if (!userData) return;
 
 			if (userData.chatPartnerId) {
 				const partnerSocket = io.sockets.sockets.get(userData.chatPartnerId);
+
 				if (partnerSocket) {
 					partnerSocket.emit('partnerLeft');
 					const partnerData = users.get(userData.chatPartnerId);
+
 					if (partnerData) {
 						partnerData.inChat = false;
 						partnerData.chatPartnerId = null;
+
 						if (partnerData.inPlayground) {
 							availableUsers.add(partnerSocket.id);
 						}
@@ -84,13 +40,15 @@ export function configureSockets(io: Server) {
 
 			userData.inChat = false;
 			userData.chatPartnerId = null;
+
 			if (!isNextUser) {
 				userData.inPlayground = false;
 				availableUsers.delete(socket.id);
 			}
 		}
 
-		function matchUsers() {
+		// Match users in the playground for chat
+		async function matchUsers() {
 			while (availableUsers.size >= 2) {
 				const [socketId1, socketId2] = Array.from(availableUsers).slice(0, 2);
 
@@ -108,23 +66,85 @@ export function configureSockets(io: Server) {
 					user2.inChat = true;
 					user2.chatPartnerId = socketId1;
 
-					const user1Id = socketUserMap.get(socketId1);
-					const user2Id = socketUserMap.get(socketId2);
+					const user1Id = await getUserIdBySocketId(socketId1);
+					const user2Id = await getUserIdBySocketId(socketId2);
 
 					io.to(socketId1).emit('matched', { partnerSocketId: socketId2, partnerUserId: user2Id });
 					io.to(socketId2).emit('matched', { partnerSocketId: socketId1, partnerUserId: user1Id });
 				}
 			}
 		}
+
+		// Map userId to socketId in Redis upon initial login
+		socket.on('login', async ({ userId }) => {
+			console.log(`User ${userId} connected with socket ${socket.id}`);
+			await setUserSocket(userId, socket.id); // Maps userId to socketId in Redis
+			await setSocketUser(socket.id, userId); // Maps socketId to userId in Redis
+		});
+
+		// Remove socket-user mapping from Redis on logout
+		socket.on('logout', async () => {
+			console.log(`User with socket ${socket.id} logged out`);
+			await deleteSocketUser(socket.id); // Removes the socket-user mapping from Redis
+		});
+
+		// User joins the playground (no need to re-set socket mappings)
+		socket.on('joinPlayground', (userId: string) => {
+			console.log(`User ${userId} joined the playground with socket ${socket.id}`);
+
+			// Store user data locally for playground functionality
+			users.set(socket.id, {
+				userId,
+				inPlayground: true,
+				inChat: false,
+				chatPartnerId: null,
+			});
+			availableUsers.add(socket.id);
+			matchUsers();
+		});
+
+		// Handle when a user leaves the playground
+		socket.on('leavePlayground', () => {
+			handleUserLeaving(socket);
+			users.delete(socket.id); // Remove local data
+			availableUsers.delete(socket.id);
+		});
+
+		// Handle moving to the next user
+		socket.on('nextUser', () => {
+			handleUserLeaving(socket, true);
+			const user = users.get(socket.id);
+
+			if (user) {
+				user.inPlayground = true;
+				availableUsers.add(socket.id);
+				matchUsers();
+			}
+		});
+
+		// Handle signaling for WebRTC connections
+		socket.on('signal', ({ to, data }) => {
+			io.to(to).emit('signal', { from: socket.id, data });
+		});
+
+		// Handle disconnects (only removes mapping if it’s unexpected)
+		socket.on('disconnect', async () => {
+			console.log(`Socket ${socket.id} disconnected`);
+			const userId = await getUserIdBySocketId(socket.id);
+
+			if (userId) {
+				await deleteSocketUser(socket.id); // Only delete mapping if this disconnect is unexpected
+				users.delete(socket.id); // Cleanup local playground data if applicable
+
+				availableUsers.delete(socket.id);
+
+				handleUserLeaving(socket);
+			}
+		});
+
+		// Handle chat messages
+		socket.on('chatMessage', ({ to, message }) => {
+			io.to(to).emit('chatMessage', message);
+		});
 	});
-}
-
-// Utility function to get userId by socketId
-export function getUserIdBySocketId(socketId: string): string | undefined {
-	return socketUserMap.get(socketId);
-}
-
-// Utility function to get socketId by userId
-export function getSocketIdByUserId(userId: string): string | undefined {
-	return userSocketMap.get(userId);
 }

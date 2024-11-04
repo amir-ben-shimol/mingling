@@ -1,10 +1,10 @@
 import express, { type Request, type Response } from 'express';
 import { type Notification } from '@mingling/types'; // Import Notification type
 import { type Server } from 'socket.io';
+import { getSocketIdByUserId, getUserIdBySocketId } from '../helpers/redis-helpers';
 import { User } from '../models/user';
 import { authenticate } from '../middleware/auth';
-import { emitFriendsListUpdate } from '../helpers/socket-emiters';
-import { getSocketIdByUserId, getUserIdBySocketId } from '../config/socket-config';
+import { emitFriendsListUpdate } from '../helpers/socket-emitters';
 import { createNotification, updateNotification } from './notifications-routes';
 
 const router = express.Router();
@@ -16,7 +16,7 @@ export function createFriendRoutes(io: Server) {
 		const { partnerSocketId } = req.body;
 
 		try {
-			const resolvedFriendUserId = getUserIdBySocketId(partnerSocketId);
+			const resolvedFriendUserId = await getUserIdBySocketId(partnerSocketId);
 
 			if (!resolvedFriendUserId) {
 				res.status(404).json({ error: 'User not found for given socket ID' });
@@ -58,7 +58,7 @@ export function createFriendRoutes(io: Server) {
 				fromUserId: requesterId,
 			});
 
-			const recipientSocketId = getSocketIdByUserId(resolvedFriendUserId);
+			const recipientSocketId = await getSocketIdByUserId(resolvedFriendUserId);
 
 			if (recipientSocketId) {
 				io.to(recipientSocketId).emit('notification', notification);
@@ -97,16 +97,8 @@ export function createFriendRoutes(io: Server) {
 				return;
 			}
 
-			console.log('recipient', recipient);
-
-			console.log('requester', requester);
-
 			const recipientFriend = recipient.friendsList.find((f) => f.userId.toString() === friendId);
 			const requesterFriend = requester.friendsList.find((f) => f.userId.toString() === recipientId);
-
-			console.log('recipientFriend', recipientFriend);
-
-			console.log('requesterFriend', requesterFriend);
 
 			if (requesterFriend) requesterFriend.status = status;
 
@@ -137,8 +129,8 @@ export function createFriendRoutes(io: Server) {
 						: `${recipient.firstName} ${recipient.lastName} declined your friend request.`,
 			});
 
-			const requesterSocketId = getSocketIdByUserId(friendId);
-			const recipientSocketId = getSocketIdByUserId(recipientId);
+			const requesterSocketId = await getSocketIdByUserId(friendId);
+			const recipientSocketId = await getSocketIdByUserId(recipientId);
 
 			if (requesterSocketId) {
 				io.to(requesterSocketId).emit('notification', requesterNotification);
@@ -167,7 +159,7 @@ export function createFriendRoutes(io: Server) {
 			// Find the user and get only the friendsList field
 			const user = await User.findById(userId).select('friendsList').populate({
 				path: 'friendsList.userId',
-				select: 'firstName lastName email country gender age',
+				select: 'firstName lastName email country gender age isOnline',
 			});
 
 			if (!user) {
