@@ -1,7 +1,7 @@
 import type { Server } from 'socket.io';
 import type { UserDetails } from '@mingling/types';
 import { User } from '../models/user';
-import { getSocketIdByUserId } from './redis-helpers';
+import { getOnlineFriends, getSocketIdByUserId } from './redis-helpers';
 
 // Helper function to emit friends list updates
 export async function emitFriendsListUpdate(io: Server, userId: string) {
@@ -10,16 +10,22 @@ export async function emitFriendsListUpdate(io: Server, userId: string) {
 	try {
 		const user = await User.findById(userId).select('friendsList').populate({
 			path: 'friendsList.userId',
-			select: 'firstName lastName email country gender age isOnline profilePictureUrl',
+			select: 'firstName lastName email country gender age profilePictureUrl',
 		});
 
 		if (user) {
 			const userSocketId = await getSocketIdByUserId(userId);
+			const friendsIdList = user.friendsList.map((friend) => (friend.userId as unknown as UserDetails)._id.toString());
+
+			const onlineFriendsList = friendsIdList.length > 0 ? await getOnlineFriends(friendsIdList) : [];
 
 			if (userSocketId) {
 				const friendsListWithDetails = user.friendsList.map((friend) => ({
 					status: friend.status,
-					userDetails: friend.userId,
+					userDetails: {
+						...JSON.parse(JSON.stringify(friend.userId)),
+						isOnline: onlineFriendsList.includes((friend.userId as unknown as UserDetails)._id.toString()),
+					},
 				}));
 
 				io.to(userSocketId).emit('friendsListUpdate', friendsListWithDetails);
