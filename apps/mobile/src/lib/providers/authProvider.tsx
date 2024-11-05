@@ -8,6 +8,7 @@ type AuthContextType = {
 	user: User | null;
 	login: (userData: User) => void;
 	logout: () => void;
+	refreshUser: () => Promise<void>;
 };
 
 type AuthProviderProps = {
@@ -66,12 +67,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		}
 	};
 
+	const refreshUser = async () => {
+		if (!user) return;
+
+		try {
+			const response = await BackendService.get<User>(`/api/users/user/${user._id}`);
+
+			setUser(response.data);
+			await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ ...response.data, timestamp: Date.now() }));
+		} catch (error) {
+			console.error('Error refreshing user data:', error);
+		}
+	};
+
 	useEffect(() => {
 		loadCachedUser();
 		checkAuth();
 	}, []);
 
-	return <AuthContext.Provider value={{ user, login, logout }}>{children}</AuthContext.Provider>;
+	return <AuthContext.Provider value={{ user, login, logout, refreshUser }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

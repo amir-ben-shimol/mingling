@@ -5,25 +5,36 @@ import { getAsyncStorage, setAsyncStorage } from './async-storage';
 
 const MAX_RETRY_COUNT = 10;
 
-async function fetcher<R = unknown, D = unknown>(path: string, method: HttpMethod, data?: D, retryCount = 0): Promise<ResponseData<R>> {
+async function fetcher<R = unknown, D = unknown>(
+	path: string,
+	method: HttpMethod,
+	data?: D,
+	headers: HeadersInit = {},
+	retryCount = 0,
+): Promise<ResponseData<R>> {
 	const { setIsRetrying } = useApiErrorStore.getState();
 
 	const token = await getAsyncStorage('token');
 	const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
 
-	const headers = new Headers();
+	const fetcherHeaders = new Headers(headers);
 
-	headers.append('Content-Type', 'application/json');
-	token && headers.append('Authorization', `Bearer ${token}`);
+	if (!fetcherHeaders.has('Content-Type')) {
+		fetcherHeaders.append('Content-Type', 'application/json');
+	}
+
+	if (token) {
+		fetcherHeaders.append('Authorization', `Bearer ${token}`);
+	}
 
 	if (retryCount > 0) {
 		setIsRetrying(true);
 	}
 
 	const response = await fetch(`${baseUrl}${path}`, {
-		method: method,
-		headers,
-		body: data ? JSON.stringify(data) : undefined,
+		method,
+		headers: fetcherHeaders,
+		body: data instanceof FormData ? data : data ? JSON.stringify(data) : undefined, // Ensure undefined if no data
 	});
 
 	if (response.status === ErrorResponseEnum.NetworkError && retryCount < MAX_RETRY_COUNT) {
@@ -31,24 +42,14 @@ async function fetcher<R = unknown, D = unknown>(path: string, method: HttpMetho
 			setTimeout(resolve, 1000);
 		});
 
-		return fetcher<R, D>(path, method, data, retryCount + 1);
+		return fetcher<R, D>(path, method, data, headers, retryCount + 1);
 	}
 
-	if (response.status === ErrorResponseEnum.Unauthorized) {
-		throw new Error('Unauthorized');
-	}
+	if (response.status === ErrorResponseEnum.Unauthorized) throw new Error('Unauthorized');
 
-	if (response.status === ErrorResponseEnum.NotFound) {
-		throw new Error('End point not found');
-	}
+	if (response.status === ErrorResponseEnum.NotFound) throw new Error('Endpoint not found');
 
-	if (response.status === ErrorResponseEnum.BadRequest) {
-		throw new Error('Bad request');
-	}
-
-	// else if (response.status === ErrorResponseEnum.NetworkError && retryCount >= MAX_RETRY_COUNT) {
-	// 	setApiError(response.status, 'קיימת בעיה בחיבור לרשת');
-	// }
+	if (response.status === ErrorResponseEnum.BadRequest) throw new Error('Bad request');
 
 	setIsRetrying(false);
 
@@ -64,17 +65,17 @@ async function fetcher<R = unknown, D = unknown>(path: string, method: HttpMetho
 }
 
 const BackendService = {
-	get<R = unknown>(path: string): Promise<ResponseData<R>> {
-		return fetcher<R>(path, 'GET');
+	get<R = unknown>(path: string, headers?: HeadersInit): Promise<ResponseData<R>> {
+		return fetcher<R>(path, 'GET', undefined, headers);
 	},
-	post<R = unknown, D = unknown>(path: string, data?: D): Promise<ResponseData<R>> {
-		return fetcher<R, D>(path, 'POST', data);
+	post<R = unknown, D = unknown>(path: string, data?: D, headers?: HeadersInit): Promise<ResponseData<R>> {
+		return fetcher<R, D>(path, 'POST', data, headers);
 	},
-	patch<R = unknown, D = unknown>(path: string, data?: D): Promise<ResponseData<R>> {
-		return fetcher<R, D>(path, 'PATCH', data);
+	patch<R = unknown, D = unknown>(path: string, data?: D, headers?: HeadersInit): Promise<ResponseData<R>> {
+		return fetcher<R, D>(path, 'PATCH', data, headers);
 	},
-	delete<R = unknown>(path: string): Promise<ResponseData<R>> {
-		return fetcher<R>(path, 'DELETE');
+	delete<R = unknown>(path: string, headers?: HeadersInit): Promise<ResponseData<R>> {
+		return fetcher<R>(path, 'DELETE', undefined, headers);
 	},
 };
 

@@ -2,12 +2,10 @@
 import React from 'react';
 import { TouchableOpacity, type ViewStyle, type GestureResponderEvent, View, ActivityIndicator } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { Link } from 'expo-router';
-import type { icons } from '@leumit/common';
+import type { icons } from '@/data/icons';
 import colors from '@/styles/colors.cjs';
 import globalStyles from '@/styles/global';
 import { UISvg } from './UISvg';
-import { UILinearGradient } from './UILinearGradient';
 import { UIText } from './UIText';
 
 type Props = {
@@ -173,28 +171,6 @@ export const UIButton = (props: Props) => {
 			{showArrow && <UISvg name="arrow" className="mr-4 h-3 w-3" stroke="#fff" fill="#fff" strokeWidth={0.3} />}
 		</View>
 	);
-
-	if (href) {
-		return (
-			<Link href={href} asChild>
-				<TouchableOpacity className={props.buttonSize === 'fit-content' ? 'self-start' : 'self-stretch'} onPress={handlePress}>
-					<UILinearGradient varient={varient} className={buttonClass} style={props.style}>
-						{renderButtonContent()}
-					</UILinearGradient>
-				</TouchableOpacity>
-			</Link>
-		);
-	}
-
-	if (typeof backgroundColors[varient] !== 'string') {
-		return (
-			<TouchableOpacity className={props.buttonSize === 'fit-content' ? 'self-start' : 'self-stretch'} onPress={handlePress}>
-				<UILinearGradient varient={varient} className={buttonClass} style={props.style}>
-					{renderButtonContent()}
-				</UILinearGradient>
-			</TouchableOpacity>
-		);
-	}
 
 	return (
 		<TouchableOpacity className={props.buttonSize === 'fit-content' ? 'self-start' : 'self-stretch'} onPress={handlePress}>
