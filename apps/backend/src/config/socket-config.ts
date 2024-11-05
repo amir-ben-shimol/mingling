@@ -1,6 +1,7 @@
 // config/socket-config.ts
 import type { Server, Socket } from 'socket.io';
-import { deleteSocketUser, setSocketUser, setUserSocket, getUserIdBySocketId } from '../helpers/redis-helpers';
+import { deleteSocketUser, setSocketUser, setUserSocket, getUserIdBySocketId, setUserOnlineStatus, deleteUserSocket } from '../helpers/redis-helpers';
+import { emitFriendUpdate } from '../helpers/socket-emitters';
 
 type UserSocketData = {
 	userId: string;
@@ -77,15 +78,35 @@ export function configureSockets(io: Server) {
 
 		// Map userId to socketId in Redis upon initial login
 		socket.on('login', async ({ userId }) => {
-			console.log(`User ${userId} connected with socket ${socket.id}`);
 			await setUserSocket(userId, socket.id); // Maps userId to socketId in Redis
 			await setSocketUser(socket.id, userId); // Maps socketId to userId in Redis
+			await setUserOnlineStatus(userId, true);
+			emitFriendUpdate(io, userId, { isOnline: true });
 		});
 
 		// Remove socket-user mapping from Redis on logout
 		socket.on('logout', async () => {
 			console.log(`User with socket ${socket.id} logged out`);
 			await deleteSocketUser(socket.id); // Removes the socket-user mapping from Redis
+			const userId = await getUserIdBySocketId(socket.id);
+
+			if (userId) {
+				await setUserOnlineStatus(userId, false);
+				await deleteUserSocket(userId);
+				emitFriendUpdate(io, userId, { isOnline: false });
+			}
+		});
+
+		// When app moves to background, set user as offline
+		socket.on('app-background', async (userId) => {
+			await setUserOnlineStatus(userId, false);
+			emitFriendUpdate(io, userId, { isOnline: false });
+		});
+
+		// When app moves to foreground, set user as online
+		socket.on('app-foreground', async (userId) => {
+			await setUserOnlineStatus(userId, true);
+			emitFriendUpdate(io, userId, { isOnline: true });
 		});
 
 		// User joins the playground (no need to re-set socket mappings)

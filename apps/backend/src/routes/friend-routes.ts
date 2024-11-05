@@ -1,8 +1,8 @@
 /* eslint-disable max-lines */
 import express, { type Request, type Response } from 'express';
-import { type Notification } from '@mingling/types'; // Import Notification type
+import type { UserDetails, Notification } from '@mingling/types'; // Import Notification type
 import { type Server } from 'socket.io';
-import { getSocketIdByUserId, getUserIdBySocketId } from '../helpers/redis-helpers';
+import { getOnlineFriends, getSocketIdByUserId, getUserIdBySocketId } from '../helpers/redis-helpers';
 import { User } from '../models/user';
 import { authenticate } from '../middleware/auth';
 import { emitFriendsListUpdate } from '../helpers/socket-emitters';
@@ -206,7 +206,6 @@ export function createFriendRoutes(io: Server) {
 			await user.save();
 			await friend.save();
 
-			// Create and emit a notification for the friend
 			const notification: Notification = await createNotification(friendId, {
 				varient: 'success',
 				type: 'system',
@@ -215,16 +214,12 @@ export function createFriendRoutes(io: Server) {
 				fromUserId: userId,
 			});
 
-			// Get the socket IDs to notify both users
 			const userSocketId = await getSocketIdByUserId(userId);
-			// const friendSocketId = await getSocketIdByUserId(friendId);
 
-			// Emit notification to the friend
 			if (userSocketId) {
 				io.to(userSocketId).emit('notification', notification);
 			}
 
-			// Emit updated friends list for both users
 			await emitFriendsListUpdate(io, userId);
 			await emitFriendsListUpdate(io, friendId);
 
@@ -243,7 +238,7 @@ export function createFriendRoutes(io: Server) {
 			// Find the user and get only the friendsList field
 			const user = await User.findById(userId).select('friendsList').populate({
 				path: 'friendsList.userId',
-				select: 'firstName lastName email country gender age isOnline profilePictureUrl',
+				select: 'firstName lastName email country gender age profilePictureUrl',
 			});
 
 			if (!user) {
@@ -252,9 +247,16 @@ export function createFriendRoutes(io: Server) {
 				return;
 			}
 
+			const friendsIdList = user.friendsList.map((friend) => (friend.userId as unknown as UserDetails)._id.toString());
+
+			const onlineFriendsList = await getOnlineFriends(friendsIdList);
+
 			const friendsListWithDetails = user.friendsList.map((friend) => ({
 				status: friend.status,
-				userDetails: friend.userId, // Assign the populated user data to 'userDetails'
+				userDetails: {
+					...JSON.parse(JSON.stringify(friend.userId)),
+					isOnline: onlineFriendsList.includes((friend.userId as unknown as UserDetails)._id.toString()),
+				},
 			}));
 
 			res.status(200).json({ data: friendsListWithDetails });

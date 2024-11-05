@@ -43,7 +43,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children, userId
 		};
 	}, [userId]); // Ensure effect reruns if userId changes
 
-	useSocketListeners(socket);
+	useSocketListeners(socket, userId);
 
 	return <SocketContext.Provider value={{ socket }}>{children}</SocketContext.Provider>;
 };
