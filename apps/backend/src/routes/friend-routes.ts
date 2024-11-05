@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import express, { type Request, type Response } from 'express';
 import { type Notification } from '@mingling/types'; // Import Notification type
 import { type Server } from 'socket.io';
@@ -33,11 +34,12 @@ export function createFriendRoutes(io: Server) {
 				return;
 			}
 
-			// Check for existing pending friend request
-			const existingRequest = requester.friendsList.find((friend) => friend.userId === resolvedFriendUserId && friend.status === 'pending');
+			// Prevent duplicate entries: Check if friend exists in both users' friend lists
+			const isAlreadyFriend = requester.friendsList.some((friend) => friend.userId.toString() === resolvedFriendUserId);
+			const isRequestReceived = recipient.friendsList.some((friend) => friend.userId.toString() === requesterId);
 
-			if (existingRequest) {
-				res.status(400).json({ error: 'Friend request already pending' });
+			if (isAlreadyFriend || isRequestReceived) {
+				res.status(400).json({ error: 'Friend request already sent or exists' });
 
 				return;
 			}
@@ -49,6 +51,7 @@ export function createFriendRoutes(io: Server) {
 			await recipient.save();
 			await requester.save();
 
+			// Emit notifications and friends list updates as before
 			// Create and emit a notification for the recipient
 			const notification: Notification = await createNotification(resolvedFriendUserId, {
 				varient: 'info',
@@ -64,7 +67,6 @@ export function createFriendRoutes(io: Server) {
 				io.to(recipientSocketId).emit('notification', notification);
 			}
 
-			// Emit updated friends list for both users
 			await emitFriendsListUpdate(io, requesterId);
 			await emitFriendsListUpdate(io, resolvedFriendUserId);
 
@@ -76,10 +78,9 @@ export function createFriendRoutes(io: Server) {
 	});
 
 	// Accept or decline a friend request
-	router.post('/response/:recipientNotificationId', authenticate, async (req: Request, res: Response) => {
+	router.post('/response', authenticate, async (req: Request, res: Response) => {
 		const recipientId = req.user?.id;
-		const { recipientNotificationId } = req.params;
-		const { status, friendId } = req.body;
+		const { status, friendId, recipientNotificationId } = req.body;
 
 		if (!['approved', 'declined'].includes(status)) {
 			res.status(400).json({ error: 'Invalid status' });
@@ -91,31 +92,47 @@ export function createFriendRoutes(io: Server) {
 			const recipient = await User.findById(recipientId);
 			const requester = await User.findById(friendId);
 
-			if (!recipient || !requester || !recipientNotificationId) {
+			if (!recipient || !requester) {
 				res.status(404).json({ error: 'User not found' });
 
 				return;
 			}
 
+			// Find and update the friend entries for both recipient and requester
 			const recipientFriend = recipient.friendsList.find((f) => f.userId.toString() === friendId);
 			const requesterFriend = requester.friendsList.find((f) => f.userId.toString() === recipientId);
 
-			if (requesterFriend) requesterFriend.status = status;
-
 			if (recipientFriend) recipientFriend.status = status;
+
+			if (requesterFriend) requesterFriend.status = status;
 
 			await recipient.save();
 			await requester.save();
 
 			// Update notification for the recipient
-			const recipientNotification: Notification = await updateNotification(recipientId, recipientNotificationId, {
-				title: status === 'approved' ? 'Friend Request Accepted' : 'Friend Request Declined',
-				content:
-					status === 'approved'
-						? `${requester.firstName} ${recipient.lastName} is now your friend.`
-						: `You declined ${requester.firstName} ${recipient.lastName}'s friend request.`,
-				type: 'system',
-			});
+			let recipientNotification: Notification | null = null;
+
+			if (recipientNotificationId) {
+				recipientNotification = await updateNotification(recipientId, recipientNotificationId, {
+					title: status === 'approved' ? 'Friend Request Accepted' : 'Friend Request Declined',
+					content:
+						status === 'approved'
+							? `${requester.firstName} ${requester.lastName} is now your friend.`
+							: `You declined ${requester.firstName} ${requester.lastName}'s friend request.`,
+					type: 'system',
+				});
+			} else {
+				recipientNotification = await createNotification(recipientId, {
+					varient: 'info',
+					type: 'system',
+					fromUserId: friendId,
+					title: status === 'approved' ? 'Friend Request Accepted' : 'Friend Request Declined',
+					content:
+						status === 'approved'
+							? `${requester.firstName} ${requester.lastName} is now your friend.`
+							: `You declined ${requester.firstName} ${requester.lastName}'s friend request.`,
+				});
+			}
 
 			// Create and emit a notification for the requester
 			const requesterNotification: Notification = await createNotification(friendId, {
@@ -151,6 +168,73 @@ export function createFriendRoutes(io: Server) {
 		}
 	});
 
+	// Remove a friend
+	router.delete('/remove-friend/:friendId', authenticate, async (req: Request, res: Response) => {
+		const userId = req.user?.id;
+		const { friendId } = req.params;
+
+		if (!friendId) {
+			res.status(400).json({ error: 'Friend ID is required' });
+
+			return;
+		}
+
+		try {
+			const user = await User.findById(userId);
+			const friend = await User.findById(friendId);
+
+			if (!user || !friend) {
+				res.status(404).json({ error: 'User or friend not found' });
+
+				return;
+			}
+
+			// Check if they are friends
+			const userFriendIndex = user.friendsList.findIndex((f) => f.userId.toString() === friendId);
+			const friendUserIndex = friend.friendsList.findIndex((f) => f.userId.toString() === userId);
+
+			if (userFriendIndex === -1 || friendUserIndex === -1) {
+				res.status(400).json({ error: 'Not friends with the specified user' });
+
+				return;
+			}
+
+			// Remove the friendship from both users' friends lists
+			user.friendsList.splice(userFriendIndex, 1);
+			friend.friendsList.splice(friendUserIndex, 1);
+
+			await user.save();
+			await friend.save();
+
+			// Create and emit a notification for the friend
+			const notification: Notification = await createNotification(friendId, {
+				varient: 'success',
+				type: 'system',
+				title: 'Friend Removed',
+				content: `You removed ${friend.firstName} ${friend.lastName} from your friends list.`,
+				fromUserId: userId,
+			});
+
+			// Get the socket IDs to notify both users
+			const userSocketId = await getSocketIdByUserId(userId);
+			// const friendSocketId = await getSocketIdByUserId(friendId);
+
+			// Emit notification to the friend
+			if (userSocketId) {
+				io.to(userSocketId).emit('notification', notification);
+			}
+
+			// Emit updated friends list for both users
+			await emitFriendsListUpdate(io, userId);
+			await emitFriendsListUpdate(io, friendId);
+
+			res.status(200).json({ message: 'Friend removed successfully' });
+		} catch (error) {
+			console.error(error);
+			res.status(500).json({ error: 'An error occurred' });
+		}
+	});
+
 	// Get friends list
 	router.get('/friends-list', authenticate, async (req: Request, res: Response) => {
 		const userId = req.user?.id;
@@ -159,7 +243,7 @@ export function createFriendRoutes(io: Server) {
 			// Find the user and get only the friendsList field
 			const user = await User.findById(userId).select('friendsList').populate({
 				path: 'friendsList.userId',
-				select: 'firstName lastName email country gender age isOnline',
+				select: 'firstName lastName email country gender age isOnline profilePictureUrl',
 			});
 
 			if (!user) {
@@ -172,8 +256,6 @@ export function createFriendRoutes(io: Server) {
 				status: friend.status,
 				userDetails: friend.userId, // Assign the populated user data to 'userDetails'
 			}));
-
-			// const approvedFriends = user.friendsList.filter((friend) => friend.status === 'approved');
 
 			res.status(200).json({ data: friendsListWithDetails });
 		} catch (error) {

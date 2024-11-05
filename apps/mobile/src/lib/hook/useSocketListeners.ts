@@ -1,6 +1,6 @@
 // src/hooks/useSocketListeners.ts
 import { useEffect } from 'react';
-import type { FriendDetails, Notification } from '@mingling/types';
+import type { FriendDetails, UserDetails, Notification } from '@mingling/types';
 import type { Socket } from 'socket.io-client';
 import { useNotificationsStore } from '@/lib/store/useNotificationsStore';
 import { useFriendsStore } from '../store/useFriendsStore';
@@ -23,15 +23,26 @@ const useSocketListeners = (socket: Socket | null) => {
 			setFriendsList(updatedFriendsList); // Update the friends list in state
 		};
 
-		// Handle individual friend status changes (online/offline updates)
-		const handleFriendStatusChange = ({ userId, isOnline }: { userId: string; isOnline: boolean }) => {
-			setFriendsList((prevFriends) => {
-				const updatedFriendsList = prevFriends.map((friend) =>
-					friend.userDetails._id === userId ? { ...friend, userDetails: { ...friend.userDetails, isOnline } } : friend,
-				);
+		// Handle individual friend updates (online status, profile picture, etc.)
+		const handleFriendUpdate = (updatedFriend: { userId: string } & Partial<UserDetails>) => {
+			const { userId, ...updatedFields } = updatedFriend;
 
-				// Log the updated friends list before setting it
-				console.log('updatedFriendsList with status change:', updatedFriendsList);
+			setFriendsList((prevFriends) => {
+				const updatedFriendsList = prevFriends.map((friend) => {
+					if (friend.userDetails._id === userId) {
+						return {
+							...friend,
+							userDetails: {
+								...friend.userDetails,
+								...updatedFields,
+							},
+						};
+					}
+
+					return friend;
+				});
+
+				console.log('updatedFriendsList with changes:', updatedFriendsList);
 
 				return updatedFriendsList;
 			});
@@ -40,13 +51,13 @@ const useSocketListeners = (socket: Socket | null) => {
 		// Register listeners
 		socket.on('notification', handleNotification);
 		socket.on('friendsListUpdate', handleFriendsListUpdate);
-		socket.on('friendStatusChange', handleFriendStatusChange); // New listener for individual friend status changes
+		socket.on('friendUpdate', handleFriendUpdate);
 
 		// Cleanup on unmount
 		return () => {
 			socket.off('notification', handleNotification);
 			socket.off('friendsListUpdate', handleFriendsListUpdate);
-			socket.off('friendStatusChange', handleFriendStatusChange); // Cleanup for new listener
+			socket.off('friendUpdate', handleFriendUpdate);
 		};
 	}, [socket, showNotification, setFriendsList]);
 };

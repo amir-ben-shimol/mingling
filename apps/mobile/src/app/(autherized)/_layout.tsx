@@ -2,7 +2,7 @@ import React from 'react';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/providers/authProvider';
 import { SocketProvider } from '@/lib/providers/socketProvider';
-import { WebRTCProvider } from '@/lib/providers/webRTCProvider';
+import { WebRtcProvider } from '@/lib/providers/webRtcProvider';
 import BottomTabsNavigator from '@/layouts/BottomTabsNavigator';
 
 const AppLayout = () => {
@@ -12,9 +12,9 @@ const AppLayout = () => {
 
 	return (
 		<SocketProvider userId={user._id}>
-			<WebRTCProvider>
+			<WebRtcProvider>
 				<BottomTabsNavigator />
-			</WebRTCProvider>
+			</WebRtcProvider>
 		</SocketProvider>
 	);
 };

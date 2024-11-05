@@ -7,7 +7,6 @@ import { cacheImages } from '@/lib/helpers/cache';
 
 import AppWrapper from '@/wrappers/AppWrapper';
 import { AuthProvider } from '@/lib/providers/authProvider';
-import { ThemeProvider } from '@/lib/providers/themeProvider';
 
 const RootLayout = () => {
 	const [appIsReady, setAppIsReady] = useState(false);
@@ -45,13 +44,11 @@ const RootLayout = () => {
 
 	return (
 		<ErrorBoundary>
-			<ThemeProvider>
-				<LoaderProvider>
-					<AuthProvider>
-						<AppWrapper />
-					</AuthProvider>
-				</LoaderProvider>
-			</ThemeProvider>
+			<LoaderProvider>
+				<AuthProvider>
+					<AppWrapper />
+				</AuthProvider>
+			</LoaderProvider>
 		</ErrorBoundary>
 	);
 };

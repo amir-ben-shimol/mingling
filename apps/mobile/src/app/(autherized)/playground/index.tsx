@@ -2,9 +2,9 @@
 import React, { useCallback } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { View, Pressable } from 'react-native';
-import { useWebRTC } from '@/providers/webRTCProvider';
 import { UIText } from '@/ui/UIText';
 import { useSocket } from '@/lib/providers/socketProvider';
+import { useWebRTC } from '@/lib/providers/webRtcProvider';
 import { useAuth } from '@/lib/providers/authProvider';
 import Chat from './components/Chat';
 import VideoStreams from './components/VideoStreams';
