@@ -1,16 +1,25 @@
 // src/hooks/useSocketListeners.ts
 import { useEffect } from 'react';
+import { AppState, type AppStateStatus } from 'react-native';
 import type { FriendDetails, UserDetails, Notification } from '@mingling/types';
 import type { Socket } from 'socket.io-client';
 import { useNotificationsStore } from '@/lib/store/useNotificationsStore';
 import { useFriendsStore } from '../store/useFriendsStore';
 
-const useSocketListeners = (socket: Socket | null) => {
+const useSocketListeners = (socket: Socket | null, userId: string) => {
 	const { showNotification } = useNotificationsStore();
 	const { setFriendsList } = useFriendsStore();
 
 	useEffect(() => {
 		if (!socket) return;
+
+		const handleAppStateChange = (nextAppState: AppStateStatus) => {
+			if (nextAppState === 'active') {
+				socket.emit('app-foreground', userId);
+			} else if (nextAppState === 'background') {
+				socket.emit('app-background', userId);
+			}
+		};
 
 		// Handle incoming notifications
 		const handleNotification = (notification: Notification) => {
@@ -42,11 +51,12 @@ const useSocketListeners = (socket: Socket | null) => {
 					return friend;
 				});
 
-				console.log('updatedFriendsList with changes:', updatedFriendsList);
-
 				return updatedFriendsList;
 			});
 		};
+
+		// Register app state change listener
+		const subscription = AppState.addEventListener('change', handleAppStateChange);
 
 		// Register listeners
 		socket.on('notification', handleNotification);
@@ -55,6 +65,7 @@ const useSocketListeners = (socket: Socket | null) => {
 
 		// Cleanup on unmount
 		return () => {
+			subscription.remove();
 			socket.off('notification', handleNotification);
 			socket.off('friendsListUpdate', handleFriendsListUpdate);
 			socket.off('friendUpdate', handleFriendUpdate);

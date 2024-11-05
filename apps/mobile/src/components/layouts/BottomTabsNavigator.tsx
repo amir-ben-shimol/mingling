@@ -3,6 +3,8 @@ import { View, Text, Pressable, StatusBar } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { router, Tabs } from 'expo-router';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { MaterialIcons } from '@expo/vector-icons';
+
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
 import { UILinearGradient } from '@/ui/UILinearGradient';
 import { Notifications } from '@/modules/Notifications';
@@ -92,7 +94,7 @@ const BottomTabsNavigator: React.FC = () => {
 				<Tabs.Screen
 					name="profile"
 					options={{
-						tabBarIcon: ({ color, size }) => <Icon name="settings" color={color} size={size} />,
+						tabBarIcon: ({ color, size }) => <MaterialIcons name="person" color={color} size={size} />,
 						tabBarLabel: 'Profile',
 					}}
 				/>
