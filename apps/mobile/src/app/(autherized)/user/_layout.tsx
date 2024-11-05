@@ -1,8 +1,8 @@
 import React from 'react';
 import BaseLayout from '@/layouts/BaseLayout';
 
-const Layout = () => {
+const UserLayout = () => {
 	return <BaseLayout />;
 };
 
-export default Layout;
+export default UserLayout;

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/providers/webRTCProvider.tsx
+// src/providers/WebRtcProvider.tsx
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
 import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, type MediaStream, mediaDevices } from 'react-native-webrtc';
 import { useSocket } from '@/lib/providers/socketProvider';
@@ -16,7 +16,7 @@ type WebRTCContextProps = {
 
 const WebRTCContext = createContext<WebRTCContextProps | undefined>(undefined);
 
-export const WebRTCProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WebRtcProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const { socket } = useSocket();
 	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 	const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
@@ -131,7 +131,7 @@ export const useWebRTC = () => {
 	const context = useContext(WebRTCContext);
 
 	if (!context) {
-		throw new Error('useWebRTC must be used within a WebRTCProvider');
+		throw new Error('useWebRTC must be used within a WebRtcProvider');
 	}
 
 	return context;

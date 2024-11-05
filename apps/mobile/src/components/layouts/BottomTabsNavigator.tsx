@@ -90,10 +90,16 @@ const BottomTabsNavigator: React.FC = () => {
 					}}
 				/>
 				<Tabs.Screen
-					name="settings"
+					name="profile"
 					options={{
 						tabBarIcon: ({ color, size }) => <Icon name="settings" color={color} size={size} />,
-						tabBarLabel: 'Settings',
+						tabBarLabel: 'Profile',
+					}}
+				/>
+				<Tabs.Screen
+					name="user"
+					options={{
+						tabBarItemStyle: { display: 'none' },
 					}}
 				/>
 			</Tabs>

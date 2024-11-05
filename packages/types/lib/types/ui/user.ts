@@ -22,6 +22,7 @@ export type User = {
 	readonly country: string;
 	readonly gender: 'male' | 'female' | 'other';
 	readonly age: number;
+	readonly profilePictureUrl?: string;
 	readonly password: string;
 	isOnline: boolean;
 	sessionToken?: string;
