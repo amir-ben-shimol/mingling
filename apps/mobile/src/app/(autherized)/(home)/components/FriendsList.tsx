@@ -1,10 +1,10 @@
-import { FlatList, View, TouchableOpacity, Text } from 'react-native';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
 import type { FriendDetails } from '@mingling/types';
-import { UIText } from '@/ui/UIText';
+import { router } from 'expo-router';
 import { useFriendsStore } from '@/lib/store/useFriendsStore';
 import { BackendService } from '@/lib/utils/backend-service';
-import { getUserFullName } from '@/lib/utils/user';
+import { FriendsListSection } from './FriendsListSection';
 
 export const FriendsList = () => {
 	const { friendsList, setFriendsList } = useFriendsStore();
@@ -23,35 +23,44 @@ export const FriendsList = () => {
 		fetchFriends();
 	}, []);
 
-	console.log('friendsList', friendsList);
+	const navToUser = (userId: string) => {
+		router.push(`/user/${userId}`);
+	};
+
+	const handleFriendRequestResponse = async (fromUserId: string, status: 'approved' | 'declined') => {
+		if (!fromUserId || !status) return;
+
+		try {
+			await BackendService.post('/api/friends/response', {
+				friendId: fromUserId,
+				status,
+			});
+		} catch (error) {
+			console.error('Error updating friend request:', error);
+		}
+	};
 
 	return (
 		<View className="flex-1 bg-white p-4">
-			<FlatList
+			<FriendsListSection
+				key="pending"
+				data={friendsList.filter((friend) => friend.status === 'pending')}
+				title="Pending Friend Requests"
+				onPressUser={navToUser}
+			/>
+			<FriendsListSection
+				key="incoming"
+				data={friendsList.filter((friend) => friend.status === 'incoming')}
+				title="Friend Requests"
+				onPressUser={navToUser}
+				onHandleFriendRequestResponse={handleFriendRequestResponse}
+			/>
+			<FriendsListSection
+				key="friends"
 				data={friendsList.filter((friend) => friend.status === 'approved').sort((a) => (a.userDetails.isOnline ? -1 : 1))}
-				keyExtractor={(item, index) => `${item.userDetails._id}-${index}`}
-				renderItem={({ item }) => {
-					if (!item) return null;
-
-					console.log('PRINTING ITEM', item);
-
-					const initials = `${(item.userDetails.firstName?.[0], item.userDetails.lastName?.[0])}`.toUpperCase();
-
-					return (
-						<TouchableOpacity className="mb-2 flex-row items-center rounded-lg bg-gray-100 p-4">
-							<View className="mr-4 h-12 w-12 items-center justify-center rounded-full bg-blue-500">
-								<Text className="text-lg font-bold text-white">{initials}</Text>
-							</View>
-							<View>
-								<UIText className="text-lg font-semibold">{getUserFullName(item.userDetails.firstName, item.userDetails.lastName)}</UIText>
-								<UIText className="text-gray-600">{item.userDetails.email}</UIText>
-								<UIText className="text-gray-600">{item.userDetails.country}</UIText>
-							</View>
-							<View className={`ml-auto h-4 w-4 rounded-full ${item.userDetails.isOnline ? 'bg-green-500' : 'bg-red-500'} `} />
-						</TouchableOpacity>
-					);
-				}}
-				ListEmptyComponent={<UIText className="text-center text-gray-500">No friends found.</UIText>}
+				title="Friends"
+				showStatusIndicator
+				onPressUser={navToUser}
 			/>
 		</View>
 	);
