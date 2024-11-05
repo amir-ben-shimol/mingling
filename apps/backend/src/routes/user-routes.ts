@@ -66,7 +66,6 @@ export const createUserRoutes = (io: Server) => {
 			const sessionToken = jwt.sign({ id: user._id }, process.env.SECRET_TOKEN_KEY as string, { expiresIn: '30m' });
 
 			user.sessionToken = sessionToken;
-			user.isOnline = true;
 			await user.save();
 
 			await setUserOnlineStatus(user._id.toString(), true);
@@ -91,7 +90,6 @@ export const createUserRoutes = (io: Server) => {
 		}
 
 		user.sessionToken = '';
-		user.isOnline = false;
 		await user.save();
 
 		// Update offline status in Redis
