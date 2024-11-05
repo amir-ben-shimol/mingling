@@ -1,6 +1,10 @@
+/* eslint-disable import/first */
 // server.ts
 import http from 'node:http';
 import dotenv from 'dotenv';
+
+dotenv.config();
+
 import mongoose from 'mongoose';
 import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
@@ -8,8 +12,6 @@ import { configureSockets } from './config/socket-config';
 import { createUserRoutes } from './routes/user-routes';
 import { createFriendRoutes } from './routes/friend-routes';
 import notificationsRoutes from './routes/notifications-routes';
-
-dotenv.config();
 
 const app = express();
 
@@ -37,8 +39,8 @@ app.get('/', (_, res) => {
 
 // Use user routes
 app.use('/api/users', createUserRoutes(io));
+app.use('/api/friends', createFriendRoutes(io));
 app.use('/api/notifications', notificationsRoutes);
-app.use('/api/friends', createFriendRoutes(io)); // Pass `io` to friend routes
 
 // Configure Socket.io with custom socket events
 configureSockets(io);

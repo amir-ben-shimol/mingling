@@ -19,8 +19,9 @@ export const NotificationModal = (props: Props) => {
 
 		try {
 			removeUserNotification(notification.id);
-			await BackendService.post(`/api/friends/response/${notification.id}`, {
+			await BackendService.post('/api/friends/response', {
 				friendId: notification.fromUserId,
+				recipientNotificationId: notification.id,
 				status,
 			});
 		} catch (error) {

@@ -22,16 +22,15 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children, userId
 			reconnection: true, // Enables automatic reconnection
 			reconnectionAttempts: 5, // Limits reconnection attempts
 			timeout: 10000, // Sets timeout for initial connection
+			transports: ['websocket'],
 		});
 
-		// Emit login event with userId when socket connects
 		newSocket.on('connect', () => {
 			if (userId) {
 				newSocket.emit('login', { userId });
 			}
 		});
 
-		// Handle connection errors
 		newSocket.on('connect_error', (error) => {
 			console.error('Socket connection error:', error);
 		});

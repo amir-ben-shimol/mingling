@@ -13,7 +13,7 @@ const FriendSchema = new Schema(
 			required: true,
 		},
 	},
-	{ _id: false }, // Disable automatic _id creation for subdocuments if not needed
+	{ _id: false },
 );
 
 // Define the NotificationSchema as a subschema (optional but recommended for consistency)
@@ -26,7 +26,7 @@ const NotificationSchema = new Schema(
 		fromUserId: { type: String },
 		timestamp: { type: Date, default: Date.now },
 	},
-	{ _id: false }, // Disable automatic _id creation for subdocuments
+	{ _id: false },
 );
 
 // Define the UserSchema
@@ -40,8 +40,9 @@ const UserSchema: Schema = new Schema({
 	password: { type: String, required: true },
 	sessionToken: { type: String, required: false },
 	isOnline: { type: Boolean, default: false },
-	friendsList: [FriendSchema], // Use the FriendSchema here
-	notifications: [NotificationSchema], // Use the NotificationSchema here
+	profilePictureUrl: { type: String },
+	friendsList: [FriendSchema],
+	notifications: [NotificationSchema],
 });
 
 export const User = mongoose.model<IUser>('User', UserSchema);
