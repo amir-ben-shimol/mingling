@@ -1,50 +1,79 @@
+/* eslint-disable max-lines */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/providers/WebRtcProvider.tsx
+/* eslint-disable padding-line-between-statements */
+// src/providers/useWebRTC.tsx
 import React, { createContext, useContext, useState, useRef, useEffect } from 'react';
-import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, type MediaStream, mediaDevices } from 'react-native-webrtc';
+import { RTCPeerConnection, RTCSessionDescription, RTCIceCandidate, MediaStream, mediaDevices } from 'react-native-webrtc';
 import { useSocket } from '@/lib/providers/socketProvider';
 
 type WebRTCContextProps = {
 	localStream: MediaStream | null;
-	remoteStream: MediaStream | null;
+	remoteStreams: Map<string, MediaStream>;
 	connected: boolean;
-	partnerSocketId: string | null;
-	setupWebRTC: (partnerSocketId: string) => void;
-	setupLocalStream: () => void;
+	partnerSocketIds: string[];
+	setupWebRTC: (partnerSocketIds: string[]) => void;
+	setupLocalStream: () => Promise<MediaStream>;
 	endCall: () => void;
 };
 
 const WebRTCContext = createContext<WebRTCContextProps | undefined>(undefined);
 
-export const WebRtcProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const WebRTCProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	const { socket } = useSocket();
 	const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-	const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-	const [partnerSocketId, setPartnerSocketId] = useState<string | null>(null);
+	const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(new Map());
+	const [partnerSocketIds, setPartnerSocketIds] = useState<string[]>([]);
 
-	const pcRef = useRef<RTCPeerConnection | null>(null);
+	const peerConnections = useRef<Map<string, RTCPeerConnection>>(new Map());
+
+	const [makingOffer, setMakingOffer] = useState(false);
 
 	useEffect(() => {
 		if (!socket) return;
 
 		const handleSignal = async ({ from, data }: { from: string; data: any }) => {
-			if (!pcRef.current) return;
+			console.log(`Received signal from ${from}`, data);
+			let pc = peerConnections.current.get(from);
 
-			if (data.sdp) {
-				await pcRef.current.setRemoteDescription(new RTCSessionDescription(data.sdp));
+			if (!pc) {
+				const stream = localStream || (await setupLocalStream());
+				pc = createPeerConnection(from, stream);
+				peerConnections.current.set(from, pc);
+			}
 
-				if (data.sdp.type === 'offer') {
-					const answer = await pcRef.current.createAnswer();
+			try {
+				if (data.sdp) {
+					const description = new RTCSessionDescription(data.sdp);
+					const offerCollision = data.sdp.type === 'offer' && (makingOffer || pc.signalingState !== 'stable');
 
-					await pcRef.current.setLocalDescription(answer);
-					socket.emit('signal', { to: from, data: { sdp: answer } });
+					const polite = isPolitePeer(from);
+
+					if (!polite && offerCollision) {
+						console.log('Ignoring offer due to collision (impolite peer)');
+						return;
+					}
+
+					if (offerCollision) {
+						console.log('Rolling back due to collision');
+						await pc.setLocalDescription({ type: 'rollback', sdp: '' });
+					}
+
+					await pc.setRemoteDescription(description);
+
+					if (description.type === 'offer') {
+						const answer = await pc.createAnswer();
+						await pc.setLocalDescription(answer);
+						socket.emit('signal', { to: from, data: { sdp: pc.localDescription } });
+					}
+				} else if (data.candidate) {
+					try {
+						await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+					} catch (error) {
+						console.error('Error adding received ice candidate', error);
+					}
 				}
-			} else if (data.candidate) {
-				try {
-					await pcRef.current.addIceCandidate(new RTCIceCandidate(data.candidate));
-				} catch (error) {
-					console.error('Error adding received ice candidate', error);
-				}
+			} catch (error) {
+				console.error('Error handling signal', error);
 			}
 		};
 
@@ -53,70 +82,123 @@ export const WebRtcProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 		return () => {
 			socket.off('signal', handleSignal);
 		};
-	}, [socket]);
+	}, [socket, makingOffer, localStream]);
 
-	const setupLocalStream = async () => {
+	const setupLocalStream = async (): Promise<MediaStream> => {
+		if (localStream) return localStream; // Return existing stream
+		console.log('Setting up local stream');
 		const stream = await mediaDevices.getUserMedia({
 			audio: true,
 			video: true,
 		});
-
 		setLocalStream(stream);
-		stream.getTracks().forEach((track) => pcRef.current?.addTrack(track, stream));
+		return stream;
 	};
 
-	const setupWebRTC = async (partnerId: string) => {
-		setPartnerSocketId(partnerId);
+	const isPolitePeer = (partnerId: string): boolean => {
+		if (!socket || !socket.id) {
+			console.warn('Socket or socket.id is undefined in isPolitePeer');
+			return false; // Handle accordingly
+		}
+		return socket.id < partnerId;
+	};
+
+	const createPeerConnection = (partnerId: string, stream: MediaStream): RTCPeerConnection => {
+		console.log(`Creating peer connection with ${partnerId}`);
 
 		const pc = new RTCPeerConnection({
 			iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
 		});
 
-		pcRef.current = pc;
-
-		if (!localStream) {
-			const stream = await mediaDevices.getUserMedia({
-				audio: true,
-				video: true,
-			});
-
-			setLocalStream(stream);
-			stream.getTracks().forEach((track) => pc.addTrack(track, stream));
-		}
+		stream.getTracks().forEach((track) => {
+			console.log(`Adding track ${track.kind} to peer connection with ${partnerId}`);
+			pc.addTrack(track, stream);
+		});
 
 		pc.addEventListener('icecandidate', (event) => {
 			if (event.candidate) {
+				console.log(`Sending ICE candidate to ${partnerId}`, event.candidate);
 				socket?.emit('signal', { to: partnerId, data: { candidate: event.candidate } });
 			}
 		});
 
 		pc.addEventListener('track', (event) => {
-			setRemoteStream(event.streams[0] || null);
+			console.log(`Received remote track from ${partnerId}`, event.track);
+			setRemoteStreams((prev) => {
+				const updatedStreams = new Map(prev);
+				let remoteStream = updatedStreams.get(partnerId);
+				if (!remoteStream) {
+					remoteStream = new MediaStream();
+					updatedStreams.set(partnerId, remoteStream);
+				}
+				if (event.track) {
+					remoteStream.addTrack(event.track);
+				}
+				console.log(`Remote stream for ${partnerId} now has tracks:`, remoteStream.getTracks());
+				return updatedStreams;
+			});
 		});
 
-		const offer = await pc.createOffer({});
+		pc.addEventListener('negotiationneeded', async () => {
+			console.log(`Negotiation needed with ${partnerId}`);
+			try {
+				if (isPolitePeer(partnerId)) {
+					setMakingOffer(true);
+					const offer = await pc.createOffer({});
+					await pc.setLocalDescription(offer);
+					socket?.emit('signal', { to: partnerId, data: { sdp: pc.localDescription } });
+				}
+			} catch (error) {
+				// console.error('Error during negotiation', error);
+			} finally {
+				setMakingOffer(false);
+			}
+		});
 
-		await pc.setLocalDescription(offer);
-		socket?.emit('signal', { to: partnerId, data: { sdp: offer } });
+		return pc;
+	};
+
+	const setupWebRTC = async (partnerIds: string[]) => {
+		const stream = await setupLocalStream(); // Ensure local stream is ready and get the stream
+		setPartnerSocketIds(partnerIds);
+
+		for (const partnerId of partnerIds) {
+			const pc = createPeerConnection(partnerId, stream);
+			peerConnections.current.set(partnerId, pc);
+
+			// Only create an offer if we're the polite peer
+			if (isPolitePeer(partnerId)) {
+				try {
+					setMakingOffer(true);
+					const offer = await pc.createOffer({});
+					await pc.setLocalDescription(offer);
+					console.log(`Sending offer to ${partnerId}`, offer);
+					socket?.emit('signal', { to: partnerId, data: { sdp: pc.localDescription } });
+				} catch (error) {
+					console.error('Error creating offer', error);
+				} finally {
+					setMakingOffer(false);
+				}
+			}
+		}
 	};
 
 	const endCall = () => {
-		if (pcRef.current) {
-			pcRef.current.close();
-			pcRef.current = null;
-		}
-
-		setRemoteStream(null);
-		setPartnerSocketId(null);
+		peerConnections.current.forEach((pc) => {
+			pc.close();
+		});
+		peerConnections.current.clear();
+		setRemoteStreams(new Map());
+		setPartnerSocketIds([]);
 	};
 
 	return (
 		<WebRTCContext.Provider
 			value={{
 				localStream,
-				remoteStream,
-				connected: !!partnerSocketId,
-				partnerSocketId,
+				remoteStreams,
+				connected: partnerSocketIds.length > 0,
+				partnerSocketIds,
 				setupWebRTC,
 				setupLocalStream,
 				endCall,
@@ -131,7 +213,7 @@ export const useWebRTC = () => {
 	const context = useContext(WebRTCContext);
 
 	if (!context) {
-		throw new Error('useWebRTC must be used within a WebRtcProvider');
+		throw new Error('useWebRTC must be used within a WebRTCProvider');
 	}
 
 	return context;
