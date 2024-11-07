@@ -1,8 +1,9 @@
-// src/screens/components/VideoStreams.tsx
-import React from 'react';
+// src/components/VideoStreams.tsx
+
+import React, { useEffect } from 'react';
 import { Image } from 'expo-image';
 import { View } from 'react-native';
-import { RTCView } from 'react-native-webrtc';
+import { RTCView, type MediaStream } from 'react-native-webrtc';
 import StaticGlitchGif from '@/assets/gifs/static-glitch.gif';
 
 type MediaStreamWithToURL = MediaStream & {
@@ -11,21 +12,38 @@ type MediaStreamWithToURL = MediaStream & {
 
 type VideoStreamsProps = {
 	localStream: MediaStream | null;
-	remoteStream: MediaStream | null;
+	remoteStreams: Map<string, MediaStream>;
 };
 
-const VideoStreams: React.FC<VideoStreamsProps> = ({ localStream, remoteStream }) => {
+const VideoStreams: React.FC<VideoStreamsProps> = ({ localStream, remoteStreams }) => {
+	useEffect(() => {
+		console.log('Remote streams updated:', remoteStreams);
+	}, [remoteStreams]);
+
 	return (
-		<View className="relative max-h-[60%] flex-1">
-			{remoteStream ? (
-				<RTCView streamURL={(remoteStream as MediaStreamWithToURL).toURL()} className="flex-1" objectFit="cover" mirror={false} />
+		<View style={{ flex: 1, position: 'relative' }}>
+			{remoteStreams.size > 0 ? (
+				<View style={{ flex: 1 }}>
+					{Array.from(remoteStreams.entries()).map(([partnerId, stream]) => {
+						const streamURL = (stream as MediaStreamWithToURL).toURL();
+
+						return <RTCView key={partnerId} streamURL={streamURL} style={{ flex: 1, backgroundColor: 'black' }} objectFit="cover" />;
+					})}
+				</View>
 			) : (
-				<Image source={StaticGlitchGif} className="flex-1" />
+				<Image source={StaticGlitchGif} style={{ flex: 1 }} />
 			)}
 			{localStream && (
 				<RTCView
 					streamURL={(localStream as MediaStreamWithToURL).toURL()}
-					className="absolute bottom-2 right-2 z-10 h-24 w-16 rounded border-2 border-red-500"
+					style={{
+						position: 'absolute',
+						bottom: 10,
+						right: 10,
+						width: 100,
+						height: 150,
+						backgroundColor: 'black',
+					}}
 					objectFit="cover"
 					mirror
 				/>

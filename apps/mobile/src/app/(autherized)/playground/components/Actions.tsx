@@ -1,31 +1,38 @@
 // src/screens/components/Actions.tsx
 import React, { useState } from 'react';
+import type { Socket } from 'socket.io-client';
 import { View, Pressable, Alert } from 'react-native';
 import { Feather, MaterialIcons } from '@expo/vector-icons';
 import { useAuth } from '@/lib/providers/authProvider';
-
 import { BackendService } from '@/lib/utils/backend-service';
 import { UIModal } from '@/ui/UIModal';
 
 type ActionsProps = {
-	partnerSocketId: string;
+	partnerSocketIds: string[];
+	socket: Socket | null;
+	onMergeGroups: () => void;
 };
 
-export const Actions: React.FC<ActionsProps> = ({ partnerSocketId }) => {
+export const Actions = (props: ActionsProps) => {
 	const [modalVisible, setModalVisible] = useState(false);
 	const { user } = useAuth();
 
-	const sendFriendRequest = async () => {
+	const sendFriendRequests = async () => {
 		if (!user) return;
 
 		try {
-			await BackendService.post('/api/friends/request', { partnerSocketId: partnerSocketId });
+			await BackendService.post('/api/friends/request', { partnerSocketId: props.partnerSocketIds[0] });
 		} catch (error) {
-			Alert.alert('Error', 'Failed to send friend request. Please try again.');
+			Alert.alert('Error', 'Failed to send friend requests. Please try again.');
 			console.error('Friend request error:', error);
 		} finally {
 			setModalVisible(false);
 		}
+	};
+
+	const inviteToJoinGroup = () => {
+		props.onMergeGroups();
+		setModalVisible(false);
 	};
 
 	return (
@@ -34,20 +41,15 @@ export const Actions: React.FC<ActionsProps> = ({ partnerSocketId }) => {
 				<Feather name="menu" size={24} color="#ffff" />
 			</Pressable>
 
-			<UIModal title="actions" customSize="25" isVisible={modalVisible} onClose={() => setModalVisible(false)}>
+			<UIModal title="Actions" customSize="25" isVisible={modalVisible} onClose={() => setModalVisible(false)}>
 				<View className="flex w-full flex-row justify-around px-2">
-					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
+					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequests}>
 						<Feather name="user-plus" size={60} color="#ffff" />
 					</Pressable>
-					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
-						<MaterialIcons name="join-full" size={60} color="#fff" />
+					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={inviteToJoinGroup}>
+						<MaterialIcons name="group-add" size={60} color="#fff" />
 					</Pressable>
-					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
-						<Feather name="user-plus" size={60} color="#ffff" />
-					</Pressable>
-					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequest}>
-						<Feather name="user-plus" size={60} color="#ffff" />
-					</Pressable>
+					{/* Add more actions as needed */}
 				</View>
 			</UIModal>
 		</View>

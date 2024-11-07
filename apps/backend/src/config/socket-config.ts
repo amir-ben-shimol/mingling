@@ -1,80 +1,410 @@
-// config/socket-config.ts
+/* eslint-disable max-lines */
+import { v4 as uuidv4 } from 'uuid';
 import type { Server, Socket } from 'socket.io';
-import { deleteSocketUser, setSocketUser, setUserSocket, getUserIdBySocketId, setUserOnlineStatus, deleteUserSocket } from '../helpers/redis-helpers';
+import {
+	createGroup,
+	addGroupToAvailableGroups,
+	setSocketGroupId,
+	getSocketGroupId,
+	getGroup,
+	updateGroup,
+	deleteGroup,
+	removeGroupFromAvailableGroups,
+	getAvailableGroupToMatch,
+	deleteSocketUser,
+	setSocketUser,
+	setUserSocket,
+	getUserIdBySocketId,
+	setUserOnlineStatus,
+	deleteUserSocket,
+	deleteSocketGroupId,
+} from '../helpers/redis-helpers';
 import { emitFriendUpdate } from '../helpers/socket-emitters';
 
-type UserSocketData = {
-	userId: string;
+type GroupData = {
+	groupId: string;
+	memberSocketIds: Set<string>;
 	inPlayground: boolean;
 	inChat: boolean;
-	chatPartnerId: string | null;
+	chatPartnerGroupId: string | null;
 };
 
 export function configureSockets(io: Server) {
-	const users = new Map<string, UserSocketData>();
-	const availableUsers = new Set<string>();
-
 	io.on('connection', (socket: Socket) => {
-		// Function to handle when a user leaves the playground or disconnects
-		function handleUserLeaving(socket: Socket, isNextUser = false) {
-			const userData = users.get(socket.id);
+		// Function to match groups
+		async function matchGroup(groupId: string) {
+			const group = await getGroup(groupId);
 
-			if (!userData) return;
+			if (!group || !group.inPlayground || group.inChat) {
+				return;
+			}
 
-			if (userData.chatPartnerId) {
-				const partnerSocket = io.sockets.sockets.get(userData.chatPartnerId);
+			// Try to find another group to match
+			const partnerGroupId = await getAvailableGroupToMatch(groupId);
 
-				if (partnerSocket) {
-					partnerSocket.emit('partnerLeft');
-					const partnerData = users.get(userData.chatPartnerId);
+			if (partnerGroupId) {
+				// Remove both groups from availableGroups
+				await removeGroupFromAvailableGroups(groupId);
+				await removeGroupFromAvailableGroups(partnerGroupId);
 
-					if (partnerData) {
-						partnerData.inChat = false;
-						partnerData.chatPartnerId = null;
+				const partnerGroup = await getGroup(partnerGroupId);
 
-						if (partnerData.inPlayground) {
-							availableUsers.add(partnerSocket.id);
-						}
+				if (partnerGroup && partnerGroup.inPlayground && !partnerGroup.inChat) {
+					// Update both groups to be in chat with each other
+					await updateGroup(groupId, { inChat: true, chatPartnerGroupId: partnerGroupId });
+					await updateGroup(partnerGroupId, { inChat: true, chatPartnerGroupId: groupId });
+
+					// Notify all members in both groups
+					const groupMemberSocketIds = Array.from(group.memberSocketIds);
+					const partnerGroupMemberSocketIds = Array.from(partnerGroup.memberSocketIds);
+
+					groupMemberSocketIds.forEach((socketId) => {
+						io.to(socketId).emit('matched', {
+							partnerGroupId: partnerGroupId,
+							partnerSocketIds: partnerGroupMemberSocketIds,
+						});
+					});
+
+					partnerGroupMemberSocketIds.forEach((socketId) => {
+						io.to(socketId).emit('matched', {
+							partnerGroupId: groupId,
+							partnerSocketIds: groupMemberSocketIds,
+						});
+					});
+				} else {
+					// Partner group is not available, add back to availableGroups
+					await addGroupToAvailableGroups(groupId);
+				}
+			} else {
+				// No partner group found, group remains in availableGroups
+				// Do nothing
+			}
+		}
+
+		// User joins the playground
+		socket.on('joinPlayground', async (userId: string) => {
+			console.log(`User ${userId} joined the playground with socket ${socket.id}`);
+
+			const groupId = uuidv4();
+
+			const groupData: GroupData = {
+				groupId,
+				memberSocketIds: new Set([socket.id]),
+				inPlayground: true,
+				inChat: false,
+				chatPartnerGroupId: null,
+			};
+
+			await createGroup(groupId, groupData);
+			await addGroupToAvailableGroups(groupId);
+			await setSocketGroupId(socket.id, groupId);
+
+			// Try to match the group
+			await matchGroup(groupId);
+		});
+
+		// User leaves the playground
+		socket.on('leavePlayground', async () => {
+			console.warn('User left the playground');
+
+			const groupId = await getSocketGroupId(socket.id);
+
+			if (!groupId) return;
+
+			const group = await getGroup(groupId);
+
+			if (!group) return;
+
+			// Remove socketId from group's memberSocketIds
+			group.memberSocketIds.delete(socket.id);
+			await updateGroup(groupId, { memberSocketIds: group.memberSocketIds });
+
+			await deleteSocketGroupId(socket.id);
+
+			if (group.memberSocketIds.size === 0) {
+				// Delete the group
+				await deleteGroup(groupId);
+				await removeGroupFromAvailableGroups(groupId);
+			} else {
+				// Update the group's members
+				const memberSocketIds = Array.from(group.memberSocketIds);
+
+				memberSocketIds.forEach((socketId) => {
+					io.to(socketId).emit('groupUpdated', {
+						groupId: group.groupId,
+						memberSocketIds: memberSocketIds,
+					});
+				});
+			}
+
+			// Remove group from availableGroups
+			await removeGroupFromAvailableGroups(groupId);
+
+			// Notify partner group if in chat
+			if (group.inChat && group.chatPartnerGroupId) {
+				const partnerGroupId = group.chatPartnerGroupId;
+				const partnerGroup = await getGroup(partnerGroupId);
+
+				if (partnerGroup) {
+					await updateGroup(partnerGroupId, { inChat: false, chatPartnerGroupId: null });
+
+					// Notify partner group members that the partner has left
+					const partnerMemberSocketIds = Array.from(partnerGroup.memberSocketIds);
+
+					partnerMemberSocketIds.forEach((socketId) => {
+						io.to(socketId).emit('partnerLeft');
+					});
+
+					// Add partner group back to availableGroups if they are still in the playground
+					if (partnerGroup.inPlayground) {
+						await addGroupToAvailableGroups(partnerGroupId);
+						// Try to match the partner group
+						await matchGroup(partnerGroupId);
 					}
 				}
 			}
 
-			userData.inChat = false;
-			userData.chatPartnerId = null;
+			await updateGroup(groupId, { inChat: false, chatPartnerGroupId: null, inPlayground: false });
+		});
 
-			if (!isNextUser) {
-				userData.inPlayground = false;
-				availableUsers.delete(socket.id);
+		// Handle 'nextUser' event
+		socket.on('nextUser', async () => {
+			console.log('Entered NEXT USER');
+			const groupId = await getSocketGroupId(socket.id);
+
+			if (!groupId) return;
+
+			const group = await getGroup(groupId);
+
+			if (!group) return;
+
+			if (!group.inChat || !group.chatPartnerGroupId) {
+				// The group is not currently in a chat
+				return;
 			}
-		}
 
-		// Match users in the playground for chat
-		async function matchUsers() {
-			while (availableUsers.size >= 2) {
-				const [socketId1, socketId2] = Array.from(availableUsers).slice(0, 2);
+			const partnerGroupId = group.chatPartnerGroupId;
+			const partnerGroup = await getGroup(partnerGroupId);
 
-				if (!socketId1 || !socketId2) return;
+			// Notify all members in both groups that the chat has ended
+			const groupMemberSocketIds = Array.from(group.memberSocketIds);
 
-				availableUsers.delete(socketId1);
-				availableUsers.delete(socketId2);
+			groupMemberSocketIds.forEach((socketId) => {
+				io.to(socketId).emit('chatEnded');
+			});
 
-				const user1 = users.get(socketId1);
-				const user2 = users.get(socketId2);
+			if (partnerGroup) {
+				const partnerMemberSocketIds = Array.from(partnerGroup.memberSocketIds);
 
-				if (user1 && user2) {
-					user1.inChat = true;
-					user1.chatPartnerId = socketId2;
-					user2.inChat = true;
-					user2.chatPartnerId = socketId1;
+				partnerMemberSocketIds.forEach((socketId) => {
+					io.to(socketId).emit('chatEnded');
+				});
 
-					const user1Id = await getUserIdBySocketId(socketId1);
-					const user2Id = await getUserIdBySocketId(socketId2);
+				// Reset partner group's state
+				await updateGroup(partnerGroupId, { inChat: false, chatPartnerGroupId: null });
 
-					io.to(socketId1).emit('matched', { partnerSocketId: socketId2, partnerUserId: user2Id });
-					io.to(socketId2).emit('matched', { partnerSocketId: socketId1, partnerUserId: user1Id });
+				// Add partner group back to availableGroups if they are still in the playground
+				if (partnerGroup.inPlayground) {
+					await addGroupToAvailableGroups(partnerGroupId);
+					// Try to match the partner group
+					await matchGroup(partnerGroupId);
 				}
 			}
-		}
+
+			// Reset our group's state
+			await updateGroup(groupId, { inChat: false, chatPartnerGroupId: null });
+
+			// Add our group back to availableGroups if we are still in the playground
+			if (group.inPlayground) {
+				await addGroupToAvailableGroups(groupId);
+				// Try to match the group again
+				await matchGroup(groupId);
+			}
+		});
+
+		// Handle 'mergeGroups' event
+		socket.on('mergeGroups', async () => {
+			console.log(`Merge request initiated by socket ${socket.id}`);
+			const socketGroupId = await getSocketGroupId(socket.id);
+
+			if (!socketGroupId) return;
+
+			const group = await getGroup(socketGroupId);
+
+			if (!group) return;
+
+			const partnerGroupId = group.chatPartnerGroupId;
+
+			if (!partnerGroupId) return;
+
+			const partnerGroup = await getGroup(partnerGroupId);
+
+			if (!partnerGroup) return;
+
+			// Send 'mergeRequest' to all members of the partner group
+			const partnerMemberSocketIds = Array.from(partnerGroup.memberSocketIds);
+
+			partnerMemberSocketIds.forEach((socketId) => {
+				io.to(socketId).emit('mergeRequest', { fromGroupId: group.groupId });
+			});
+		});
+
+		// Handle 'mergeResponse' event
+		socket.on('mergeResponse', async ({ accepted, fromGroupId }) => {
+			console.log(`Merge response from socket ${socket.id}: ${accepted}`);
+			const socketGroupId = await getSocketGroupId(socket.id);
+
+			if (!socketGroupId) return;
+
+			const group = await getGroup(socketGroupId);
+
+			if (!group) return;
+
+			const requestingGroupId = fromGroupId;
+
+			const requestingGroup = await getGroup(requestingGroupId);
+
+			if (!requestingGroup) return;
+
+			if (accepted) {
+				// Proceed to merge the groups
+				const newGroupId = uuidv4();
+				const newMemberSocketIds = new Set([...group.memberSocketIds, ...requestingGroup.memberSocketIds]);
+
+				const newGroupData: GroupData = {
+					groupId: newGroupId,
+					memberSocketIds: newMemberSocketIds,
+					inPlayground: true,
+					inChat: false,
+					chatPartnerGroupId: null,
+				};
+
+				await createGroup(newGroupId, newGroupData);
+				await addGroupToAvailableGroups(newGroupId);
+
+				// Update socketGroupId mappings
+				for (const socketId of newMemberSocketIds) {
+					await setSocketGroupId(socketId, newGroupId);
+				}
+
+				// Notify all members
+				const memberSocketIds = Array.from(newMemberSocketIds);
+
+				memberSocketIds.forEach((socketId) => {
+					io.to(socketId).emit('groupUpdated', {
+						groupId: newGroupId,
+						memberSocketIds: memberSocketIds,
+						isMerged: true,
+					});
+				});
+
+				// Delete old groups
+				await deleteGroup(group.groupId);
+				await deleteGroup(requestingGroup.groupId);
+				await removeGroupFromAvailableGroups(group.groupId);
+				await removeGroupFromAvailableGroups(requestingGroup.groupId);
+
+				// Notify that they are looking for a match together
+				memberSocketIds.forEach((socketId) => {
+					io.to(socketId).emit('lookingForMatchTogether');
+				});
+
+				// Attempt to match groups again
+				await matchGroup(newGroupId);
+			} else {
+				// Merge declined, notify the requesting group
+				const requestingMemberSocketIds = Array.from(requestingGroup.memberSocketIds);
+
+				requestingMemberSocketIds.forEach((socketId) => {
+					io.to(socketId).emit('mergeDeclined');
+				});
+			}
+		});
+
+		// Handle signaling for WebRTC connections
+		socket.on('signal', ({ to, data }) => {
+			io.to(to).emit('signal', { from: socket.id, data });
+		});
+
+		// Handle chat messages
+		socket.on('chatMessage', ({ to, message }) => {
+			io.to(to).emit('chatMessage', message);
+		});
+
+		// Handle disconnects
+		socket.on('disconnect', async () => {
+			console.log(`User with socket ${socket.id} disconnected`);
+
+			// Handle the user leaving the playground
+			const groupId = await getSocketGroupId(socket.id);
+
+			if (groupId) {
+				const group = await getGroup(groupId);
+
+				if (group) {
+					// Remove socketId from group's memberSocketIds
+					group.memberSocketIds.delete(socket.id);
+					await updateGroup(groupId, { memberSocketIds: group.memberSocketIds });
+
+					await deleteSocketGroupId(socket.id);
+
+					if (group.memberSocketIds.size === 0) {
+						// Delete the group
+						await deleteGroup(groupId);
+						await removeGroupFromAvailableGroups(groupId);
+					} else {
+						// Update the group's members
+						const memberSocketIds = Array.from(group.memberSocketIds);
+
+						memberSocketIds.forEach((socketId) => {
+							io.to(socketId).emit('groupUpdated', {
+								groupId: group.groupId,
+								memberSocketIds: memberSocketIds,
+							});
+						});
+					}
+
+					// Remove group from availableGroups
+					await removeGroupFromAvailableGroups(groupId);
+
+					// Notify partner group if in chat
+					if (group.inChat && group.chatPartnerGroupId) {
+						const partnerGroupId = group.chatPartnerGroupId;
+						const partnerGroup = await getGroup(partnerGroupId);
+
+						if (partnerGroup) {
+							await updateGroup(partnerGroupId, { inChat: false, chatPartnerGroupId: null });
+
+							// Notify partner group members that the partner has left
+							const partnerMemberSocketIds = Array.from(partnerGroup.memberSocketIds);
+
+							partnerMemberSocketIds.forEach((socketId) => {
+								io.to(socketId).emit('partnerLeft');
+							});
+
+							// Add partner group back to availableGroups if they are still in the playground
+							if (partnerGroup.inPlayground) {
+								await addGroupToAvailableGroups(partnerGroupId);
+								// Try to match the partner group
+								await matchGroup(partnerGroupId);
+							}
+						}
+					}
+
+					await updateGroup(groupId, { inChat: false, chatPartnerGroupId: null, inPlayground: false });
+				}
+			}
+
+			// Handle user disconnection
+			await deleteSocketUser(socket.id); // Removes the socket-user mapping from Redis
+			const userId = await getUserIdBySocketId(socket.id);
+
+			if (userId) {
+				await setUserOnlineStatus(userId, false);
+				await deleteUserSocket(userId);
+				emitFriendUpdate(io, userId, { isOnline: false });
+			}
+		});
 
 		// Map userId to socketId in Redis upon initial login
 		socket.on('login', async ({ userId }) => {
@@ -107,65 +437,6 @@ export function configureSockets(io: Server) {
 		socket.on('app-foreground', async (userId) => {
 			await setUserOnlineStatus(userId, true);
 			emitFriendUpdate(io, userId, { isOnline: true });
-		});
-
-		// User joins the playground (no need to re-set socket mappings)
-		socket.on('joinPlayground', (userId: string) => {
-			console.log(`User ${userId} joined the playground with socket ${socket.id}`);
-
-			// Store user data locally for playground functionality
-			users.set(socket.id, {
-				userId,
-				inPlayground: true,
-				inChat: false,
-				chatPartnerId: null,
-			});
-			availableUsers.add(socket.id);
-			matchUsers();
-		});
-
-		// Handle when a user leaves the playground
-		socket.on('leavePlayground', () => {
-			handleUserLeaving(socket);
-			users.delete(socket.id); // Remove local data
-			availableUsers.delete(socket.id);
-		});
-
-		// Handle moving to the next user
-		socket.on('nextUser', () => {
-			handleUserLeaving(socket, true);
-			const user = users.get(socket.id);
-
-			if (user) {
-				user.inPlayground = true;
-				availableUsers.add(socket.id);
-				matchUsers();
-			}
-		});
-
-		// Handle signaling for WebRTC connections
-		socket.on('signal', ({ to, data }) => {
-			io.to(to).emit('signal', { from: socket.id, data });
-		});
-
-		// Handle disconnects (only removes mapping if it’s unexpected)
-		socket.on('disconnect', async () => {
-			console.log(`Socket ${socket.id} disconnected`);
-			const userId = await getUserIdBySocketId(socket.id);
-
-			if (userId) {
-				await deleteSocketUser(socket.id); // Only delete mapping if this disconnect is unexpected
-				users.delete(socket.id); // Cleanup local playground data if applicable
-
-				availableUsers.delete(socket.id);
-
-				handleUserLeaving(socket);
-			}
-		});
-
-		// Handle chat messages
-		socket.on('chatMessage', ({ to, message }) => {
-			io.to(to).emit('chatMessage', message);
 		});
 	});
 }
