@@ -6,17 +6,17 @@ import { useSocket } from '@/lib/providers/socketProvider';
 import { useAuth } from '@/lib/providers/authProvider';
 
 type ChatProps = {
-	connectedUser: string;
+	connectedUsers: string[];
 };
 
 type Message = {
-	sender: string;
+	senderId: string;
+	senderName: string;
 	content: string;
 	timestamp: number;
 };
 
-const Chat: React.FC<ChatProps> = ({ connectedUser }) => {
-	console.log('Inside Chat component', connectedUser);
+const Chat: React.FC<ChatProps> = ({ connectedUsers }) => {
 	const { socket } = useSocket();
 	const { user } = useAuth();
 	const [messages, setMessages] = useState<Message[]>([]);
@@ -46,22 +46,30 @@ const Chat: React.FC<ChatProps> = ({ connectedUser }) => {
 		if (!input.trim() || !user) return;
 
 		const message: Message = {
-			sender: user._id,
+			senderId: user._id,
+			senderName: user.firstName || 'You',
 			content: input.trim(),
 			timestamp: Date.now(),
 		};
 
-		socket?.emit('chatMessage', { to: connectedUser, message });
+		// Send the message to all connected users
+		connectedUsers
+			.filter((connectedUserSocketId) => connectedUserSocketId !== socket?.id)
+			.forEach((partnerSocketId) => {
+				socket?.emit('chatMessage', { to: partnerSocketId, message });
+			});
+
 		setMessages((prev) => [...prev, message]);
 		setInput('');
-		Keyboard.dismiss(); // Hide the keyboard
+		Keyboard.dismiss();
 	};
 
 	const renderItem = ({ item }: { item: Message }) => {
-		const isSentByUser = item.sender === user?._id;
+		const isSentByUser = item.senderId === user?._id;
 
 		return (
 			<View className={`my-1 max-w-[80%] rounded-md p-2 ${isSentByUser ? 'self-end bg-blue-500' : 'self-start bg-gray-300'}`}>
+				{!isSentByUser && <Text className="text-sm font-bold text-black">{item.senderName}</Text>}
 				<Text className={`${isSentByUser ? 'text-white' : 'text-black'}`}>{item.content}</Text>
 				<Text className={`mt-1 text-xs ${isSentByUser ? 'text-white' : 'text-gray-600'}`}>{dayjs(item.timestamp).format('HH:mm')}</Text>
 			</View>
