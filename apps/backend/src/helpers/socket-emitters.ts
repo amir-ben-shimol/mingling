@@ -48,8 +48,6 @@ export async function emitFriendUpdate(io: Server, userId: string, updatedFields
 				console.log("Found friend's status to update with userId", friend.userId);
 				const friendSocketId = await getSocketIdByUserId(friend.userId);
 
-				console.log('friendSocketId', friendSocketId);
-
 				if (friendSocketId) {
 					io.to(friendSocketId).emit('friendUpdate', { userId, ...updatedFields });
 				}
