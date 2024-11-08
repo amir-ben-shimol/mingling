@@ -68,7 +68,7 @@ const ProfilePage = () => {
 	}, []);
 
 	return (
-		<View className="flex w-full items-center bg-white px-6 py-8">
+		<View className="flex w-full items-center bg-gray-900 px-6 py-8">
 			<View className="relative h-28 w-28">
 				{loadingImage && <UISvg name="profileImagePlaceholder" className="absolute left-0 top-0 h-28 w-28 rounded-full" />}
 				{user?.profilePictureUrl && (
@@ -76,30 +76,30 @@ const ProfilePage = () => {
 						source={{ uri: user.profilePictureUrl }}
 						className="absolute left-0 top-0 h-28 w-28 rounded-full"
 						resizeMode="cover"
-						onLoadStart={() => setLoadingImage(true)} // Set loading state at the start of image loading
-						onLoad={() => setLoadingImage(false)} // Hide placeholder when image finishes loading
-						onError={() => setLoadingImage(false)} // Hide placeholder if there's an error
+						onLoadStart={() => setLoadingImage(true)}
+						onLoad={() => setLoadingImage(false)}
+						onError={() => setLoadingImage(false)}
 					/>
 				)}
 				<UISvg name="edit" className="absolute bottom-0 right-0" onClick={handleSelectProfilePicture} />
 			</View>
 
-			<UIText className="font-RubikBold mt-8 text-3xl text-blue-900">{`Hello, ${user?.firstName} ${user?.lastName}`}</UIText>
+			<UIText className="font-RubikBold mt-8 text-3xl text-gray-100">{`Hello, ${user?.firstName} ${user?.lastName}`}</UIText>
 
-			<View className="mt-6 w-full rounded-lg bg-blue-50 p-4">
-				<UIText className="font-RubikBold text-xl text-gray-700">Profile Details</UIText>
+			<View className="mt-6 w-full rounded-lg bg-gray-800 p-4">
+				<UIText className="font-RubikBold text-xl text-gray-200">Profile Details</UIText>
 
 				<View className="mt-4">
-					<UIText className="text-lg text-gray-600">Email: {user?.email}</UIText>
-					<UIText className="text-lg text-gray-600">Country: {user?.country}</UIText>
-					<UIText className="text-lg text-gray-600">Gender: {user?.gender}</UIText>
-					<UIText className="text-lg text-gray-600">Age: {user?.age}</UIText>
-					<UIText className="text-lg text-gray-600">Status: {user?.isOnline ? 'Online' : 'Offline'}</UIText>
+					<UIText className="text-lg text-gray-400">Email: {user?.email}</UIText>
+					<UIText className="text-lg text-gray-400">Country: {user?.country}</UIText>
+					<UIText className="text-lg text-gray-400">Gender: {user?.gender}</UIText>
+					<UIText className="text-lg text-gray-400">Age: {user?.age}</UIText>
+					<UIText className="text-lg text-gray-400">Status: {user?.isOnline ? 'Online' : 'Offline'}</UIText>
 				</View>
 			</View>
 
 			<View className="mt-10 flex w-full flex-row justify-between">
-				<TouchableOpacity className="rounded bg-red-500 px-6 py-2" onPress={logout}>
+				<TouchableOpacity className="rounded bg-red-600 px-6 py-2" onPress={logout}>
 					<UIText className="text-lg text-white">Logout</UIText>
 				</TouchableOpacity>
 			</View>

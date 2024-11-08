@@ -2,6 +2,7 @@
 // src/helpers/redis-helpers.ts
 
 import redisClient from '../config/redis-config';
+import type { GroupData } from '../types/playground';
 
 // Set or remove user's online status in Redis
 export const setUserOnlineStatus = async (userId: string, isOnline: boolean): Promise<void> => {
@@ -61,15 +62,6 @@ export const deleteSocketUser = async (socketId: string): Promise<void> => {
 	}
 
 	await redisClient.del(`socketUser:${socketId}`);
-};
-
-// Group management functions
-export type GroupData = {
-	groupId: string;
-	memberSocketIds: Set<string>;
-	inPlayground: boolean;
-	inChat: boolean;
-	chatPartnerGroupId: string | null;
 };
 
 export const createGroup = async (groupId: string, groupData: GroupData): Promise<void> => {

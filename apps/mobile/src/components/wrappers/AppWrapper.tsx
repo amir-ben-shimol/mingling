@@ -6,7 +6,7 @@ import AppErrorHandler from '@/modules/ApplErrorHandler';
 
 const AppWrapper = () => {
 	return (
-		<GestureHandlerRootView className="flex-1 bg-white pb-8">
+		<GestureHandlerRootView className="flex-1">
 			<BottomSheetModalProvider>
 				<AppErrorHandler />
 				<Slot />
