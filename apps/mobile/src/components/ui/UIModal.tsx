@@ -90,7 +90,7 @@ export const UIModal = (props: Props) => {
 			opacity: interpolate(
 				animatedIndex.value,
 				[-1, 0],
-				[0, 0.5], // * Adjust the second value to control max opacity
+				[0, 0.5], // Adjust the second value to control max opacity
 				Extrapolation.CLAMP,
 			),
 		}));
@@ -131,27 +131,30 @@ export const UIModal = (props: Props) => {
 			backdropComponent={(props) => <CustomBackdrop {...props} />}
 			onDismiss={onDismiss}
 		>
-			<View className={`flex-row items-center justify-between px-3 pb-4 ${headerShadow ? 'shadow' : ''}`} style={{ backgroundColor: 'white' }}>
+			{/* Modal Header with Dark Background */}
+			<View className={`flex-row items-center justify-between px-3 pb-4 ${headerShadow ? 'shadow' : ''}`} style={{ backgroundColor: '#1F2937' }}>
 				{props.title && (
-					<UITitle size="large" isGradient>
+					<UITitle size="large" isGradient={false}>
 						{props.title}
 					</UITitle>
 				)}
 				{!props.presist && (
-					<TouchableOpacity className="rounded-full bg-gray-300 p-2 text-black" onPress={onDismiss}>
-						<UISvg name="close" className="h-3 w-3 text-black" fill="#000000" />
+					<TouchableOpacity style={{ backgroundColor: '#374151', borderRadius: 50, padding: 8 }} onPress={onDismiss}>
+						<UISvg name="close" fill="#FFFFFF" className="h-3 w-3" />
 					</TouchableOpacity>
 				)}
 			</View>
+
+			{/* Modal Body with Dark Background */}
 			{props.scrollable === false ? (
-				<BottomSheetView className={props.className} style={[{ padding: 12 }, props.style]}>
+				<BottomSheetView className={props.className} style={[{ padding: 12, backgroundColor: '#111827' }, props.style]}>
 					{props.children}
 				</BottomSheetView>
 			) : (
 				<BottomSheetScrollView
-					contentContainerStyle={{ display: 'flex', alignItems: 'center', paddingBottom: 32 }}
+					contentContainerStyle={{ display: 'flex', alignItems: 'center', paddingBottom: 32, backgroundColor: '#111827' }}
 					className={props.className}
-					style={props.style}
+					style={[{ backgroundColor: '#111827' }, props.style]}
 					onScroll={handleScroll}
 				>
 					{props.children}

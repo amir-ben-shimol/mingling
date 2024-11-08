@@ -28,7 +28,7 @@ export const FriendsListSection: React.FC<FriendsListSectionProps> = ({
 		<FlatList
 			data={data}
 			keyExtractor={(item) => item.userDetails._id}
-			ListHeaderComponent={<UIText className="text-xl font-semibold">{title}</UIText>}
+			ListHeaderComponent={<UIText className="text-xl font-semibold text-gray-100">{title}</UIText>}
 			renderItem={({ item }) => (
 				<FriendListItem
 					friend={item}
