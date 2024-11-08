@@ -20,14 +20,7 @@ import {
 	deleteSocketGroupId,
 } from '../helpers/redis-helpers';
 import { emitFriendUpdate } from '../helpers/socket-emitters';
-
-type GroupData = {
-	groupId: string;
-	memberSocketIds: Set<string>;
-	inPlayground: boolean;
-	inChat: boolean;
-	chatPartnerGroupId: string | null;
-};
+import type { GroupData } from '../types/playground';
 
 export function configureSockets(io: Server) {
 	io.on('connection', (socket: Socket) => {

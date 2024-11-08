@@ -38,18 +38,19 @@ export const Actions = (props: ActionsProps) => {
 	return (
 		<View className="absolute right-4 top-4">
 			<Pressable className="items-center justify-center rounded-full bg-blue-600 p-2" onPress={() => setModalVisible(true)}>
-				<Feather name="menu" size={24} color="#ffff" />
+				<Feather name="menu" size={24} color="#FFFFFF" />
 			</Pressable>
 
 			<UIModal title="Actions" customSize="25" isVisible={modalVisible} onClose={() => setModalVisible(false)}>
 				<View className="flex w-full flex-row justify-around px-2">
-					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={sendFriendRequests}>
-						<Feather name="user-plus" size={60} color="#ffff" />
+					<Pressable className="flex w-fit flex-row rounded-xl bg-gray-700 p-2" onPress={sendFriendRequests}>
+						{/* Dark button */}
+						<Feather name="user-plus" size={60} color="#FFFFFF" />
 					</Pressable>
-					<Pressable className="flex w-fit flex-row rounded-xl bg-slate-600 p-2" onPress={inviteToJoinGroup}>
-						<MaterialIcons name="group-add" size={60} color="#fff" />
+					<Pressable className="flex w-fit flex-row rounded-xl bg-gray-700 p-2" onPress={inviteToJoinGroup}>
+						{/* Dark button */}
+						<MaterialIcons name="group-add" size={60} color="#FFFFFF" />
 					</Pressable>
-					{/* Add more actions as needed */}
 				</View>
 			</UIModal>
 		</View>
