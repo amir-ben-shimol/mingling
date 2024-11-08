@@ -1,13 +1,15 @@
 import React, { useEffect, useCallback } from 'react';
-import { View, Text, Pressable, StatusBar } from 'react-native';
+import { View, Pressable, StatusBar, Text } from 'react-native';
+
 import * as Haptics from 'expo-haptics';
 import { router, Tabs } from 'expo-router';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
-import { UILinearGradient } from '@/ui/UILinearGradient';
+// import { UILinearGradient } from '@/ui/UILinearGradient';
 import { Notifications } from '@/modules/Notifications';
+import { Profile } from '@/modules/Profile';
 
 const BottomTabsNavigator: React.FC = () => {
 	const rotation = useSharedValue(0);
@@ -46,20 +48,34 @@ const BottomTabsNavigator: React.FC = () => {
 
 	return (
 		<>
-			<StatusBar barStyle="dark-content" />
+			<StatusBar barStyle="light-content" />
 			<Tabs
-				sceneContainerStyle={{ backgroundColor: '#f1f5f9' }}
+				sceneContainerStyle={{ backgroundColor: '#18181B' }} // Dark background for main scene
 				screenOptions={(router) => ({
-					tabBarActiveTintColor: '#3b82f6',
+					tabBarActiveTintColor: '#60A5FA', // Light blue for active tab
+					tabBarInactiveTintColor: '#A1A1AA', // Gray for inactive tabs
+					tabBarStyle: {
+						backgroundColor: '#27272A', // Darker background for the tab bar
+						borderTopColor: '#3F3F46', // Subtle border for separation
+						display: router.route.name === 'playground' ? 'none' : 'flex',
+					},
 					tabBarIconStyle: { marginBottom: -15 },
 					tabBarLabelStyle: { fontSize: 12, position: 'absolute', bottom: -12, fontWeight: '500' },
 					headerShown: true,
 					unmountOnBlur: true,
-					tabBarStyle: {
-						display: router.route.name === 'playground' ? 'none' : 'flex',
+
+					headerStyle: {
+						backgroundColor: '#27272A', // Dark background for header
+						elevation: 0, // Remove shadow on Android
+						shadowOpacity: 0, // Remove shadow on iOS
 					},
+					headerShadowVisible: false, // Explicitly hide header shadow on all platforms
+
+					// Optional: set header title color to match the dark theme
+					headerTintColor: '#E5E7EB', // Light gray for header text/icons
 
 					headerRight: () => <Notifications />,
+					headerLeft: () => <Profile />,
 					headerTitle: '',
 				})}
 			>
@@ -75,15 +91,10 @@ const BottomTabsNavigator: React.FC = () => {
 					options={{
 						tabBarIcon: () => (
 							<Pressable onPress={handlePress}>
-								<View className="mb-10 h-16 w-16 rounded-full bg-white p-2">
-									<UILinearGradient
-										gradientColors={['#60a5fa', '#3b82f6']}
-										className="flex items-center justify-center rounded-full bg-blue-300 p-2"
-									>
-										<Animated.View style={animatedStyle}>
-											<Text className="text-3xl">📺</Text>
-										</Animated.View>
-									</UILinearGradient>
+								<View className="mb-10 h-16 w-16 rounded-full bg-gray-800 p-2">
+									<Animated.View style={animatedStyle} className="flex items-center justify-center rounded-full bg-blue-500 p-2">
+										<Text className="text-3xl text-white">📺</Text>
+									</Animated.View>
 								</View>
 							</Pressable>
 						),

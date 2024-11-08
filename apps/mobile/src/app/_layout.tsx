@@ -12,11 +12,7 @@ const RootLayout = () => {
 	const [appIsReady, setAppIsReady] = useState(false);
 
 	const loadResources = async () => {
-		const imageAssets = cacheImages([
-			require('@/assets/images/global/header-background.png'),
-			require('@/assets/images/global/home-page-hasida-top.png'),
-			require('@/assets/gifs/loader.gif'),
-		]);
+		const imageAssets = cacheImages([require('@/assets/gifs/loader.gif')]);
 
 		await Promise.all([...imageAssets]);
 	};

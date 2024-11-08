@@ -21,7 +21,8 @@ const VideoStreams: React.FC<VideoStreamsProps> = ({ localStream, remoteStreams 
 	}, [remoteStreams]);
 
 	return (
-		<View style={{ flex: 1, position: 'relative' }}>
+		<View style={{ flex: 1, position: 'relative', backgroundColor: '#111827' }}>
+			{/* Dark background */}
 			{remoteStreams.size > 0 ? (
 				<View style={{ flex: 1 }}>
 					{Array.from(remoteStreams.entries()).map(([partnerId, stream]) => {
@@ -42,7 +43,7 @@ const VideoStreams: React.FC<VideoStreamsProps> = ({ localStream, remoteStreams 
 						right: 10,
 						width: 100,
 						height: 150,
-						backgroundColor: 'black',
+						backgroundColor: 'black', // Dark background for local stream preview
 					}}
 					objectFit="cover"
 					mirror

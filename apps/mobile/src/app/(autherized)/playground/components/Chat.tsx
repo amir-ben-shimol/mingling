@@ -94,12 +94,14 @@ const Chat: React.FC<ChatProps> = ({ connectedUsers }) => {
 						paddingBottom: 60,
 					}}
 				/>
-				<View className="absolute bottom-0 left-0 right-0 flex-row items-center border-t border-gray-200 bg-white p-2">
+				<View className="absolute bottom-0 left-0 right-0 flex-row items-center border-t border-gray-700 bg-gray-800 p-2">
 					<TextInput
-						className="flex-1 rounded-md border border-gray-300 p-2"
+						className="flex-1 rounded-md border border-gray-600 bg-gray-900 p-3 text-gray-200" // Updated styles for dark theme
 						value={input}
 						placeholder="Type a message"
+						placeholderTextColor="#6B7280" // Lighter gray placeholder
 						multiline
+						style={{ color: '#E5E7EB' }} // Light text color for input
 						onChangeText={setInput}
 					/>
 					<Pressable className="ml-2 rounded-md bg-blue-500 p-2" onPress={sendMessage}>
