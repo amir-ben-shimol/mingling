@@ -32,7 +32,7 @@ const UserPage = () => {
 	}
 
 	return (
-		<ScrollView className="flex-1 bg-white px-4 py-6">
+		<ScrollView className="flex-1 bg-gray-900 px-4 py-6">
 			<View className="items-center">
 				{/* Profile Picture with Placeholder */}
 				<View className="relative mb-4 h-28 w-28 overflow-hidden rounded-full">
@@ -50,20 +50,20 @@ const UserPage = () => {
 				</View>
 
 				{/* User Details */}
-				<UIText className="text-2xl font-bold text-blue-900">{`${user?.firstName} ${user?.lastName}`}</UIText>
-				<UIText className="mb-2 text-lg text-gray-500">{user?.email}</UIText>
+				<UIText className="text-2xl font-bold text-gray-100">{`${user?.firstName} ${user?.lastName}`}</UIText>
+				<UIText className="mb-2 text-lg text-gray-400">{user?.email}</UIText>
 
-				<View className="mt-6 w-full rounded-lg bg-blue-50 p-4 shadow-sm">
-					<UIText className="mb-2 text-xl font-semibold text-gray-700">Profile Information</UIText>
-					<UIText className="text-lg text-gray-600">{`Country: ${user?.country}`}</UIText>
-					<UIText className="text-lg text-gray-600">{`Gender: ${user?.gender}`}</UIText>
-					<UIText className="text-lg text-gray-600">{`Age: ${user?.age}`}</UIText>
-					<UIText className="text-lg text-gray-600">{`Status: ${user?.isOnline ? 'Online' : 'Offline'}`}</UIText>
+				<View className="mt-6 w-full rounded-lg bg-gray-800 p-4 shadow-sm">
+					<UIText className="mb-2 text-xl font-semibold text-gray-200">Profile Information</UIText>
+					<UIText className="text-lg text-gray-400">{`Country: ${user?.country}`}</UIText>
+					<UIText className="text-lg text-gray-400">{`Gender: ${user?.gender}`}</UIText>
+					<UIText className="text-lg text-gray-400">{`Age: ${user?.age}`}</UIText>
+					<UIText className="text-lg text-gray-400">{`Status: ${user?.isOnline ? 'Online' : 'Offline'}`}</UIText>
 				</View>
 
 				{/* Action Button */}
 				<View className="mt-8 w-full">
-					<Pressable className="w-full items-center rounded-md bg-red-500 p-4" onPress={() => removeFriend(userId as string)}>
+					<Pressable className="w-full items-center rounded-md bg-red-600 p-4" onPress={() => removeFriend(userId as string)}>
 						<UIText className="text-lg font-semibold text-white">Remove Friend</UIText>
 					</Pressable>
 				</View>

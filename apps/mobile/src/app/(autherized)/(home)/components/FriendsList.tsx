@@ -41,7 +41,7 @@ export const FriendsList = () => {
 	};
 
 	return (
-		<View className="flex-1 bg-white p-4">
+		<View className="flex-1 bg-gray-900 p-4">
 			<FriendsListSection
 				key="pending"
 				data={friendsList.filter((friend) => friend.status === 'pending')}

@@ -16,7 +16,7 @@ export const FriendListItem: React.FC<FriendListItemProps> = ({ friend, onPress,
 	const [loadingImage, setLoadingImage] = useState(true);
 
 	return (
-		<TouchableOpacity className="mb-2 flex-row items-center rounded-lg bg-gray-100 p-4" onPress={() => onPress(friend.userDetails._id)}>
+		<TouchableOpacity className="mb-2 flex-row items-center rounded-lg bg-gray-800 p-4" onPress={() => onPress(friend.userDetails._id)}>
 			<View className="relative mr-4 h-12 w-12 overflow-hidden rounded-full">
 				{loadingImage && <UISvg name="profileImagePlaceholder" className="absolute h-full w-full" />}
 				{friend.userDetails.profilePictureUrl && (
@@ -31,11 +31,11 @@ export const FriendListItem: React.FC<FriendListItemProps> = ({ friend, onPress,
 				)}
 			</View>
 			<View className="flex-1">
-				<UIText className="text-lg font-semibold">
+				<UIText className="text-lg font-semibold text-gray-100">
 					{friend.userDetails.firstName} {friend.userDetails.lastName}
 				</UIText>
-				<UIText className="text-gray-600">{friend.userDetails.email}</UIText>
-				<UIText className="text-gray-600">{friend.userDetails.country}</UIText>
+				<UIText className="text-gray-400">{friend.userDetails.email}</UIText>
+				<UIText className="text-gray-400">{friend.userDetails.country}</UIText>
 			</View>
 			{showStatusIndicator && <View className={`ml-auto h-4 w-4 rounded-full ${friend.userDetails.isOnline ? 'bg-green-500' : 'bg-red-500'}`} />}
 			{onHandleFriendRequestResponse && (

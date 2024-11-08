@@ -122,18 +122,23 @@ const PlaygroundPage: React.FC = () => {
 	};
 
 	return (
-		<View style={{ flex: 1 }}>
+		<View style={{ flex: 1, backgroundColor: '#111827' }}>
+			{/* Dark background */}
 			<VideoStreams localStream={localStream} remoteStreams={remoteStreams} />
 			{partnerSocketIds.length > 0 && <Chat connectedUsers={[...memberSocketIds, ...partnerSocketIds]} />}
 			{partnerSocketIds.length > 0 && <Actions partnerSocketIds={partnerSocketIds} socket={socket} onMergeGroups={handleMergeGroups} />}
-			{isLookingForMatchTogether && <UIText style={{ fontSize: 18, textAlign: 'center', marginTop: 20 }}>Looking for a match together...</UIText>}
-
-			<View style={{ flexDirection: 'row', height: 50 }}>
-				<Pressable style={{ flex: 1, backgroundColor: '#b71c1c', justifyContent: 'center', alignItems: 'center' }} onPress={handleEndSession}>
+			{isLookingForMatchTogether && (
+				<UIText style={{ fontSize: 18, textAlign: 'center', color: '#E5E7EB', marginTop: 20 }}>
+					{/* Light text color */}
+					Looking for a match together...
+				</UIText>
+			)}
+			<View style={{ flexDirection: 'row', height: 70 }}>
+				<Pressable style={{ flex: 1, backgroundColor: '#B91C1C', justifyContent: 'center', alignItems: 'center' }} onPress={handleEndSession}>
 					<UIText style={{ color: 'white', fontSize: 18 }}>End Session</UIText>
 				</Pressable>
 				{!isLookingForMatchTogether && partnerSocketIds.length > 0 && (
-					<Pressable style={{ flex: 1, backgroundColor: '#1b5e20', justifyContent: 'center', alignItems: 'center' }} onPress={handleNextUser}>
+					<Pressable style={{ flex: 1, backgroundColor: '#15803D', justifyContent: 'center', alignItems: 'center' }} onPress={handleNextUser}>
 						<UIText style={{ color: 'white', fontSize: 18 }}>Next User</UIText>
 					</Pressable>
 				)}

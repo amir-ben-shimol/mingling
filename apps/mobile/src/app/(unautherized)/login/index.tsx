@@ -1,8 +1,9 @@
 // src/screens/LoginScreen.tsx
 import React, { useState } from 'react';
-import type { User } from '@mingling/types';
 import { router } from 'expo-router';
-import { View, Text, TextInput, Button, Alert } from 'react-native';
+import { Image } from 'expo-image';
+import type { User } from '@mingling/types';
+import { View, Text, TextInput, Alert, Pressable } from 'react-native';
 import { useAuth } from '@/lib/providers/authProvider';
 import { BackendService } from '@/lib/utils/backend-service';
 
@@ -30,28 +31,51 @@ const LoginScreen = () => {
 	};
 
 	return (
-		<View className="flex-1 bg-white p-6">
-			<Text className="mb-6 text-center text-2xl font-bold">Login</Text>
+		<View className="flex-1 justify-center bg-gray-900 p-6">
+			{/* Header */}
+			<View className="mb-8 flex items-center justify-center">
+				<Image className="h-24 w-24" source="app_logo" />
+				<Text className="text-center text-3xl font-bold text-gray-100">Welcome Back</Text>
+				<Text className="text-center text-lg text-gray-400">Sign in to your account</Text>
+			</View>
 
-			<TextInput
-				className="mb-4 rounded-md border p-3"
-				placeholderTextColor="#939393"
-				placeholder="Email"
-				value={email}
-				keyboardType="email-address"
-				onChangeText={setEmail}
-			/>
-			<TextInput
-				className="mb-4 rounded-md border p-3"
-				placeholderTextColor="#939393"
-				placeholder="Password"
-				value={password}
-				secureTextEntry
-				onChangeText={setPassword}
-			/>
+			{/* Email Input */}
+			<View className="mb-4 rounded-md border border-gray-700 bg-gray-800 p-3">
+				<TextInput
+					className="text-base text-gray-200"
+					placeholder="Email"
+					placeholderTextColor="#6B7280" // gray-500
+					value={email}
+					keyboardType="email-address"
+					onChangeText={setEmail}
+				/>
+			</View>
 
-			<Button title="Login" color="#4F46E5" onPress={handleLogin} />
-			<Button title="Register" color="#4F46E5" onPress={navToRegistration} />
+			{/* Password Input */}
+			<View className="mb-6 rounded-md border border-gray-700 bg-gray-800 p-3">
+				<TextInput
+					className="text-base text-gray-200"
+					placeholder="Password"
+					placeholderTextColor="#6B7280" // gray-500
+					value={password}
+					secureTextEntry
+					onChangeText={setPassword}
+				/>
+			</View>
+
+			{/* Login Button */}
+			<View className="mb-4 rounded-lg bg-indigo-600 p-4">
+				<Pressable onPress={handleLogin}>
+					<Text className="text-center text-lg font-semibold text-white">Login</Text>
+				</Pressable>
+			</View>
+
+			{/* Register Button */}
+			<View className="rounded-lg bg-gray-700 p-4">
+				<Pressable onPress={navToRegistration}>
+					<Text className="text-center text-lg font-semibold text-indigo-400">Register</Text>
+				</Pressable>
+			</View>
 		</View>
 	);
 };
