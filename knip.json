@@ -16,12 +16,15 @@
 				"expo-localization",
 				"reactotron-plugin-zustand",
 				"reactotron-react-native",
-				"ts-mock-api"
+				"ts-mock-api",
+				"@expo/metro-config",
+				"@config-plugins/react-native-webrtc"
 			],
 			"ignoreBinaries": ["eas", "pod"]
 		},
 		"apps/backend": {
-			"ignoreDependencies": ["ts-node"]
+			"ignoreDependencies": ["ts-node"],
+			"ignore": ["@types/**/*", "src/models/user.ts"]
 		}
 	}
 }
