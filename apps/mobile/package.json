@@ -105,7 +105,7 @@
 		"reactotron-plugin-zustand": "2.0.3",
 		"reactotron-react-native": "5.1.7",
 		"tailwindcss": "3.3.2",
-		"ts-mock-api": "1.0.6",
+		"ts-mock-api": "1.0.13",
 		"typescript": "5.6.3"
 	},
 	"peerDependencies": {
