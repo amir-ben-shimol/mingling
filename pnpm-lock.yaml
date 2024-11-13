@@ -362,8 +362,8 @@ importers:
         specifier: 3.3.2
         version: 3.3.2(ts-node@10.9.2(@types/node@20.14.1)(typescript@5.6.3))
       ts-mock-api:
-        specifier: 1.0.6
-        version: 1.0.6
+        specifier: 1.0.13
+        version: 1.0.13
       typescript:
         specifier: 5.6.3
         version: 5.6.3
@@ -6568,8 +6568,8 @@ packages:
   ts-interface-checker@0.1.13:
     resolution: {integrity: sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==}
 
-  ts-mock-api@1.0.6:
-    resolution: {integrity: sha512-aO2cqiNEgeJchcISE7NKEJolQytwuqRpI2KIgEN8uqAKQem+3D5qFVHxQsPWgeqVwyqluIU69EajvC7EXmRJQw==}
+  ts-mock-api@1.0.13:
+    resolution: {integrity: sha512-+2XIBjv5F7u3DkNPmB8C/5X5sv8bZxfdJiWQePBnwZW/W5rZCbccxvbJ4hcdVg+qxBtEZciCT0k0R4qNJbc0Mw==}
 
   ts-node@10.9.2:
     resolution: {integrity: sha512-f0FFpIdcHgn8zcPSbf1dRevwt047YMnaiJM3u2w2RewrB+fob/zePZcrOyQoLMMO7aBIddLcQIEK5dYjkLnGrQ==}
@@ -15230,7 +15230,7 @@ snapshots:
 
   ts-interface-checker@0.1.13: {}
 
-  ts-mock-api@1.0.6:
+  ts-mock-api@1.0.13:
     dependencies:
       '@faker-js/faker': 8.4.1
 
