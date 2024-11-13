@@ -20,7 +20,6 @@ jobs:
             - uses: pnpm/action-setup@v3
               with:
                   version: 9.12.2
-                  run_install: true
 
             - name: Build Packages
               run: pnpm build:packages
@@ -40,7 +39,6 @@ jobs:
             - uses: pnpm/action-setup@v3
               with:
                   version: 9.12.2
-                  run_install: true
 
             - name: Build packages
               run: pnpm build:packages
@@ -60,7 +58,6 @@ jobs:
             - uses: pnpm/action-setup@v3
               with:
                   version: 9.12.2
-                  run_install: true
 
             - name: Build packages
               run: pnpm build:packages
@@ -80,7 +77,6 @@ jobs:
             - uses: pnpm/action-setup@v3
               with:
                   version: 9.12.2
-                  run_install: true
 
             - name: Build packages
               run: pnpm build:packages
@@ -100,7 +96,6 @@ jobs:
             - uses: pnpm/action-setup@v3
               with:
                   version: 9.12.2
-                  run_install: true
 
             - name: Build packages
               run: pnpm build:packages
