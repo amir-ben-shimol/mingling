@@ -1,12 +1,13 @@
 /* eslint-disable max-lines */
 import React from 'react';
-import { TouchableOpacity, type ViewStyle, type GestureResponderEvent, View, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, type ViewStyle, type GestureResponderEvent, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import type { icons } from '@/data/icons';
 import colors from '@/styles/colors.cjs';
 import globalStyles from '@/styles/global';
 import { UISvg } from './UISvg';
 import { UIText } from './UIText';
+import { UISpinner } from './UISpinner';
 
 type Props = {
 	readonly href?: string;
@@ -161,12 +162,7 @@ export const UIButton = (props: Props) => {
 			) : (
 				label
 			)}
-			{isLoading && (
-				<ActivityIndicator
-					size="small"
-					className={`mr-4 ${iconSize === 'medium' ? '!h-4 !w-4' : iconSize === 'large' ? '!h-6 !w-6' : '!h-2.5 !w-2.5'}`}
-				/>
-			)}
+			{isLoading && <UISpinner />}
 			{icon && !isLoading && !isIconFirst && renderIcon(icon)}
 			{showArrow && <UISvg name="arrow" className="mr-4 h-3 w-3" stroke="#fff" fill="#fff" strokeWidth={0.3} />}
 		</View>

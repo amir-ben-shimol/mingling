@@ -4,9 +4,13 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Slot } from 'expo-router';
 import AppErrorHandler from '@/modules/ApplErrorHandler';
 
-const AppWrapper = () => {
+type Props = {
+	readonly onLayout: () => Promise<void>;
+};
+
+const AppWrapper = (props: Props) => {
 	return (
-		<GestureHandlerRootView className="flex-1">
+		<GestureHandlerRootView className="flex-1 bg-[#27272A]" onLayout={props.onLayout}>
 			<BottomSheetModalProvider>
 				<AppErrorHandler />
 				<Slot />

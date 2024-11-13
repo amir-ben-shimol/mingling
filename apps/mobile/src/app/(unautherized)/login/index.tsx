@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { router } from 'expo-router';
 import { Image } from 'expo-image';
 import type { User } from '@mingling/types';
-import { View, Text, TextInput, Alert, Pressable } from 'react-native';
+import { View, Text, TextInput, Alert, Pressable, KeyboardAvoidingView, Platform } from 'react-native';
 import { useAuth } from '@/lib/providers/authProvider';
 import { BackendService } from '@/lib/utils/backend-service';
 
@@ -40,42 +40,41 @@ const LoginScreen = () => {
 			</View>
 
 			{/* Email Input */}
-			<View className="mb-4 rounded-md border border-gray-700 bg-gray-800 p-3">
-				<TextInput
-					className="text-base text-gray-200"
-					placeholder="Email"
-					placeholderTextColor="#6B7280" // gray-500
-					value={email}
-					keyboardType="email-address"
-					onChangeText={setEmail}
-				/>
-			</View>
-
-			{/* Password Input */}
-			<View className="mb-6 rounded-md border border-gray-700 bg-gray-800 p-3">
-				<TextInput
-					className="text-base text-gray-200"
-					placeholder="Password"
-					placeholderTextColor="#6B7280" // gray-500
-					value={password}
-					secureTextEntry
-					onChangeText={setPassword}
-				/>
-			</View>
-
-			{/* Login Button */}
-			<View className="mb-4 rounded-lg bg-indigo-600 p-4">
-				<Pressable onPress={handleLogin}>
-					<Text className="text-center text-lg font-semibold text-white">Login</Text>
-				</Pressable>
-			</View>
-
-			{/* Register Button */}
-			<View className="rounded-lg bg-gray-700 p-4">
-				<Pressable onPress={navToRegistration}>
-					<Text className="text-center text-lg font-semibold text-indigo-400">Register</Text>
-				</Pressable>
-			</View>
+			<KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+				<View className="mb-4 rounded-md border border-gray-700 bg-gray-800 p-3">
+					<TextInput
+						className="text-base text-gray-200"
+						placeholder="Email"
+						placeholderTextColor="#6B7280" // gray-500
+						value={email}
+						keyboardType="email-address"
+						onChangeText={setEmail}
+					/>
+				</View>
+				{/* Password Input */}
+				<View className="mb-6 rounded-md border border-gray-700 bg-gray-800 p-3">
+					<TextInput
+						className="text-base text-gray-200"
+						placeholder="Password"
+						placeholderTextColor="#6B7280" // gray-500
+						value={password}
+						secureTextEntry
+						onChangeText={setPassword}
+					/>
+				</View>
+				{/* Login Button */}
+				<View className="mb-4 rounded-lg bg-indigo-600 p-4">
+					<Pressable onPress={handleLogin}>
+						<Text className="text-center text-lg font-semibold text-white">Login</Text>
+					</Pressable>
+				</View>
+				{/* Register Button */}
+				<View className="rounded-lg bg-gray-700 p-4">
+					<Pressable onPress={navToRegistration}>
+						<Text className="text-center text-lg font-semibold text-indigo-400">Register</Text>
+					</Pressable>
+				</View>
+			</KeyboardAvoidingView>
 		</View>
 	);
 };
