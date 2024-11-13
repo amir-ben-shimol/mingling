@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
-import { View, Pressable, StatusBar, Text } from 'react-native';
+import { View, Pressable, StatusBar } from 'react-native';
+import { Image } from 'expo-image';
 
 import * as Haptics from 'expo-haptics';
 import { router, Tabs } from 'expo-router';
@@ -7,7 +8,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from 'react-native-reanimated';
-// import { UILinearGradient } from '@/ui/UILinearGradient';
 import { Notifications } from '@/modules/Notifications';
 import { Profile } from '@/modules/Profile';
 
@@ -58,8 +58,8 @@ const BottomTabsNavigator: React.FC = () => {
 						backgroundColor: '#27272A', // Darker background for the tab bar
 						borderTopColor: '#3F3F46', // Subtle border for separation
 						display: router.route.name === 'playground' ? 'none' : 'flex',
+						marginBottom: 20,
 					},
-					tabBarIconStyle: { marginBottom: -15 },
 					tabBarLabelStyle: { fontSize: 12, position: 'absolute', bottom: -12, fontWeight: '500' },
 					headerShown: true,
 					unmountOnBlur: true,
@@ -71,7 +71,6 @@ const BottomTabsNavigator: React.FC = () => {
 					},
 					headerShadowVisible: false, // Explicitly hide header shadow on all platforms
 
-					// Optional: set header title color to match the dark theme
 					headerTintColor: '#E5E7EB', // Light gray for header text/icons
 
 					headerRight: () => <Notifications />,
@@ -91,9 +90,9 @@ const BottomTabsNavigator: React.FC = () => {
 					options={{
 						tabBarIcon: () => (
 							<Pressable onPress={handlePress}>
-								<View className="mb-10 h-16 w-16 rounded-full bg-gray-800 p-2">
+								<View className="mb-10 flex h-20 w-20 items-center justify-center rounded-full bg-gray-800 p-2">
 									<Animated.View style={animatedStyle} className="flex items-center justify-center rounded-full bg-blue-500 p-2">
-										<Text className="text-3xl text-white">📺</Text>
+										<Image source="app_logo" className="h-14 w-14" />
 									</Animated.View>
 								</View>
 							</Pressable>
