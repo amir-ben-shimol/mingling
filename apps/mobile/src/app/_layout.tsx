@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 
 import { LoaderProvider } from '@/providers/loaderProvider';
@@ -7,6 +7,10 @@ import { cacheImages } from '@/lib/helpers/cache';
 
 import AppWrapper from '@/wrappers/AppWrapper';
 import { AuthProvider } from '@/lib/providers/authProvider';
+import UIAnimatedSplashScreen from '@/ui/UIAnimatedSplashScreen';
+
+// Keep the splash screen visible until we're ready to hide it
+SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
 	const [appIsReady, setAppIsReady] = useState(false);
@@ -20,12 +24,8 @@ const RootLayout = () => {
 	useEffect(() => {
 		const prepare = async () => {
 			try {
-				SplashScreen.preventAutoHideAsync();
-
 				await loadResources();
-
 				setAppIsReady(true);
-				await SplashScreen.hideAsync();
 			} catch (error) {
 				console.warn(error);
 			}
@@ -33,6 +33,12 @@ const RootLayout = () => {
 
 		prepare();
 	}, []);
+
+	const onLayoutRootView = useCallback(async () => {
+		if (appIsReady) {
+			await SplashScreen.hideAsync();
+		}
+	}, [appIsReady]);
 
 	if (!appIsReady) {
 		return null;
@@ -42,7 +48,16 @@ const RootLayout = () => {
 		<ErrorBoundary>
 			<LoaderProvider>
 				<AuthProvider>
-					<AppWrapper />
+					<UIAnimatedSplashScreen
+						translucent
+						isLoaded={appIsReady}
+						logoImage={require('../assets/images/global/app_logo.png')}
+						backgroundColor="#1f2937"
+						logoHeight={250}
+						logoWidth={250}
+					>
+						<AppWrapper onLayout={onLayoutRootView} />
+					</UIAnimatedSplashScreen>
 				</AuthProvider>
 			</LoaderProvider>
 		</ErrorBoundary>

@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { View, TextInput, FlatList, Text, Pressable, KeyboardAvoidingView, Platform, Keyboard } from 'react-native';
 import { useSocket } from '@/lib/providers/socketProvider';
 import { useAuth } from '@/lib/providers/authProvider';
+import { UIText } from '@/ui/UIText';
 
 type ChatProps = {
 	connectedUsers: string[];
@@ -52,7 +53,6 @@ const Chat: React.FC<ChatProps> = ({ connectedUsers }) => {
 			timestamp: Date.now(),
 		};
 
-		// Send the message to all connected users
 		connectedUsers
 			.filter((connectedUserSocketId) => connectedUserSocketId !== socket?.id)
 			.forEach((partnerSocketId) => {
@@ -78,11 +78,12 @@ const Chat: React.FC<ChatProps> = ({ connectedUsers }) => {
 
 	return (
 		<KeyboardAvoidingView
-			className="flex-1"
+			className="flex-[0.5]"
 			behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-			keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
+			keyboardVerticalOffset={Platform.OS === 'ios' ? 56 : 0}
 		>
 			<View className="flex-1">
+				<UIText>connected</UIText>
 				<FlatList
 					ref={flatListRef}
 					data={messages}

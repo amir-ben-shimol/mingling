@@ -1,5 +1,5 @@
 import type { Notification } from '@mingling/types';
-import { Feather } from '@expo/vector-icons'; // Assuming you're using Expo and have vector icons installed
+import { Feather } from '@expo/vector-icons';
 import { View, TouchableOpacity, ScrollView } from 'react-native';
 import { useNotificationsStore } from '@/lib/store/useNotificationsStore';
 import { BackendService } from '@/lib/utils/backend-service';
@@ -45,22 +45,26 @@ export const NotificationModal = (props: Props) => {
 	if (!props.isVisible) return null;
 
 	return (
-		<UIModal title="Notifications" isVisible={props.isVisible} onClose={props.onHideModal}>
+		<UIModal size="small-large" title="Notifications" isVisible={props.isVisible} onClose={props.onHideModal}>
 			<ScrollView className="max-h-96 w-full">
 				{userNotifications.length === 0 ? (
 					<View className="p-4">
-						<UIText className="text-center text-gray-500">No notifications at this time.</UIText>
+						<UIText className="text-center text-gray-400">No notifications at this time.</UIText>
 					</View>
 				) : (
 					userNotifications.map((notification) => (
-						<View key={notification.id} className="border-b border-gray-200 p-4">
+						<View
+							key={notification.id}
+							className="border-b border-gray-700 p-4" // Darker border for separation
+							style={{ backgroundColor: '#1F2937' }} // Dark background color
+						>
 							<View className="flex-row items-center justify-between">
 								<View className="flex-1 pr-2">
-									<UIText className="text-lg font-bold">{notification.title}</UIText>
-									<UIText className="text-gray-600">{notification.content}</UIText>
+									<UIText className="text-lg font-bold text-gray-100">{notification.title}</UIText>
+									<UIText className="text-gray-400">{notification.content}</UIText>
 								</View>
 								<TouchableOpacity onPress={() => onRemoveNotification(notification)}>
-									<Feather name="x-circle" size={24} color="#4B5563" />
+									<Feather name="x-circle" size={24} color="#9CA3AF" />
 								</TouchableOpacity>
 							</View>
 
@@ -68,13 +72,13 @@ export const NotificationModal = (props: Props) => {
 							{notification.type === 'friend-request' && (
 								<View className="mt-4 flex-row">
 									<TouchableOpacity
-										className="mr-2 flex-1 rounded-md bg-green-500 py-2"
+										className="mr-2 flex-1 rounded-md bg-green-600 py-2" // Darker green for dark mode
 										onPress={() => handleFriendRequestResponse(notification, 'approved')}
 									>
 										<UIText className="text-center font-semibold text-white">Accept</UIText>
 									</TouchableOpacity>
 									<TouchableOpacity
-										className="flex-1 rounded-md bg-red-500 py-2"
+										className="flex-1 rounded-md bg-red-600 py-2" // Darker red for dark mode
 										onPress={() => handleFriendRequestResponse(notification, 'declined')}
 									>
 										<UIText className="text-center font-semibold text-white">Decline</UIText>

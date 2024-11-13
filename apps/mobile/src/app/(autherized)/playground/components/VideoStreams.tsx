@@ -1,50 +1,41 @@
-// src/components/VideoStreams.tsx
-
-import React, { useEffect } from 'react';
-import { Image } from 'expo-image';
+import React from 'react';
 import { View } from 'react-native';
 import { RTCView, type MediaStream } from 'react-native-webrtc';
-import StaticGlitchGif from '@/assets/gifs/static-glitch.gif';
+import LottieView from 'lottie-react-native';
+import { cn } from '@/lib/utils/component';
 
 type MediaStreamWithToURL = MediaStream & {
 	toURL(): string;
 };
 
 type VideoStreamsProps = {
-	localStream: MediaStream | null;
-	remoteStreams: Map<string, MediaStream>;
+	readonly localStream: MediaStream | null;
+	readonly remoteStreams: Map<string, MediaStream>;
 };
 
 const VideoStreams: React.FC<VideoStreamsProps> = ({ localStream, remoteStreams }) => {
-	useEffect(() => {
-		console.log('Remote streams updated:', remoteStreams);
-	}, [remoteStreams]);
-
 	return (
-		<View style={{ flex: 1, position: 'relative', backgroundColor: '#111827' }}>
-			{/* Dark background */}
+		<View className="relative flex-1 bg-slate-950">
 			{remoteStreams.size > 0 ? (
-				<View style={{ flex: 1 }}>
+				<View className="flex-[0.5]">
 					{Array.from(remoteStreams.entries()).map(([partnerId, stream]) => {
 						const streamURL = (stream as MediaStreamWithToURL).toURL();
 
-						return <RTCView key={partnerId} streamURL={streamURL} style={{ flex: 1, backgroundColor: 'black' }} objectFit="cover" />;
+						return <RTCView key={partnerId} streamURL={streamURL} className="flex-1 bg-slate-950" objectFit="cover" />;
 					})}
 				</View>
 			) : (
-				<Image source={StaticGlitchGif} style={{ flex: 1 }} />
+				<View className="flex-1">
+					<LottieView source={require('@/assets/jsons/calling.json')} style={{ width: '100%', height: '100%' }} autoPlay loop />
+				</View>
 			)}
 			{localStream && (
 				<RTCView
 					streamURL={(localStream as MediaStreamWithToURL).toURL()}
-					style={{
-						position: 'absolute',
-						bottom: 10,
-						right: 10,
-						width: 100,
-						height: 150,
-						backgroundColor: 'black', // Dark background for local stream preview
-					}}
+					className={cn('bg-slate-950', {
+						'flex-[0.5]': remoteStreams.size > 0,
+						'flex-1': remoteStreams.size === 0,
+					})}
 					objectFit="cover"
 					mirror
 				/>
