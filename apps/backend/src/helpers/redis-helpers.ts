@@ -9,13 +9,6 @@ export const setUserOnlineStatus = async (userId: string, isOnline: boolean): Pr
 	await redisClient.hSet('onlineUsers', userId, isOnline ? '1' : '0');
 };
 
-// Check if a user is currently online in Redis
-export const getUserOnlineStatus = async (userId: string): Promise<boolean> => {
-	const status = await redisClient.hGet('onlineUsers', userId);
-
-	return status === '1';
-};
-
 // Get online status for multiple friends
 export const getOnlineFriends = async (friendIds: string[]): Promise<string[]> => {
 	const statuses = await redisClient.hmGet('onlineUsers', friendIds);
@@ -155,10 +148,6 @@ export const addGroupToAvailableGroups = async (groupId: string): Promise<void> 
 
 export const removeGroupFromAvailableGroups = async (groupId: string): Promise<void> => {
 	await redisClient.sRem('availableGroups', groupId);
-};
-
-export const getAvailableGroups = async (): Promise<string[]> => {
-	return await redisClient.sMembers('availableGroups');
 };
 
 export const setSocketGroupId = async (socketId: string, groupId: string): Promise<void> => {
