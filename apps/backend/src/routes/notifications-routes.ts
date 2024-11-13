@@ -48,7 +48,7 @@ export async function updateNotification(
 	return existingNotification.toObject() as Notification;
 }
 
-export async function deleteNotification(userId: string, notificationId: string): Promise<{ message: string }> {
+async function deleteNotification(userId: string, notificationId: string): Promise<{ message: string }> {
 	const user = await User.findById(userId);
 
 	if (!user) throw new Error('User not found');
