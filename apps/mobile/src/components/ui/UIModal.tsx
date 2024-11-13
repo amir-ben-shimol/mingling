@@ -1,7 +1,8 @@
 /* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable max-lines */
 import React, { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import { View, TouchableOpacity, BackHandler, type ViewStyle, type NativeSyntheticEvent, type NativeScrollEvent } from 'react-native';
-import { BottomSheetModal, BottomSheetScrollView, BottomSheetView, type BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
+import { type BottomSheetBackgroundProps, BottomSheetModal, BottomSheetScrollView, BottomSheetView, type BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import Animated, { Extrapolation, interpolate, useAnimatedStyle } from 'react-native-reanimated';
 import { UISvg } from './UISvg';
 import { UITitle } from './UITitle';
@@ -10,7 +11,7 @@ type Props = {
 	readonly isVisible?: boolean;
 	readonly title?: string;
 	readonly children?: React.ReactNode;
-	readonly size?: 'extra-small' | 'small' | 'medium' | 'large' | 'custom';
+	readonly size?: 'extra-small' | 'small' | 'medium' | 'large' | 'small-large' | 'custom';
 	readonly customSize?: string;
 	readonly scrollable?: boolean;
 	readonly className?: string;
@@ -42,11 +43,14 @@ export const UIModal = (props: Props) => {
 			case 'large': {
 				return ['80%'];
 			}
+			case 'small-large': {
+				return ['30%', '80%'];
+			} // Two breakpoints for "small-large" size
 			default: {
 				return ['75%'];
 			}
 		}
-	}, [props.size]);
+	}, [props.size, props.customSize]);
 
 	const handlePresentModal = useCallback(() => {
 		if (props.isVisible) {
@@ -90,7 +94,7 @@ export const UIModal = (props: Props) => {
 			opacity: interpolate(
 				animatedIndex.value,
 				[-1, 0],
-				[0, 0.5], // Adjust the second value to control max opacity
+				[0, 0.5], // Adjust max opacity
 				Extrapolation.CLAMP,
 			),
 		}));
@@ -119,42 +123,63 @@ export const UIModal = (props: Props) => {
 		setHeaderShadow(offsetY > 5);
 	};
 
+	const CustomBackground = ({ style }: BottomSheetBackgroundProps) => (
+		<View
+			style={[
+				style,
+				{
+					backgroundColor: '#1F2937',
+					borderTopLeftRadius: 20,
+					borderTopRightRadius: 20,
+					overflow: 'hidden',
+				},
+			]}
+		/>
+	);
+
 	return (
 		<BottomSheetModal
 			ref={bottomSheetModalRef}
 			index={0}
-			enableOverDrag={false}
 			snapPoints={snapPoints}
 			stackBehavior="push"
 			enablePanDownToClose={!props.presist}
-			handleIndicatorStyle={{ display: 'none' }}
+			handleIndicatorStyle={{
+				backgroundColor: '#374151',
+				width: 40,
+				height: 4,
+				borderRadius: 2,
+			}}
+			backgroundComponent={CustomBackground}
+			style={{
+				backgroundColor: '#1F2937',
+				borderTopLeftRadius: 20,
+				borderTopRightRadius: 20,
+			}}
 			backdropComponent={(props) => <CustomBackdrop {...props} />}
 			onDismiss={onDismiss}
 		>
-			{/* Modal Header with Dark Background */}
 			<View className={`flex-row items-center justify-between px-3 pb-4 ${headerShadow ? 'shadow' : ''}`} style={{ backgroundColor: '#1F2937' }}>
 				{props.title && (
-					<UITitle size="large" isGradient={false}>
+					<UITitle size="large" isGradient>
 						{props.title}
 					</UITitle>
 				)}
 				{!props.presist && (
-					<TouchableOpacity style={{ backgroundColor: '#374151', borderRadius: 50, padding: 8 }} onPress={onDismiss}>
-						<UISvg name="close" fill="#FFFFFF" className="h-3 w-3" />
+					<TouchableOpacity className="rounded-full bg-gray-300 p-2 text-black" onPress={onDismiss}>
+						<UISvg name="close" className="h-3 w-3 text-black" fill="#000000" />
 					</TouchableOpacity>
 				)}
 			</View>
-
-			{/* Modal Body with Dark Background */}
 			{props.scrollable === false ? (
-				<BottomSheetView className={props.className} style={[{ padding: 12, backgroundColor: '#111827' }, props.style]}>
+				<BottomSheetView className={props.className} style={[{ padding: 12, backgroundColor: '#1F2937' }, props.style]}>
 					{props.children}
 				</BottomSheetView>
 			) : (
 				<BottomSheetScrollView
-					contentContainerStyle={{ display: 'flex', alignItems: 'center', paddingBottom: 32, backgroundColor: '#111827' }}
+					contentContainerStyle={{ display: 'flex', alignItems: 'center', paddingBottom: 32, backgroundColor: '#1F2937' }}
 					className={props.className}
-					style={[{ backgroundColor: '#111827' }, props.style]}
+					style={props.style}
 					onScroll={handleScroll}
 				>
 					{props.children}

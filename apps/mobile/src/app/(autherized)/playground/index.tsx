@@ -26,7 +26,7 @@ const PlaygroundPage: React.FC = () => {
 
 			const handleMatched = ({ partnerSocketIds }: { partnerSocketIds: string[] }) => {
 				setupWebRTC(partnerSocketIds);
-				setIsLookingForMatchTogether(false); // Reset if previously merged
+				setIsLookingForMatchTogether(false);
 			};
 
 			const handlePartnerLeft = () => {
@@ -123,17 +123,14 @@ const PlaygroundPage: React.FC = () => {
 
 	return (
 		<View style={{ flex: 1, backgroundColor: '#111827' }}>
-			{/* Dark background */}
 			<VideoStreams localStream={localStream} remoteStreams={remoteStreams} />
+
 			{partnerSocketIds.length > 0 && <Chat connectedUsers={[...memberSocketIds, ...partnerSocketIds]} />}
 			{partnerSocketIds.length > 0 && <Actions partnerSocketIds={partnerSocketIds} socket={socket} onMergeGroups={handleMergeGroups} />}
 			{isLookingForMatchTogether && (
-				<UIText style={{ fontSize: 18, textAlign: 'center', color: '#E5E7EB', marginTop: 20 }}>
-					{/* Light text color */}
-					Looking for a match together...
-				</UIText>
+				<UIText style={{ fontSize: 18, textAlign: 'center', color: '#E5E7EB', marginTop: 20 }}>Looking for a match together...</UIText>
 			)}
-			<View style={{ flexDirection: 'row', height: 70 }}>
+			<View className="flex h-[70px] flex-row pb-5">
 				<Pressable style={{ flex: 1, backgroundColor: '#B91C1C', justifyContent: 'center', alignItems: 'center' }} onPress={handleEndSession}>
 					<UIText style={{ color: 'white', fontSize: 18 }}>End Session</UIText>
 				</Pressable>
