@@ -81,7 +81,7 @@ const ProfilePage = () => {
 						onError={() => setLoadingImage(false)}
 					/>
 				)}
-				<UISvg name="edit" className="absolute bottom-0 right-0" onClick={handleSelectProfilePicture} />
+				<UISvg name="edit" className="absolute bottom-0 right-0" fill="#f5f5f5" onClick={handleSelectProfilePicture} />
 			</View>
 
 			<UIText className="font-RubikBold mt-8 text-3xl text-gray-100">{`Hello, ${user?.firstName} ${user?.lastName}`}</UIText>
@@ -94,7 +94,6 @@ const ProfilePage = () => {
 					<UIText className="text-lg text-gray-400">Country: {user?.country}</UIText>
 					<UIText className="text-lg text-gray-400">Gender: {user?.gender}</UIText>
 					<UIText className="text-lg text-gray-400">Age: {user?.age}</UIText>
-					<UIText className="text-lg text-gray-400">Status: {user?.isOnline ? 'Online' : 'Offline'}</UIText>
 				</View>
 			</View>
 
