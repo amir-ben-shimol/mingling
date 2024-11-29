@@ -5,14 +5,13 @@ RUN npm i -g pnpm@9.12.2
 WORKDIR /app
 
 COPY ./package.json ./pnpm-workspace.yaml ./.npmrc ./
-COPY ./apps/backend/package.json ./apps/backend/
-COPY ./packages/types/package.json ./packages/types/
 COPY ./packages/database/package.json ./packages/database/
+COPY ./packages/types/package.json ./packages/types/
 COPY ./tsconfig.base.json ./turbo.json ./
 COPY ./pnpm-lock.yaml ./
 
 RUN pnpm install --no-frozen-lockfile
 
-COPY ./apps/backend/ ./apps/backend/
+COPY ./packages/database/ ./packages/database/
 
-CMD ["pnpm", "exec", "turbo", "dev", "--filter={./apps/backend}..."]
+CMD ["pnpm", "exec", "turbo", "start:docker", "--filter=@mingling/database"]

@@ -1,9 +1,9 @@
 /* eslint-disable max-lines */
 import express, { type Request, type Response } from 'express';
-import type { UserDetails, Notification } from '@mingling/types'; // Import Notification type
+import type { UserDetails, Notification } from '@mingling/types';
+import { UserDB } from '@mingling/database';
 import { type Server } from 'socket.io';
 import { getOnlineFriends, getSocketIdByUserId, getUserIdBySocketId } from '../helpers/redis-helpers';
-import { User } from '../models/user';
 import { authenticate } from '../middleware/auth';
 import { emitFriendsListUpdate } from '../helpers/socket-emitters';
 import { createNotification, updateNotification } from './notifications-routes';
@@ -25,8 +25,8 @@ export function createFriendRoutes(io: Server) {
 				return;
 			}
 
-			const requester = await User.findById(requesterId);
-			const recipient = await User.findById(resolvedFriendUserId);
+			const requester = await UserDB.findById(requesterId);
+			const recipient = await UserDB.findById(resolvedFriendUserId);
 
 			if (!requester || !recipient) {
 				res.status(404).json({ error: 'User not found' });
@@ -89,8 +89,8 @@ export function createFriendRoutes(io: Server) {
 		}
 
 		try {
-			const recipient = await User.findById(recipientId);
-			const requester = await User.findById(friendId);
+			const recipient = await UserDB.findById(recipientId);
+			const requester = await UserDB.findById(friendId);
 
 			if (!recipient || !requester) {
 				res.status(404).json({ error: 'User not found' });
@@ -180,8 +180,8 @@ export function createFriendRoutes(io: Server) {
 		}
 
 		try {
-			const user = await User.findById(userId);
-			const friend = await User.findById(friendId);
+			const user = await UserDB.findById(userId);
+			const friend = await UserDB.findById(friendId);
 
 			if (!user || !friend) {
 				res.status(404).json({ error: 'User or friend not found' });
@@ -236,7 +236,7 @@ export function createFriendRoutes(io: Server) {
 
 		try {
 			// Find the user and get only the friendsList field
-			const user = await User.findById(userId).select('friendsList').populate({
+			const user = await UserDB.findById(userId).select('friendsList').populate({
 				path: 'friendsList.userId',
 				select: 'firstName lastName email country gender age profilePictureUrl',
 			});

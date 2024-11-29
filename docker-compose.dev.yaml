@@ -83,6 +83,25 @@ services:
             - type: bind
               source: ./packages/types/dist
               target: /app/packages/types/dist
+    database:
+        container_name: database
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.database-dev
+        env_file:
+            - ./packages/database/.env
+        restart: always
+        depends_on:
+            - types
+        networks:
+            - app_network
+        volumes:
+            - type: bind
+              source: ./packages/database/lib
+              target: /app/packages/database/lib
+            - type: bind
+              source: ./packages/database/dist
+              target: /app/packages/database/dist
     backend:
         container_name: backend
         build:
@@ -98,6 +117,7 @@ services:
             - mongo_replica_2
             - mongo_replica_3
             - types
+            - database
         networks:
             - app_network
         volumes:
@@ -107,6 +127,10 @@ services:
             - type: bind
               source: ./packages/types/dist
               target: /app/packages/types/dist
+            - type: bind
+              source: ./packages/database/dist
+              target: /app/packages/database/dist
+
     # mobile:
     #     container_name: mobile
     #     build:

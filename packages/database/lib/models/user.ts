@@ -1,3 +1,4 @@
+/* eslint-disable import/exports-last */
 // models/User.ts
 import mongoose, { type Document, Schema } from 'mongoose';
 import type { User as UserType } from '@mingling/types';
@@ -16,7 +17,6 @@ const FriendSchema = new Schema(
 	{ _id: false },
 );
 
-// Define the NotificationSchema as a subschema (optional but recommended for consistency)
 const NotificationSchema = new Schema(
 	{
 		id: { type: String, required: true },
@@ -29,7 +29,6 @@ const NotificationSchema = new Schema(
 	{ _id: false },
 );
 
-// Define the UserSchema
 const UserSchema: Schema = new Schema({
 	firstName: { type: String, required: true },
 	lastName: { type: String, required: true },
@@ -44,4 +43,4 @@ const UserSchema: Schema = new Schema({
 	notifications: [NotificationSchema],
 });
 
-export const User = mongoose.model<IUser>('User', UserSchema);
+export const UserDB = mongoose.model<IUser>('User', UserSchema);

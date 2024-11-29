@@ -1,6 +1,6 @@
 import type { Server } from 'socket.io';
 import type { UserDetails } from '@mingling/types';
-import { User } from '../models/user';
+import { UserDB } from '@mingling/database';
 import { getOnlineFriends, getSocketIdByUserId } from './redis-helpers';
 
 // Helper function to emit friends list updates
@@ -8,7 +8,7 @@ export async function emitFriendsListUpdate(io: Server, userId: string) {
 	console.log(`Emitting friends list update for user ${userId}`);
 
 	try {
-		const user = await User.findById(userId).select('friendsList').populate({
+		const user = await UserDB.findById(userId).select('friendsList').populate({
 			path: 'friendsList.userId',
 			select: 'firstName lastName email country gender age profilePictureUrl',
 		});
@@ -38,7 +38,7 @@ export async function emitFriendsListUpdate(io: Server, userId: string) {
 
 export async function emitFriendUpdate(io: Server, userId: string, updatedFields: Partial<UserDetails>) {
 	console.log(`Emitting friend update for user ${userId}`);
-	const user = await User.findById(userId).select('friendsList');
+	const user = await UserDB.findById(userId).select('friendsList');
 
 	console.log('user', user);
 
