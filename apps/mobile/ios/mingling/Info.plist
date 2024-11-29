@@ -58,7 +58,7 @@
     <key>NSCameraUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to access your camera</string>
     <key>NSFaceIDUsageDescription</key>
-    <string>Allow $(PRODUCT_NAME) to use Face ID.</string>
+    <string>Allow $(PRODUCT_NAME) to access your Face ID biometric data.</string>
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
     <string>Allow $(PRODUCT_NAME) to use your location.</string>
     <key>NSLocationAlwaysUsageDescription</key>
@@ -71,6 +71,7 @@
     <string>Allow $(PRODUCT_NAME) to access your photos</string>
     <key>NSUserActivityTypes</key>
     <array>
+      <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
