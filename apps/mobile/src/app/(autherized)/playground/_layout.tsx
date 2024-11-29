@@ -3,7 +3,7 @@ import BaseLayout from '@/layouts/BaseLayout';
 import { PlaygroundNavigatoinButton } from '@/modules/PlaygroundNavigationButton';
 
 const Layout = () => {
-	return <BaseLayout className="mt-14" animationType="componentSlideExpand" animationComponent={<PlaygroundNavigatoinButton />} />;
+	return <BaseLayout className="pt-14" animationType="componentSlideExpand" animationComponent={<PlaygroundNavigatoinButton />} />;
 };
 
 export default Layout;

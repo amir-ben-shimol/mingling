@@ -12,7 +12,7 @@ type ActionsProps = {
 	onMergeGroups: () => void;
 };
 
-export const Actions = (props: ActionsProps) => {
+const Actions = (props: ActionsProps) => {
 	const [modalVisible, setModalVisible] = useState(false);
 	const { user } = useAuth();
 
@@ -55,3 +55,5 @@ export const Actions = (props: ActionsProps) => {
 		</View>
 	);
 };
+
+export default Actions;

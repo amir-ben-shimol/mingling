@@ -3,7 +3,7 @@ import type { ViewProps } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type Props = {
-	readonly gradientColors: string[];
+	readonly gradientColors: [string, string, ...string[]];
 	readonly children?: React.ReactNode;
 	readonly className?: string;
 	readonly style?: ViewProps['style'];
