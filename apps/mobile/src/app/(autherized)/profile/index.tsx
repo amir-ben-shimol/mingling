@@ -22,7 +22,7 @@ const ProfilePage = () => {
 		}
 
 		const pickerResult = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			mediaTypes: 'images',
 			quality: 1,
 		});
 

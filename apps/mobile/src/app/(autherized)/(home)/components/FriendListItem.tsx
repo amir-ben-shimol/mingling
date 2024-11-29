@@ -12,7 +12,7 @@ type FriendListItemProps = {
 	showStatusIndicator?: boolean;
 };
 
-export const FriendListItem: React.FC<FriendListItemProps> = ({ friend, onPress, onHandleFriendRequestResponse, showStatusIndicator = false }) => {
+const FriendListItem: React.FC<FriendListItemProps> = ({ friend, onPress, onHandleFriendRequestResponse, showStatusIndicator = false }) => {
 	const [loadingImage, setLoadingImage] = useState(true);
 
 	return (
@@ -57,3 +57,5 @@ export const FriendListItem: React.FC<FriendListItemProps> = ({ friend, onPress,
 		</TouchableOpacity>
 	);
 };
+
+export default FriendListItem;

@@ -6,12 +6,12 @@ import { UIText } from './UIText';
 
 type Props = {
 	readonly text: string | ReactNode;
-	readonly colors: string[];
+	readonly colors: [string, string, ...string[]];
 	readonly className?: string;
 	readonly style?: TextStyle;
 	readonly start?: { x: number; y: number };
 	readonly end?: { x: number; y: number };
-	readonly locations?: number[];
+	readonly locations?: [number, number, ...number[]];
 };
 
 const UITextGradient: React.FC<Props> = ({ text, colors, className, style = {}, start = { x: 0, y: 0 }, end = { x: 1, y: 1 }, locations = [0, 1] }) => {
