@@ -12,4 +12,4 @@ RUN pnpm i
 
 COPY ./packages/types/ ./packages/types/
 
-CMD ["pnpm", "exec", "turbo", "start:docker", "--filter={./packages/types}..."]
+CMD ["pnpm", "exec", "turbo", "start:docker", "--filter=@mingling/types"]

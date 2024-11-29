@@ -22,7 +22,7 @@ const BaseLayout = (props: Props) => {
 
 	const fadeSlideValue = useSharedValue(0);
 	const translateYfadeSlideIn = useSharedValue(50);
-	const translateYcomponentSlideExpand = useSharedValue(windowHeight / 2 - 60);
+	const translateYcomponentSlideExpand = useSharedValue(windowHeight / 2 - 150);
 	const scale = useSharedValue(1);
 	const opacity = useSharedValue(1);
 	const contentOpacity = useSharedValue(0);
@@ -30,7 +30,7 @@ const BaseLayout = (props: Props) => {
 	const resetAnimationValues = useCallback(() => {
 		fadeSlideValue.value = 0;
 		translateYfadeSlideIn.value = 50;
-		translateYcomponentSlideExpand.value = windowHeight / 2 - 60;
+		translateYcomponentSlideExpand.value = windowHeight / 2 - 150;
 		scale.value = 1;
 		opacity.value = 1;
 		contentOpacity.value = 0;

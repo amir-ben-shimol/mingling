@@ -3,7 +3,6 @@ declare global {
 		interface ProcessEnv {
 			readonly NODE_ENV: 'development' | 'production';
 			readonly CURRENT_IP: string;
-			readonly DATABASE_URL: string;
 			readonly PORT: string;
 			readonly SECRET_TOKEN_KEY: string;
 			readonly REDIS_URL: string;
