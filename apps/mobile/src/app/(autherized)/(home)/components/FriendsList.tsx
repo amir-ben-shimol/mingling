@@ -4,9 +4,9 @@ import type { FriendDetails } from '@mingling/types';
 import { router } from 'expo-router';
 import { useFriendsStore } from '@/lib/store/useFriendsStore';
 import { BackendService } from '@/lib/utils/backend-service';
-import { FriendsListSection } from './FriendsListSection';
+import FriendsListSection from './FriendsListSection';
 
-export const FriendsList = () => {
+const FriendsList = () => {
 	const { friendsList, setFriendsList } = useFriendsStore();
 
 	useEffect(() => {
@@ -65,3 +65,5 @@ export const FriendsList = () => {
 		</View>
 	);
 };
+
+export default FriendsList;

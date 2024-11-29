@@ -44,7 +44,7 @@ export const UIModal = (props: Props) => {
 				return ['80%'];
 			}
 			case 'small-large': {
-				return ['30%', '80%'];
+				return [200, '80%'];
 			} // Two breakpoints for "small-large" size
 			default: {
 				return ['75%'];
@@ -141,6 +141,7 @@ export const UIModal = (props: Props) => {
 		<BottomSheetModal
 			ref={bottomSheetModalRef}
 			index={0}
+			enableDynamicSizing={false}
 			snapPoints={snapPoints}
 			stackBehavior="push"
 			enablePanDownToClose={!props.presist}

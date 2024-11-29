@@ -1,6 +1,6 @@
 {
 	"expo": {
-		"name": "mogichat",
+		"name": "mingling",
 		"slug": "mingling-mobile-app",
 		"orientation": "portrait",
 		"icon": "./src/assets/images/global/app_logo.png",
@@ -8,17 +8,12 @@
 		"userInterfaceStyle": "dark",
 		"assetBundlePatterns": ["./src/assets/**/*"],
 		"jsEngine": "hermes",
-		"bundler": "metro",
+		"newArchEnabled": true,
 		"packagerOpts": {
 			"assetExts": ["png", "jpg", "jpeg", "gif", "webp", "svg", "otf", "ttf", "woff", "woff2"]
 		},
 		"runtimeVersion": {
 			"policy": "appVersion"
-		},
-		"splash": {
-			"image": "./src/assets/images/global/splash_2.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#1f2937"
 		},
 		"extra": {
 			"supportsRTL": false,
@@ -68,19 +63,12 @@
 				"android.permission.SYSTEM_ALERT_WINDOW",
 				"android.permission.WAKE_LOCK",
 				"android.permission.BLUETOOTH"
-			],
-			"useNextNotificationsApi": true
+			]
 		},
 		"plugins": [
 			"expo-router",
 			"expo-file-system",
 			"expo-localization",
-			[
-				"expo-splash-screen",
-				{
-					"splashScreenDelay": false
-				}
-			],
 			[
 				"@config-plugins/react-native-webrtc",
 				{
@@ -139,6 +127,14 @@
 					"android": {
 						"usesCleartextTraffic": true
 					}
+				}
+			],
+			[
+				"expo-splash-screen",
+				{
+					"backgroundColor": "#1f2937",
+					"image": "./src/assets/images/global/app_logo.png",
+					"imageWidth": 250
 				}
 			]
 		],

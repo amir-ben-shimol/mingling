@@ -15,7 +15,7 @@ async function fetcher<R = unknown, D = unknown>(
 	const { setIsRetrying } = useApiErrorStore.getState();
 
 	const token = await getAsyncStorage('token');
-	const baseUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+	const baseUrl = process.env['EXPO_PUBLIC_BACKEND_URL'];
 
 	const fetcherHeaders = new Headers(headers);
 
