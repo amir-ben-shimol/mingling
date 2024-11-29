@@ -105,15 +105,15 @@
 		"reactotron-plugin-zustand": "2.0.3",
 		"reactotron-react-native": "5.1.7",
 		"tailwindcss": "3.3.2",
-		"ts-mock-api": "1.0.6",
+		"ts-mock-api": "1.0.13",
 		"typescript": "5.6.3"
 	},
 	"peerDependencies": {
 		"@types/node": "20.14.1",
 		"@typescript-eslint/parser": "6.18.1",
 		"eslint": "8.57.0",
-		"npm-run-all2": "6.2.0",
+		"npm-run-all2": "6.2.6",
 		"prettier": "3.3.2",
-		"react-i18next": "14.1.2"
+		"react-i18next": "14.1.3"
 	}
 }
