@@ -73,7 +73,6 @@
 		},
 		"plugins": [
 			"expo-router",
-			"expo-document-picker",
 			"expo-file-system",
 			"expo-localization",
 			[
@@ -87,12 +86,6 @@
 				{
 					"cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
 					"microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
-				}
-			],
-			[
-				"expo-local-authentication",
-				{
-					"faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID."
 				}
 			],
 			[
@@ -122,12 +115,6 @@
 				}
 			],
 			[
-				"expo-location",
-				{
-					"locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
-				}
-			],
-			[
 				"expo-dev-launcher",
 				{
 					"launchMode": "most-recent"
@@ -152,14 +139,6 @@
 					"android": {
 						"usesCleartextTraffic": true
 					}
-				}
-			],
-			[
-				"expo-camera",
-				{
-					"cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-					"microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-					"recordAudioAndroid": true
 				}
 			]
 		],
