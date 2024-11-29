@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useCallback } from 'react';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from 'react-native-reanimated';
-import { Slot } from 'expo-router';
+import { Slot, useFocusEffect } from 'expo-router';
 import { View, type ViewStyle, Dimensions, StatusBar } from 'react-native';
 import { UINotifications } from '@/ui/UINotifications';
 import { UIText } from '@/ui/UIText';
@@ -22,12 +22,19 @@ const BaseLayout = (props: Props) => {
 
 	const fadeSlideValue = useSharedValue(0);
 	const translateYfadeSlideIn = useSharedValue(50);
-	const translateYcomponentSlideExpand = useSharedValue(windowHeight / 2 - 150);
+	const translateYcomponentSlideExpand = useSharedValue(windowHeight / 2 - 60);
 	const scale = useSharedValue(1);
 	const opacity = useSharedValue(1);
 	const contentOpacity = useSharedValue(0);
 
-	useEffect(() => {
+	const resetAnimationValues = useCallback(() => {
+		fadeSlideValue.value = 0;
+		translateYfadeSlideIn.value = 50;
+		translateYcomponentSlideExpand.value = windowHeight / 2 - 60;
+		scale.value = 1;
+		opacity.value = 1;
+		contentOpacity.value = 0;
+
 		if (animationType === 'fadeSlideIn') {
 			fadeSlideValue.value = withTiming(1, {
 				duration: 1000,
@@ -79,7 +86,13 @@ const BaseLayout = (props: Props) => {
 				},
 			);
 		}
-	}, [animationType]);
+	}, [animationType, fadeSlideValue, translateYfadeSlideIn, translateYcomponentSlideExpand, scale, opacity, contentOpacity]);
+
+	useFocusEffect(
+		useCallback(() => {
+			resetAnimationValues();
+		}, [resetAnimationValues]),
+	);
 
 	const animationComponentStyle = useAnimatedStyle(() => {
 		if (animationType === 'componentSlideExpand') {
@@ -127,7 +140,7 @@ const BaseLayout = (props: Props) => {
 						{
 							position: 'absolute',
 							left: (windowWidth - 150) / 2,
-							top: (windowHeight - 150) / 2,
+							top: (windowHeight - 60) / 2,
 							width: 150,
 							height: 150,
 							alignItems: 'center',

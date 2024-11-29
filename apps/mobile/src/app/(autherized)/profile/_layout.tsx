@@ -1,8 +1,8 @@
 import React from 'react';
 import BaseLayout from '@/layouts/BaseLayout';
 
-const HomeLayout = () => {
+const ProfileLayout = () => {
 	return <BaseLayout />;
 };
 
-export default HomeLayout;
+export default ProfileLayout;

@@ -50,7 +50,6 @@ const BottomTabsNavigator: React.FC = () => {
 		<>
 			<StatusBar barStyle="light-content" />
 			<Tabs
-				sceneContainerStyle={{ backgroundColor: '#18181B' }} // Dark background for main scene
 				screenOptions={(router) => ({
 					tabBarActiveTintColor: '#60A5FA', // Light blue for active tab
 					tabBarInactiveTintColor: '#A1A1AA', // Gray for inactive tabs
