@@ -1,5 +1,5 @@
 import React from 'react';
-import type { ViewStyle } from 'react-native';
+import type { TextStyle } from 'react-native';
 import { UIText } from './UIText';
 import UITextGradient from './UITextGradient';
 
@@ -7,9 +7,9 @@ type Props = {
 	readonly children: string;
 	readonly varient?: 'white' | 'gradientRedPurple' | 'gradientGreenBlue' | 'gradientPinkPurple' | 'dark' | 'blue';
 	readonly className?: string;
-	readonly style?: ViewStyle;
+	readonly style?: TextStyle;
 	readonly size?: 'small' | 'medium' | 'large';
-	readonly colors?: string[];
+	readonly colors?: [string, string, ...string[]];
 	readonly isGradient?: boolean;
 };
 

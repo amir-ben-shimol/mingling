@@ -18,7 +18,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children, userId
 	const [socket, setSocket] = useState<Socket | null>(null);
 
 	useEffect(() => {
-		const newSocket = io(process.env.EXPO_PUBLIC_BACKEND_URL, {
+		const newSocket = io(process.env['EXPO_PUBLIC_BACKEND_URL'], {
 			reconnection: true, // Enables automatic reconnection
 			reconnectionAttempts: 5, // Limits reconnection attempts
 			timeout: 10000, // Sets timeout for initial connection

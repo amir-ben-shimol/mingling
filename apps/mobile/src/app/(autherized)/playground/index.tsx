@@ -9,7 +9,7 @@ import { useWebRTC } from '@/lib/providers/webRtcProvider';
 import { useAuth } from '@/lib/providers/authProvider';
 import Chat from './components/Chat';
 import VideoStreams from './components/VideoStreams';
-import { Actions } from './components/Actions';
+import Actions from './components/Actions';
 
 const PlaygroundPage: React.FC = () => {
 	const { user } = useAuth();
