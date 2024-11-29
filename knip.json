@@ -1,6 +1,6 @@
 {
 	"ignore": ["inflint.config.cjs", "cnb.config.ts", "intro.config.ts"],
-	"ignoreWorkspaces": ["packages/types"],
+	"ignoreWorkspaces": ["packages/types", "packages/database"],
 	"ignoreDependencies": ["cnb"],
 	"workspaces": {
 		"apps/mobile": {
