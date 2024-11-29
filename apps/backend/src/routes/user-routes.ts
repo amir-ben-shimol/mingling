@@ -7,10 +7,10 @@ import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import bcrypt from 'bcrypt';
 import type { Server } from 'socket.io'; // Import Socket.io type
+import { UserDB } from '@mingling/database';
 import { DeleteObjectCommand, ListObjectsCommand, type PutObjectRequest } from '@aws-sdk/client-s3';
 
 import { setUserOnlineStatus } from '../helpers/redis-helpers';
-import { User } from '../models/user';
 import s3 from '../config/s3-config';
 import { authenticate } from '../middleware/auth';
 import { emitFriendUpdate } from '../helpers/socket-emitters'; // Import the emitter for friend status
@@ -33,7 +33,7 @@ export const createUserRoutes = (io: Server) => {
 			const saltRounds = 10;
 			const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-			const newUser = new User({ firstName, lastName, email, country, gender, age, password: hashedPassword });
+			const newUser = new UserDB({ firstName, lastName, email, country, gender, age, password: hashedPassword });
 
 			await newUser.save();
 
@@ -55,7 +55,7 @@ export const createUserRoutes = (io: Server) => {
 		}
 
 		try {
-			const user = await User.findOne({ email });
+			const user = await UserDB.findOne({ email });
 
 			if (!user || !(await bcrypt.compare(password, user.password))) {
 				res.status(400).json({ error: 'Invalid email or password' });
@@ -109,7 +109,7 @@ export const createUserRoutes = (io: Server) => {
 		const { id } = req.params;
 
 		try {
-			const user = await User.findById(id).select('-password -sessionToken -friendsList -notifications').exec();
+			const user = await UserDB.findById(id).select('-password -sessionToken -friendsList -notifications').exec();
 
 			if (!user) {
 				res.status(404).json({ error: 'User not found' });
@@ -171,13 +171,13 @@ export const createUserRoutes = (io: Server) => {
 			const profilePictureUrl = response.Location || `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.S3_REGION}.amazonaws.com/${params.Key}`;
 
 			if (process.env.NODE_ENV === 'production') {
-				await User.findByIdAndUpdate(userId, { profilePictureUrl: profilePictureUrl }, { new: true });
+				await UserDB.findByIdAndUpdate(userId, { profilePictureUrl: profilePictureUrl }, { new: true });
 				await emitFriendUpdate(io, userId.toString(), { profilePictureUrl: profilePictureUrl });
 			} else {
 				const currentIp = process.env.CURRENT_IP || 'localhost';
 				const localProfilePictureUrl = profilePictureUrl.replace('minio', currentIp);
 
-				await User.findByIdAndUpdate(userId, { profilePictureUrl: localProfilePictureUrl });
+				await UserDB.findByIdAndUpdate(userId, { profilePictureUrl: localProfilePictureUrl });
 				await emitFriendUpdate(io, userId.toString(), { profilePictureUrl: localProfilePictureUrl });
 			}
 

@@ -5,9 +5,9 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-import mongoose from 'mongoose';
 import express from 'express';
 import { Server as SocketIOServer } from 'socket.io';
+import { connectToDatabase } from '@mingling/database';
 import { configureSockets } from './config/socket-config';
 import { createUserRoutes } from './routes/user-routes';
 import { createFriendRoutes } from './routes/friend-routes';
@@ -26,12 +26,7 @@ const io = new SocketIOServer(server, {
 	},
 });
 
-const mongoUri = process.env.DATABASE_URL;
-
-mongoose
-	.connect(mongoUri)
-	.then(() => console.log('Connected to MongoDB'))
-	.catch((error) => console.error('Error connecting to MongoDB:', error));
+connectToDatabase();
 
 app.get('/', (_, res) => {
 	res.send('WebRTC Signaling Server is running');

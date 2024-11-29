@@ -1,8 +1,7 @@
 // routes/notificationsRoutes.ts
 import express, { type Request, type Response } from 'express';
-import mongoose from 'mongoose';
+import { type Document, generateObjectId, UserDB } from '@mingling/database';
 import { type Notification } from '@mingling/types';
-import { User } from '../models/user';
 import { authenticate } from '../middleware/auth';
 
 const router = express.Router();
@@ -10,11 +9,11 @@ const router = express.Router();
 export async function createNotification(userId: string, notificationData: Omit<Notification, 'id' | 'timestamp'>): Promise<Notification> {
 	const notification: Notification = {
 		...notificationData,
-		id: new mongoose.Types.ObjectId().toHexString(),
+		id: generateObjectId(),
 		timestamp: new Date(),
 	};
 
-	const user = await User.findById(userId);
+	const user = await UserDB.findById(userId);
 
 	if (!user) throw new Error('User not found');
 
@@ -29,7 +28,7 @@ export async function updateNotification(
 	notificationId: string,
 	updateData: Partial<Omit<Notification, 'id' | 'timestamp'>>,
 ): Promise<Notification> {
-	const user = await User.findById(userId);
+	const user = await UserDB.findById(userId);
 
 	if (!user) throw new Error('User not found');
 
@@ -37,7 +36,7 @@ export async function updateNotification(
 
 	if (notificationIndex === -1) throw new Error('Notification not found');
 
-	const existingNotification = user.notifications[notificationIndex] as unknown as mongoose.Document;
+	const existingNotification = user.notifications[notificationIndex] as unknown as Document;
 
 	Object.assign(existingNotification, updateData, {
 		timestamp: existingNotification.get('timestamp') || new Date(),
@@ -49,7 +48,7 @@ export async function updateNotification(
 }
 
 async function deleteNotification(userId: string, notificationId: string): Promise<{ message: string }> {
-	const user = await User.findById(userId);
+	const user = await UserDB.findById(userId);
 
 	if (!user) throw new Error('User not found');
 
