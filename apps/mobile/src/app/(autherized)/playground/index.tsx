@@ -112,7 +112,7 @@ const PlaygroundPage: React.FC = () => {
 
 	const handleEndSession = () => {
 		socket?.emit('leavePlayground');
-		// endCall();
+		endCall();
 		setIsLookingForMatchTogether(false);
 		router.push('/');
 	};
