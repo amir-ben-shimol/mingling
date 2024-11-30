@@ -362,6 +362,49 @@ importers:
         specifier: 5.6.3
         version: 5.6.3
 
+  apps/notifications-service:
+    dependencies:
+      '@mingling/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@mingling/redis':
+        specifier: workspace:*
+        version: link:../../packages/redis
+      '@mingling/socket':
+        specifier: workspace:*
+        version: link:../../packages/socket
+      '@mingling/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      dotenv:
+        specifier: 16.4.5
+        version: 16.4.5
+      express:
+        specifier: 4.21.1
+        version: 4.21.1
+      multer:
+        specifier: 1.4.5-lts.1
+        version: 1.4.5-lts.1
+      ts-node:
+        specifier: 10.9.2
+        version: 10.9.2(@types/node@22.5.5)(typescript@5.6.3)
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+    devDependencies:
+      '@types/bcrypt':
+        specifier: 5.0.2
+        version: 5.0.2
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      '@types/multer':
+        specifier: 1.4.12
+        version: 1.4.12
+      nodemon:
+        specifier: 3.1.7
+        version: 3.1.7
+
   packages/database:
     dependencies:
       '@mingling/types':
