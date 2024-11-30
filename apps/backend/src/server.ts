@@ -6,9 +6,8 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
-import { Server as SocketIOServer } from 'socket.io';
 import { connectToDatabase } from '@mingling/database';
-import { configureSockets } from './config/socket-config';
+import { configureSockets, configureSocketServer } from '@mingling/socket';
 import { createUserRoutes } from './routes/user-routes';
 import { createFriendRoutes } from './routes/friend-routes';
 import notificationsRoutes from './routes/notifications-routes';
@@ -19,26 +18,15 @@ app.use(express.json());
 
 const server = http.createServer(app);
 
-const io = new SocketIOServer(server, {
-	cors: {
-		origin: '*', // Replace with your frontend URL in production
-		methods: ['GET', 'POST'],
-	},
-});
+const io = configureSocketServer(server);
 
 connectToDatabase();
-
-app.get('/', (_, res) => {
-	res.send('WebRTC Signaling Server is running');
-});
+configureSockets(io);
 
 // Use user routes
 app.use('/api/users', createUserRoutes(io));
 app.use('/api/friends', createFriendRoutes(io));
 app.use('/api/notifications', notificationsRoutes);
-
-// Configure Socket.io with custom socket events
-configureSockets(io);
 
 const PORT = process.env.PORT || 3000;
 

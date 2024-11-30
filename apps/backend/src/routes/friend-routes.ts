@@ -2,15 +2,14 @@
 import express, { type Request, type Response } from 'express';
 import type { UserDetails, Notification } from '@mingling/types';
 import { UserDB } from '@mingling/database';
-import { type Server } from 'socket.io';
-import { getOnlineFriends, getSocketIdByUserId, getUserIdBySocketId } from '../helpers/redis-helpers';
+import { emitFriendsListUpdate, type SocketServerType } from '@mingling/socket';
+import { getOnlineFriends, getSocketIdByUserId, getUserIdBySocketId } from '@mingling/redis';
 import { authenticate } from '../middleware/auth';
-import { emitFriendsListUpdate } from '../helpers/socket-emitters';
 import { createNotification, updateNotification } from './notifications-routes';
 
 const router = express.Router();
 
-export function createFriendRoutes(io: Server) {
+export function createFriendRoutes(io: SocketServerType) {
 	// Send a friend request
 	router.post('/request', authenticate, async (req: Request, res: Response) => {
 		const requesterId = req.user?.id;
