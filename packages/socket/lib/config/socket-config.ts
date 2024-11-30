@@ -18,9 +18,9 @@ import {
 	setUserOnlineStatus,
 	deleteUserSocket,
 	deleteSocketGroupId,
-} from '../helpers/redis-helpers';
+} from '@mingling/redis';
+import type { GroupData } from '@mingling/types';
 import { emitFriendUpdate } from '../helpers/socket-emitters';
-import type { GroupData } from '../types/playground';
 
 export function configureSockets(io: Server) {
 	io.on('connection', (socket: Socket) => {

@@ -3,7 +3,6 @@
 	"display": "@mingling/database",
 	"compilerOptions": {
 		"baseUrl": "./",
-		"types": ["node"],
-		"typeRoots": ["./@types", "../../node_modules/@types"]
+		"types": ["node"]
 	}
 }
