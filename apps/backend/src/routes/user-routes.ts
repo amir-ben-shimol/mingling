@@ -6,17 +6,16 @@ import { Upload } from '@aws-sdk/lib-storage';
 import jwt from 'jsonwebtoken';
 import multer from 'multer';
 import bcrypt from 'bcrypt';
-import type { Server } from 'socket.io'; // Import Socket.io type
+import { setUserOnlineStatus } from '@mingling/redis';
+import { type SocketServerType, emitFriendUpdate } from '@mingling/socket';
 import { UserDB } from '@mingling/database';
 import { DeleteObjectCommand, ListObjectsCommand, type PutObjectRequest } from '@aws-sdk/client-s3';
 
-import { setUserOnlineStatus } from '../helpers/redis-helpers';
 import s3 from '../config/s3-config';
-import { authenticate } from '../middleware/auth';
-import { emitFriendUpdate } from '../helpers/socket-emitters'; // Import the emitter for friend status
 import { generateProfileImageKey } from '../helpers/s3-helpers';
+import { authenticate } from '../middleware/auth';
 
-export const createUserRoutes = (io: Server) => {
+export const createUserRoutes = (io: SocketServerType) => {
 	const router = express.Router();
 	const upload = multer({ storage: multer.memoryStorage() }); // Use memory storage to keep the file in memory
 

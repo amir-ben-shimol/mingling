@@ -5,16 +5,15 @@ RUN npm i -g pnpm@9.12.2
 WORKDIR /app
 
 COPY ./package.json ./pnpm-workspace.yaml ./.npmrc ./
-COPY ./apps/backend/package.json ./apps/backend/
-COPY ./packages/types/package.json ./packages/types/
+COPY ./packages/socket/package.json ./packages/socket/
 COPY ./packages/database/package.json ./packages/database/
 COPY ./packages/redis/package.json ./packages/redis/
-COPY ./packages/socket/package.json ./packages/socket/
+COPY ./packages/types/package.json ./packages/types/
 COPY ./tsconfig.base.json ./turbo.json ./
 COPY ./pnpm-lock.yaml ./
 
 RUN pnpm install --no-frozen-lockfile
 
-COPY ./apps/backend/ ./apps/backend/
+COPY ./packages/socket/ ./packages/socket/
 
-CMD ["pnpm", "exec", "turbo", "dev", "--filter=@mingling/backend"]
+CMD ["pnpm", "exec", "turbo", "start:docker", "--filter=@mingling/socket"]
