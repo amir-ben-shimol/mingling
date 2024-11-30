@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/helpers/redis-helpers.ts
 
-import redisClient from '../config/redis-config';
-import type { GroupData } from '../types/playground';
+import type { GroupData } from '@mingling/types';
+import { redisClient } from '../config/redis-config';
 
 // Set or remove user's online status in Redis
 export const setUserOnlineStatus = async (userId: string, isOnline: boolean): Promise<void> => {

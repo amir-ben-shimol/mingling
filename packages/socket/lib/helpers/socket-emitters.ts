@@ -1,7 +1,7 @@
 import type { Server } from 'socket.io';
-import type { UserDetails } from '@mingling/types';
 import { UserDB } from '@mingling/database';
-import { getOnlineFriends, getSocketIdByUserId } from './redis-helpers';
+import type { UserDetails } from '@mingling/types';
+import { getOnlineFriends, getSocketIdByUserId } from '@mingling/redis';
 
 // Helper function to emit friends list updates
 export async function emitFriendsListUpdate(io: Server, userId: string) {
