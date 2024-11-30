@@ -1,0 +1,20 @@
+FROM node:20.17.0
+
+RUN npm i -g pnpm@9.12.2
+
+WORKDIR /app
+
+COPY ./package.json ./pnpm-workspace.yaml ./.npmrc ./
+COPY ./apps/notifications-service/package.json ./apps/notifications-service/
+COPY ./packages/types/package.json ./packages/types/
+COPY ./packages/database/package.json ./packages/database/
+COPY ./packages/redis/package.json ./packages/redis/
+COPY ./packages/socket/package.json ./packages/socket/
+COPY ./tsconfig.base.json ./turbo.json ./
+COPY ./pnpm-lock.yaml ./
+
+RUN pnpm install --no-frozen-lockfile
+
+COPY ./apps/notifications-service/ ./apps/notifications-service/
+
+CMD ["pnpm", "exec", "turbo", "dev", "--filter=@mingling/notifications-service"]
