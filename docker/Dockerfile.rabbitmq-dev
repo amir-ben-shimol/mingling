@@ -1,0 +1,15 @@
+FROM node:20.17.0
+
+RUN npm i -g pnpm@9.12.2
+
+WORKDIR /app
+
+COPY ./package.json ./pnpm-workspace.yaml ./.npmrc ./
+COPY ./packages/rabbitmq/package.json ./packages/rabbitmq/
+COPY ./tsconfig.base.json ./turbo.json ./
+
+RUN pnpm i
+
+COPY ./packages/rabbitmq/ ./packages/rabbitmq/
+
+CMD ["pnpm", "exec", "turbo", "start:docker", "--filter=@mingling/rabbitmq"]

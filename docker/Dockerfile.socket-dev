@@ -9,6 +9,7 @@ COPY ./packages/socket/package.json ./packages/socket/
 COPY ./packages/database/package.json ./packages/database/
 COPY ./packages/redis/package.json ./packages/redis/
 COPY ./packages/types/package.json ./packages/types/
+COPY ./packages/rabbitmq/package.json ./packages/rabbitmq/
 COPY ./tsconfig.base.json ./turbo.json ./
 COPY ./pnpm-lock.yaml ./
 

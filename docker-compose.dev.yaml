@@ -59,7 +59,6 @@ services:
             - app_network
         volumes:
             - ./.volumes/minio/data:/data
-
     redis:
         image: redis:latest
         container_name: redis
@@ -67,6 +66,24 @@ services:
             - '6379:6379'
         networks:
             - app_network
+    rabbitmq:
+        container_name: rabbitmq
+        image: rabbitmq:management
+        restart: always
+        ports:
+            - '5672:5672'
+            - '15672:15672'
+        environment:
+            RABBITMQ_DEFAULT_USER: admin
+            RABBITMQ_DEFAULT_PASS: admin
+        networks:
+            - app_network
+        healthcheck:
+            test: ['CMD', 'rabbitmq-diagnostics', 'ping']
+            interval: 5s
+            timeout: 3s
+            retries: 5
+
     types_package:
         container_name: types_package
         build:
@@ -112,6 +129,7 @@ services:
             - database_package
             - redis_package
             - types_package
+            - rabbitmq_package
         networks:
             - app_network
         volumes:
@@ -130,6 +148,9 @@ services:
             - type: bind
               source: ./packages/types/dist
               target: /app/packages/types/dist
+            - type: bind
+              source: ./packages/rabbitmq/dist
+              target: /app/packages/rabbitmq/dist
     redis_package:
         container_name: redis_package
         build:
@@ -150,30 +171,87 @@ services:
             - type: bind
               source: ./packages/types/dist
               target: /app/packages/types/dist
-    backend:
-        container_name: backend
+    rabbitmq_package:
+        container_name: rabbitmq_package
         build:
             context: .
-            dockerfile: ./docker/Dockerfile.backend-dev
-        env_file:
-            - ./apps/backend/.env
-        ports:
-            - 8080:8080
+            dockerfile: ./docker/Dockerfile.rabbitmq-dev
         restart: always
         depends_on:
-            - mongo_replica_1
-            - mongo_replica_2
-            - mongo_replica_3
-            - types_package
-            - database_package
-            - socket_package
-            - redis_package
+            - rabbitmq
         networks:
             - app_network
         volumes:
             - type: bind
-              source: ./apps/backend/src
-              target: /app/apps/backend/src
+              source: ./packages/rabbitmq/lib
+              target: /app/packages/rabbitmq/lib
+            - type: bind
+              source: ./packages/rabbitmq/dist
+              target: /app/packages/rabbitmq/dist
+
+    api_gateway:
+        container_name: api_gateway
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.api_gateway-dev
+        env_file:
+            - ./apps/api-gateway/.env
+        ports:
+            - 3000:3000
+        restart: always
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+            mongo_replica_1:
+                condition: service_started
+            mongo_replica_2:
+                condition: service_started
+            mongo_replica_3:
+                condition: service_started
+        networks:
+            - app_network
+        volumes:
+            - type: bind
+              source: ./apps/api-gateway/src
+              target: /app/apps/api-gateway/src
+            - type: bind
+              source: ./packages/database/dist
+              target: /app/packages/database/dist
+            - type: bind
+              source: ./packages/socket/dist
+              target: /app/packages/socket/dist
+            - type: bind
+              source: ./packages/redis/dist
+              target: /app/packages/redis/dist
+            - type: bind
+              source: ./packages/rabbitmq/dist
+              target: /app/packages/rabbitmq/dist
+            - type: bind
+              source: ./packages/types/dist
+              target: /app/packages/types/dist
+    user_service:
+        container_name: user_service
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.user_service-dev
+        env_file:
+            - ./apps/user-service/.env
+        ports:
+            - 8080:8080
+        restart: always
+        depends_on:
+            - redis
+            - minio
+            - rabbitmq
+            - mongo_replica_1
+            - mongo_replica_2
+            - mongo_replica_3
+        networks:
+            - app_network
+        volumes:
+            - type: bind
+              source: ./apps/user-service/src
+              target: /app/apps/user-service/src
             - type: bind
               source: ./packages/types/dist
               target: /app/packages/types/dist
@@ -186,6 +264,87 @@ services:
             - type: bind
               source: ./packages/redis/dist
               target: /app/packages/redis/dist
+            - type: bind
+              source: ./packages/rabbitmq/dist
+              target: /app/packages/rabbitmq/dist
+    friend_service:
+        container_name: friend_service
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.friend_service-dev
+        env_file:
+            - ./apps/friend-service/.env
+        ports:
+            - 3001:3001
+        restart: always
+        depends_on:
+            - redis
+            - minio
+            - rabbitmq
+            - mongo_replica_1
+            - mongo_replica_2
+            - mongo_replica_3
+        networks:
+            - app_network
+        volumes:
+            - type: bind
+              source: ./apps/friend-service/src
+              target: /app/apps/friend-service/src
+            - type: bind
+              source: ./packages/types/dist
+              target: /app/packages/types/dist
+            - type: bind
+              source: ./packages/database/dist
+              target: /app/packages/database/dist
+            - type: bind
+              source: ./packages/socket/dist
+              target: /app/packages/socket/dist
+            - type: bind
+              source: ./packages/redis/dist
+              target: /app/packages/redis/dist
+            - type: bind
+              source: ./packages/rabbitmq/dist
+              target: /app/packages/rabbitmq/dist
+    notification_service:
+        container_name: notification_service
+        build:
+            context: .
+            dockerfile: ./docker/Dockerfile.notification_service-dev
+        env_file:
+            - ./apps/notification-service/.env
+        ports:
+            - 4000:4000
+        restart: always
+        depends_on:
+            rabbitmq:
+                condition: service_healthy
+            mongo_replica_1:
+                condition: service_started
+            mongo_replica_2:
+                condition: service_started
+            mongo_replica_3:
+                condition: service_started
+        networks:
+            - app_network
+        volumes:
+            - type: bind
+              source: ./apps/notification-service/src
+              target: /app/apps/notification-service/src
+            - type: bind
+              source: ./packages/types/dist
+              target: /app/packages/types/dist
+            - type: bind
+              source: ./packages/database/dist
+              target: /app/packages/database/dist
+            - type: bind
+              source: ./packages/socket/dist
+              target: /app/packages/socket/dist
+            - type: bind
+              source: ./packages/redis/dist
+              target: /app/packages/redis/dist
+            - type: bind
+              source: ./packages/rabbitmq/dist
+              target: /app/packages/rabbitmq/dist
 
     # mobile:
     #     container_name: mobile

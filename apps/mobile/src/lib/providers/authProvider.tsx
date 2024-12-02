@@ -32,7 +32,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	};
 
 	const logout = async () => {
-		await Promise.allSettled([BackendService.post('/api/users/logout'), AsyncStorage.removeItem(CACHE_KEY), AsyncStorage.removeItem('token')]);
+		await Promise.allSettled([BackendService.post('/api/user/logout'), AsyncStorage.removeItem(CACHE_KEY), AsyncStorage.removeItem('token')]);
 		setUser(null);
 	};
 
@@ -61,7 +61,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		}
 
 		try {
-			await BackendService.get('/api/users/is-auth');
+			await BackendService.get('/api/user/is-auth');
 		} catch (error) {
 			logout();
 		}
@@ -71,7 +71,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		if (!user) return;
 
 		try {
-			const response = await BackendService.get<User>(`/api/users/user/${user._id}`);
+			const response = await BackendService.get<User>(`/api/user/${user._id}`);
 
 			setUser(response.data);
 			await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ ...response.data, timestamp: Date.now() }));
