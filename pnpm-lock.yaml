@@ -84,29 +84,23 @@ importers:
         specifier: 5.6.3
         version: 5.6.3
 
-  apps/backend:
+  apps/api-gateway:
     dependencies:
-      '@aws-sdk/client-s3':
-        specifier: 3.685.0
-        version: 3.685.0
-      '@aws-sdk/lib-storage':
-        specifier: 3.685.0
-        version: 3.685.0(@aws-sdk/client-s3@3.685.0)
       '@mingling/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@mingling/rabbitmq':
+        specifier: workspace:*
+        version: link:../../packages/rabbitmq
       '@mingling/redis':
         specifier: workspace:*
         version: link:../../packages/redis
       '@mingling/socket':
         specifier: workspace:*
         version: link:../../packages/socket
-      '@mingling/types':
-        specifier: workspace:*
-        version: link:../../packages/types
-      bcrypt:
-        specifier: 5.1.1
-        version: 5.1.1
+      axios:
+        specifier: 1.7.8
+        version: 1.7.8
       dotenv:
         specifier: 16.4.5
         version: 16.4.5
@@ -116,9 +110,6 @@ importers:
       jsonwebtoken:
         specifier: 9.0.2
         version: 9.0.2
-      multer:
-        specifier: 1.4.5-lts.1
-        version: 1.4.5-lts.1
       ts-node:
         specifier: 10.9.2
         version: 10.9.2(@types/node@22.5.5)(typescript@5.6.3)
@@ -126,18 +117,49 @@ importers:
         specifier: 5.6.3
         version: 5.6.3
     devDependencies:
-      '@types/bcrypt':
-        specifier: 5.0.2
-        version: 5.0.2
       '@types/express':
         specifier: 5.0.0
         version: 5.0.0
       '@types/jsonwebtoken':
         specifier: 9.0.7
         version: 9.0.7
-      '@types/multer':
-        specifier: 1.4.12
-        version: 1.4.12
+      nodemon:
+        specifier: 3.1.7
+        version: 3.1.7
+
+  apps/friend-service:
+    dependencies:
+      '@mingling/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@mingling/rabbitmq':
+        specifier: workspace:*
+        version: link:../../packages/rabbitmq
+      '@mingling/redis':
+        specifier: workspace:*
+        version: link:../../packages/redis
+      '@mingling/socket':
+        specifier: workspace:*
+        version: link:../../packages/socket
+      '@mingling/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      dotenv:
+        specifier: 16.4.5
+        version: 16.4.5
+      express:
+        specifier: 4.21.1
+        version: 4.21.1
+      ts-node:
+        specifier: 10.9.2
+        version: 10.9.2(@types/node@22.5.5)(typescript@5.6.3)
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+    devDependencies:
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
       nodemon:
         specifier: 3.1.7
         version: 3.1.7
@@ -362,14 +384,14 @@ importers:
         specifier: 5.6.3
         version: 5.6.3
 
-  apps/notifications-service:
+  apps/notification-service:
     dependencies:
       '@mingling/database':
         specifier: workspace:*
         version: link:../../packages/database
-      '@mingling/redis':
+      '@mingling/rabbitmq':
         specifier: workspace:*
-        version: link:../../packages/redis
+        version: link:../../packages/rabbitmq
       '@mingling/socket':
         specifier: workspace:*
         version: link:../../packages/socket
@@ -382,6 +404,49 @@ importers:
       express:
         specifier: 4.21.1
         version: 4.21.1
+      ts-node:
+        specifier: 10.9.2
+        version: 10.9.2(@types/node@22.5.5)(typescript@5.6.3)
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+    devDependencies:
+      '@types/express':
+        specifier: 5.0.0
+        version: 5.0.0
+      nodemon:
+        specifier: 3.1.7
+        version: 3.1.7
+
+  apps/user-service:
+    dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 3.685.0
+        version: 3.685.0
+      '@aws-sdk/lib-storage':
+        specifier: 3.685.0
+        version: 3.685.0(@aws-sdk/client-s3@3.685.0)
+      '@mingling/database':
+        specifier: workspace:*
+        version: link:../../packages/database
+      '@mingling/redis':
+        specifier: workspace:*
+        version: link:../../packages/redis
+      '@mingling/socket':
+        specifier: workspace:*
+        version: link:../../packages/socket
+      bcrypt:
+        specifier: 5.1.1
+        version: 5.1.1
+      dotenv:
+        specifier: 16.4.5
+        version: 16.4.5
+      express:
+        specifier: 4.21.1
+        version: 4.21.1
+      jsonwebtoken:
+        specifier: 9.0.2
+        version: 9.0.2
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
@@ -398,6 +463,9 @@ importers:
       '@types/express':
         specifier: 5.0.0
         version: 5.0.0
+      '@types/jsonwebtoken':
+        specifier: 9.0.7
+        version: 9.0.7
       '@types/multer':
         specifier: 1.4.12
         version: 1.4.12
@@ -420,6 +488,58 @@ importers:
         specifier: 3.3.2
         version: 3.3.2
     devDependencies:
+      '@typescript-eslint/eslint-plugin':
+        specifier: 6.18.1
+        version: 6.18.1(@typescript-eslint/parser@6.18.1(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0)(typescript@5.6.3)
+      '@typescript-eslint/parser':
+        specifier: 6.18.1
+        version: 6.18.1(eslint@8.57.0)(typescript@5.6.3)
+      eslint:
+        specifier: 8.57.0
+        version: 8.57.0
+      eslint-config-prettier:
+        specifier: 9.1.0
+        version: 9.1.0(eslint@8.57.0)
+      eslint-plugin-deprecation:
+        specifier: 1.5.0
+        version: 1.5.0(eslint@8.57.0)(typescript@5.6.3)
+      eslint-plugin-import:
+        specifier: 2.29.1
+        version: 2.29.1(@typescript-eslint/parser@6.18.1(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0)
+      eslint-plugin-jsx-a11y:
+        specifier: 6.8.0
+        version: 6.8.0(eslint@8.57.0)
+      eslint-plugin-react:
+        specifier: 7.32.2
+        version: 7.32.2(eslint@8.57.0)
+      eslint-plugin-react-hooks:
+        specifier: 4.6.0
+        version: 4.6.0(eslint@8.57.0)
+      eslint-plugin-unicorn:
+        specifier: 47.0.0
+        version: 47.0.0(eslint@8.57.0)
+      eslint-plugin-unused-imports:
+        specifier: 3.2.0
+        version: 3.2.0(@typescript-eslint/eslint-plugin@6.18.1(@typescript-eslint/parser@6.18.1(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0)
+      typescript:
+        specifier: 5.6.3
+        version: 5.6.3
+
+  packages/rabbitmq:
+    dependencies:
+      '@types/node':
+        specifier: 20.14.1
+        version: 20.14.1
+      amqplib:
+        specifier: 0.10.5
+        version: 0.10.5
+      prettier:
+        specifier: 3.3.2
+        version: 3.3.2
+    devDependencies:
+      '@types/amqplib':
+        specifier: 0.10.5
+        version: 0.10.5
       '@typescript-eslint/eslint-plugin':
         specifier: 6.18.1
         version: 6.18.1(@typescript-eslint/parser@6.18.1(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0)(typescript@5.6.3)
@@ -514,6 +634,9 @@ importers:
       '@mingling/database':
         specifier: workspace:*
         version: link:../database
+      '@mingling/rabbitmq':
+        specifier: workspace:*
+        version: link:../rabbitmq
       '@mingling/redis':
         specifier: workspace:*
         version: link:../redis
@@ -622,6 +745,10 @@ packages:
     peerDependenciesMeta:
       graphql:
         optional: true
+
+  '@acuminous/bitsyntax@0.1.2':
+    resolution: {integrity: sha512-29lUK80d1muEQqiUsSo+3A0yP6CdspgC95EnKBMi22Xlwt79i/En4Vr67+cXhU+cZjbti3TgGGC5wy1stIywVQ==}
+    engines: {node: '>=0.8'}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -896,10 +1023,6 @@ packages:
 
   '@babel/helper-string-parser@7.25.9':
     resolution: {integrity: sha512-4A/SCr/2KLd5jrtOMFzaKjVtAei3+2r/NChoBNoZ3EyP/+GlhoaEGoWOZUmFmoITP7zOJyHIMm+DYRd8o3PvHA==}
-    engines: {node: '>=6.9.0'}
-
-  '@babel/helper-validator-identifier@7.24.7':
-    resolution: {integrity: sha512-rR+PBcQ1SMQDDyF6X0wxtG8QyLCgUB0eRAGguqRLfkCA87l7yAP7ehq8SNj96OOGTO8OBV70KhuFYcIkHXOg0w==}
     engines: {node: '>=6.9.0'}
 
   '@babel/helper-validator-identifier@7.25.9':
@@ -1510,10 +1633,6 @@ packages:
     engines: {node: '>=6.9.0'}
     peerDependencies:
       '@babel/core': ^7.0.0-0
-
-  '@babel/runtime@7.24.7':
-    resolution: {integrity: sha512-UwgBRMjJP+xv857DCngvqXI3Iq6J4v0wXmwc6sapg+zyhbwmQX67LUEFrkK5tbyJ30jGuG3ZvWpBiB9LCy1kWw==}
-    engines: {node: '>=6.9.0'}
 
   '@babel/runtime@7.26.0':
     resolution: {integrity: sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==}
@@ -2326,6 +2445,9 @@ packages:
   '@tsconfig/node16@1.0.4':
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
+  '@types/amqplib@0.10.5':
+    resolution: {integrity: sha512-/cSykxROY7BWwDoi4Y4/jLAuZTshZxd8Ey1QYa/VaXriMotBDoou7V/twJiOSHzU6t1Kp1AHAUXGCgqq+6DNeg==}
+
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
 
@@ -2628,6 +2750,10 @@ packages:
   ajv@8.17.1:
     resolution: {integrity: sha512-B/gBuNg5SiMTrPkC+A2+cW0RszwxYmn6VYxB/inlBStS5nx6xHIt/ehKRhIMhqusl7a8LjQoZnjCs5vhwxOQ1g==}
 
+  amqplib@0.10.5:
+    resolution: {integrity: sha512-Dx5zmy0Ur+Q7LPPdhz+jx5IzmJBoHd15tOeAfQ8SuvEtyPJ20hBemhOBA4b1WeORCRa0ENM/kHCzmem1w/zHvQ==}
+    engines: {node: '>=10'}
+
   anser@1.4.10:
     resolution: {integrity: sha512-hCv9AqTQ8ycjpSd3upOJd7vFwW1JaoYQ7tpham03GJ1ca8/65rqn0RpaWpItOAd6ylW9wAw6luXYPJIyPFVOww==}
 
@@ -2777,6 +2903,9 @@ packages:
   axe-core@4.7.0:
     resolution: {integrity: sha512-M0JtH+hlOL5pLQwHOLNYZaXuhqmvS8oExsqB1SBYgA4Dk7u/xx+YdGHXaK5pyUfed5mYXdlYiphWq3G8cRi5JQ==}
     engines: {node: '>=4'}
+
+  axios@1.7.8:
+    resolution: {integrity: sha512-Uu0wb7KNqK2t5K+YQyVCLM76prD5sRFjKHbJYCP1J7JFGEQ6nN7HWn9+04LAeiJ3ji54lgS/gZCH1oxyrf1SPw==}
 
   axobject-query@3.2.1:
     resolution: {integrity: sha512-jsyHu61e6N4Vbz/v18DHwWYKK0bSWLqn47eeDSKPB7m8tqMHF9YJ+mhIk2lVteyZrY8tnSj/jHOv4YiTCuCJgg==}
@@ -2945,6 +3074,9 @@ packages:
 
   buffer-from@1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
+
+  buffer-more-ints@1.0.0:
+    resolution: {integrity: sha512-EMetuGFz5SLsT0QTnXzINh4Ksr+oo4i+UGTXEshiGCQWnsgSs7ZhJ8fzlwQ+OzEMs0MpDAMr1hxnblp5a4vcHg==}
 
   buffer@5.6.0:
     resolution: {integrity: sha512-/gDYp/UtU0eA1ys8bOs9J6a+E/KWIY+DZ+Q2WESNUA0jFRsJOc0SNUO6xJ5SGA1xueg3NL65W6s+NY5l9cunuw==}
@@ -4089,6 +4221,15 @@ packages:
     resolution: {integrity: sha512-8mkLh/CotlvqA9vCyQMbhJoPx2upEg9oKxARAayz8zQ58wCdABnTZy6U4xhMHvHvbTUFgZQk4uH2cglOCOel5A==}
     engines: {node: '>=0.4.0'}
 
+  follow-redirects@1.15.9:
+    resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
+    engines: {node: '>=4.0'}
+    peerDependencies:
+      debug: '*'
+    peerDependenciesMeta:
+      debug:
+        optional: true
+
   fontfaceobserver@2.3.0:
     resolution: {integrity: sha512-6FPvD/IVyT4ZlNe7Wcn5Fb/4ChigpucKYSvD6a+0iMoLn2inpo711eyIcKjmDtE5XNcgAkSH9uN/nfAeZzHEfg==}
 
@@ -4101,6 +4242,10 @@ packages:
 
   form-data@3.0.2:
     resolution: {integrity: sha512-sJe+TQb2vIaIyO783qN6BlMYWMw3WBOHA1Ay2qxsnjuafEOQFJ2JakedOQirT6D5XPRxDvS7AHYyem9fTpb4LQ==}
+    engines: {node: '>= 6'}
+
+  form-data@4.0.1:
+    resolution: {integrity: sha512-tzN8e4TX8+kkxGPK8D5u0FNmjPUjw3lwC9lSLxxoB/+GtsJG91CO8bSWy73APlgAZzZbXEYZJuxjkHH2w+Ezhw==}
     engines: {node: '>= 6'}
 
   forwarded@0.2.0:
@@ -5133,6 +5278,10 @@ packages:
     resolution: {integrity: sha512-LPP/3KorzCwBxfeUuZmaR6bG2kdeHSbe0P2tY3FLRU4vYrjYz5hI4QZwV0njUx3jeuKe67YukQ1LSPZBKDqO/Q==}
     engines: {node: '>=8.6'}
 
+  micromatch@4.0.8:
+    resolution: {integrity: sha512-PXwfBhYu0hBCPw8Dn0E+WDYb7af3dSLVWKi3HGv84IdF4TyFoC0ysxFd0Goxw7nSv4T/PzEJQxsYsEiFCKo2BA==}
+    engines: {node: '>=8.6'}
+
   mime-db@1.52.0:
     resolution: {integrity: sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==}
     engines: {node: '>= 0.6'}
@@ -5851,6 +6000,9 @@ packages:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
 
+  proxy-from-env@1.1.0:
+    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
+
   pstree.remy@1.1.8:
     resolution: {integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==}
 
@@ -5872,6 +6024,9 @@ packages:
   query-string@7.1.3:
     resolution: {integrity: sha512-hh2WYhq4fi8+b+/2Kg9CEge4fDPvHS534aOOvOZeQ3+Vf2mCFsaFBYj0i+iXcAq6I9Vzp5fjMFBlONvayDC1qg==}
     engines: {node: '>=6'}
+
+  querystringify@2.2.0:
+    resolution: {integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -6131,6 +6286,9 @@ packages:
   requireindex@1.1.0:
     resolution: {integrity: sha512-LBnkqsDE7BZKvqylbmn7lTIVdpx4K/QCduRATpO5R+wtPmky/a8pN1bO2D6wXppn1497AJF9mNjqAXr6bdl9jg==}
     engines: {node: '>=0.10.5'}
+
+  requires-port@1.0.0:
+    resolution: {integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==}
 
   resolve-from@3.0.0:
     resolution: {integrity: sha512-GnlH6vxLymXJNMBo7XP1fJIzBFbdYt49CuTwmB/6N53t+kMPRMFKz783LlQ4tv28XoQfMWinAJX6WCGf2IlaIw==}
@@ -6924,6 +7082,9 @@ packages:
   uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
 
+  url-parse@1.5.10:
+    resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==}
+
   use-latest-callback@0.2.1:
     resolution: {integrity: sha512-QWlq8Is8BGWBf883QOEQP5HWYX/kMI+JTbJ5rdtvJLmXTIh9XoHIO3PQcmQl8BU44VKxow1kbQUHa6mQSMALDQ==}
     peerDependencies:
@@ -7234,6 +7395,14 @@ snapshots:
   '@0no-co/graphql.web@1.0.11(graphql@15.8.0)':
     optionalDependencies:
       graphql: 15.8.0
+
+  '@acuminous/bitsyntax@0.1.2':
+    dependencies:
+      buffer-more-ints: 1.0.0
+      debug: 4.3.7(supports-color@5.5.0)
+      safe-buffer: 5.1.2
+    transitivePeerDependencies:
+      - supports-color
 
   '@alloc/quick-lru@5.2.0': {}
 
@@ -7783,7 +7952,7 @@ snapshots:
       '@babel/traverse': 7.25.9
       '@babel/types': 7.26.0
       convert-source-map: 2.0.0
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.5
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -7842,7 +8011,7 @@ snapshots:
       '@babel/core': 7.26.0
       '@babel/helper-compilation-targets': 7.25.9
       '@babel/helper-plugin-utils': 7.25.9
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       lodash.debounce: 4.0.8
       resolve: 1.22.8
     transitivePeerDependencies:
@@ -7914,8 +8083,6 @@ snapshots:
       - supports-color
 
   '@babel/helper-string-parser@7.25.9': {}
-
-  '@babel/helper-validator-identifier@7.24.7': {}
 
   '@babel/helper-validator-identifier@7.25.9': {}
 
@@ -8649,10 +8816,6 @@ snapshots:
       pirates: 4.0.6
       source-map-support: 0.5.21
 
-  '@babel/runtime@7.24.7':
-    dependencies:
-      regenerator-runtime: 0.14.1
-
   '@babel/runtime@7.26.0':
     dependencies:
       regenerator-runtime: 0.14.1
@@ -8670,7 +8833,7 @@ snapshots:
       '@babel/parser': 7.26.1
       '@babel/template': 7.25.9
       '@babel/types': 7.26.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       globals: 11.12.0
     transitivePeerDependencies:
       - supports-color
@@ -8729,7 +8892,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.1
@@ -8792,7 +8955,7 @@ snapshots:
       ci-info: 3.9.0
       compression: 1.7.4
       connect: 3.7.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       env-editor: 0.4.2
       fast-glob: 3.3.2
       form-data: 3.0.2
@@ -8819,7 +8982,7 @@ snapshots:
       resolve: 1.22.8
       resolve-from: 5.0.0
       resolve.exports: 2.0.2
-      semver: 7.6.2
+      semver: 7.6.3
       send: 0.19.0
       slugify: 1.6.6
       source-map-support: 0.5.21
@@ -8852,11 +9015,11 @@ snapshots:
       '@expo/plist': 0.2.0
       '@expo/sdk-runtime-versions': 1.0.0
       chalk: 4.1.2
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       getenv: 1.0.0
       glob: 10.4.5
       resolve-from: 5.0.0
-      semver: 7.6.2
+      semver: 7.6.3
       slash: 3.0.0
       slugify: 1.6.6
       xcode: 3.0.1
@@ -8904,7 +9067,7 @@ snapshots:
   '@expo/env@0.4.0':
     dependencies:
       chalk: 4.1.2
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       dotenv: 16.4.5
       dotenv-expand: 11.0.6
       getenv: 1.0.0
@@ -8916,13 +9079,13 @@ snapshots:
       '@expo/spawn-async': 1.7.2
       arg: 5.0.2
       chalk: 4.1.2
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       find-up: 5.0.0
       getenv: 1.0.0
       minimatch: 3.1.2
       p-limit: 3.1.0
       resolve-from: 5.0.0
-      semver: 7.6.2
+      semver: 7.6.3
     transitivePeerDependencies:
       - supports-color
 
@@ -8935,7 +9098,7 @@ snapshots:
       jimp-compact: 0.16.1
       parse-png: 2.1.0
       resolve-from: 5.0.0
-      semver: 7.6.2
+      semver: 7.6.3
       temp-dir: 2.0.0
       unique-string: 2.0.0
 
@@ -8962,7 +9125,7 @@ snapshots:
       '@expo/json-file': 9.0.0
       '@expo/spawn-async': 1.7.2
       chalk: 4.1.2
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       fs-extra: 9.1.0
       getenv: 1.0.0
       glob: 10.4.5
@@ -8992,7 +9155,7 @@ snapshots:
       find-up: 5.0.0
       find-yarn-workspace-root: 2.0.0
       js-yaml: 3.14.1
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       npm-package-arg: 7.0.0
       ora: 3.4.0
       split: 1.0.1
@@ -9012,10 +9175,10 @@ snapshots:
       '@expo/image-utils': 0.6.3
       '@expo/json-file': 9.0.0
       '@react-native/normalize-colors': 0.76.3
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       fs-extra: 9.1.0
       resolve-from: 5.0.0
-      semver: 7.6.2
+      semver: 7.6.3
       xml2js: 0.6.0
     transitivePeerDependencies:
       - supports-color
@@ -9038,7 +9201,7 @@ snapshots:
     dependencies:
       '@remix-run/node': 2.13.1(typescript@5.6.3)
       abort-controller: 3.0.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       source-map-support: 0.5.21
     transitivePeerDependencies:
       - supports-color
@@ -9082,7 +9245,7 @@ snapshots:
   '@humanwhocodes/config-array@0.11.14':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -9247,7 +9410,7 @@ snapshots:
       jest-haste-map: 29.7.0
       jest-regex-util: 29.6.3
       jest-util: 29.7.0
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       pirates: 4.0.6
       slash: 3.0.0
       write-file-atomic: 4.0.2
@@ -9301,7 +9464,7 @@ snapshots:
 
   '@kwsites/file-exists@1.1.1':
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -9316,7 +9479,7 @@ snapshots:
       nopt: 5.0.0
       npmlog: 5.0.1
       rimraf: 3.0.2
-      semver: 7.6.2
+      semver: 7.6.3
       tar: 6.2.1
     transitivePeerDependencies:
       - encoding
@@ -9352,7 +9515,7 @@ snapshots:
 
   '@npmcli/fs@3.1.1':
     dependencies:
-      semver: 7.6.2
+      semver: 7.6.3
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
@@ -9510,7 +9673,7 @@ snapshots:
       metro-core: 0.81.0
       node-fetch: 2.7.0
       readline: 1.3.0
-      semver: 7.6.2
+      semver: 7.6.3
     optionalDependencies:
       '@react-native-community/cli-server-api': 13.6.9
     transitivePeerDependencies:
@@ -10091,6 +10254,10 @@ snapshots:
 
   '@tsconfig/node16@1.0.4': {}
 
+  '@types/amqplib@0.10.5':
+    dependencies:
+      '@types/node': 20.14.1
+
   '@types/babel__core@7.20.5':
     dependencies:
       '@babel/parser': 7.26.1
@@ -10274,12 +10441,12 @@ snapshots:
       '@typescript-eslint/type-utils': 6.18.1(eslint@8.57.0)(typescript@5.6.3)
       '@typescript-eslint/utils': 6.18.1(eslint@8.57.0)(typescript@5.6.3)
       '@typescript-eslint/visitor-keys': 6.18.1
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.7(supports-color@5.5.0)
       eslint: 8.57.0
       graphemer: 1.4.0
       ignore: 5.3.1
       natural-compare: 1.4.0
-      semver: 7.6.2
+      semver: 7.6.3
       ts-api-utils: 1.3.0(typescript@5.6.3)
     optionalDependencies:
       typescript: 5.6.3
@@ -10292,7 +10459,7 @@ snapshots:
       '@typescript-eslint/types': 6.18.1
       '@typescript-eslint/typescript-estree': 6.18.1(typescript@5.6.3)
       '@typescript-eslint/visitor-keys': 6.18.1
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.7(supports-color@5.5.0)
       eslint: 8.57.0
     optionalDependencies:
       typescript: 5.6.3
@@ -10313,7 +10480,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 6.18.1(typescript@5.6.3)
       '@typescript-eslint/utils': 6.18.1(eslint@8.57.0)(typescript@5.6.3)
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       eslint: 8.57.0
       ts-api-utils: 1.3.0(typescript@5.6.3)
     optionalDependencies:
@@ -10329,10 +10496,10 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.6.2
+      semver: 7.6.3
       tsutils: 3.21.0(typescript@5.6.3)
     optionalDependencies:
       typescript: 5.6.3
@@ -10343,11 +10510,11 @@ snapshots:
     dependencies:
       '@typescript-eslint/types': 6.18.1
       '@typescript-eslint/visitor-keys': 6.18.1
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       globby: 11.1.0
       is-glob: 4.0.3
       minimatch: 9.0.3
-      semver: 7.6.2
+      semver: 7.6.3
       ts-api-utils: 1.3.0(typescript@5.6.3)
     optionalDependencies:
       typescript: 5.6.3
@@ -10364,7 +10531,7 @@ snapshots:
       '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.6.3)
       eslint: 8.57.0
       eslint-scope: 5.1.1
-      semver: 7.6.2
+      semver: 7.6.3
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -10378,7 +10545,7 @@ snapshots:
       '@typescript-eslint/types': 6.18.1
       '@typescript-eslint/typescript-estree': 6.18.1(typescript@5.6.3)
       eslint: 8.57.0
-      semver: 7.6.2
+      semver: 7.6.3
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -10439,7 +10606,7 @@ snapshots:
 
   agent-base@6.0.2:
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -10477,6 +10644,14 @@ snapshots:
       fast-uri: 3.0.3
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
+
+  amqplib@0.10.5:
+    dependencies:
+      '@acuminous/bitsyntax': 0.1.2
+      buffer-more-ints: 1.0.0
+      url-parse: 1.5.10
+    transitivePeerDependencies:
+      - supports-color
 
   anser@1.4.10: {}
 
@@ -10632,6 +10807,14 @@ snapshots:
       possible-typed-array-names: 1.0.0
 
   axe-core@4.7.0: {}
+
+  axios@1.7.8:
+    dependencies:
+      follow-redirects: 1.15.9
+      form-data: 4.0.1
+      proxy-from-env: 1.1.0
+    transitivePeerDependencies:
+      - debug
 
   axobject-query@3.2.1:
     dependencies:
@@ -10860,6 +11043,8 @@ snapshots:
   buffer-fill@1.0.0: {}
 
   buffer-from@1.1.2: {}
+
+  buffer-more-ints@1.0.0: {}
 
   buffer@5.6.0:
     dependencies:
@@ -11277,15 +11462,15 @@ snapshots:
     dependencies:
       ms: 2.1.2
 
-  debug@4.3.5(supports-color@5.5.0):
+  debug@4.3.5:
     dependencies:
       ms: 2.1.2
-    optionalDependencies:
-      supports-color: 5.5.0
 
-  debug@4.3.7:
+  debug@4.3.7(supports-color@5.5.0):
     dependencies:
       ms: 2.1.3
+    optionalDependencies:
+      supports-color: 5.5.0
 
   decode-uri-component@0.2.2: {}
 
@@ -11420,7 +11605,7 @@ snapshots:
   engine.io-client@6.6.2:
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       engine.io-parser: 5.2.3
       ws: 8.17.1
       xmlhttprequest-ssl: 2.1.2
@@ -11440,7 +11625,7 @@ snapshots:
       base64id: 2.0.0
       cookie: 0.7.2
       cors: 2.8.5
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       engine.io-parser: 5.2.3
       ws: 8.17.1
     transitivePeerDependencies:
@@ -11636,7 +11821,7 @@ snapshots:
 
   eslint-plugin-jsx-a11y@6.8.0(eslint@8.57.0):
     dependencies:
-      '@babel/runtime': 7.24.7
+      '@babel/runtime': 7.26.0
       aria-query: 5.3.0
       array-includes: 3.1.8
       array.prototype.flatmap: 1.3.2
@@ -11679,7 +11864,7 @@ snapshots:
 
   eslint-plugin-unicorn@47.0.0(eslint@8.57.0):
     dependencies:
-      '@babel/helper-validator-identifier': 7.24.7
+      '@babel/helper-validator-identifier': 7.25.9
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
       ci-info: 3.9.0
       clean-regexp: 1.0.0
@@ -11694,7 +11879,7 @@ snapshots:
       regexp-tree: 0.1.27
       regjsparser: 0.10.0
       safe-regex: 2.1.1
-      semver: 7.6.2
+      semver: 7.6.3
       strip-indent: 3.0.0
 
   eslint-plugin-unused-imports@3.2.0(@typescript-eslint/eslint-plugin@6.18.1(@typescript-eslint/parser@6.18.1(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0)(typescript@5.6.3))(eslint@8.57.0):
@@ -11731,7 +11916,7 @@ snapshots:
       ajv: 6.12.6
       chalk: 4.1.2
       cross-spawn: 7.0.3
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.7(supports-color@5.5.0)
       doctrine: 3.0.0
       escape-string-regexp: 4.0.0
       eslint-scope: 7.2.2
@@ -11849,7 +12034,7 @@ snapshots:
     dependencies:
       ajv: 8.17.1
       expo: 52.0.11(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@expo/metro-runtime@4.0.0(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@react-native-community/cli-server-api@13.6.9)(@types/react@18.3.12)(react@18.3.1)))(graphql@15.8.0)(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@react-native-community/cli-server-api@13.6.9)(@types/react@18.3.12)(react@18.3.1))(react@18.3.1)
-      semver: 7.6.2
+      semver: 7.6.3
 
   expo-build-properties@0.13.1(expo@52.0.11(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@expo/metro-runtime@4.0.0(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@react-native-community/cli-server-api@13.6.9)(@types/react@18.3.12)(react@18.3.1)))(graphql@15.8.0)(react-native@0.76.3(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(@react-native-community/cli-server-api@13.6.9)(@types/react@18.3.12)(react@18.3.1))(react@18.3.1)):
     dependencies:
@@ -12247,7 +12432,7 @@ snapshots:
 
   find-yarn-workspace-root@2.0.0:
     dependencies:
-      micromatch: 4.0.7
+      micromatch: 4.0.8
 
   flat-cache@3.2.0:
     dependencies:
@@ -12261,6 +12446,8 @@ snapshots:
 
   flow-parser@0.250.0: {}
 
+  follow-redirects@1.15.9: {}
+
   fontfaceobserver@2.3.0: {}
 
   for-each@0.3.3:
@@ -12273,6 +12460,12 @@ snapshots:
       signal-exit: 4.1.0
 
   form-data@3.0.2:
+    dependencies:
+      asynckit: 0.4.0
+      combined-stream: 1.0.8
+      mime-types: 2.1.35
+
+  form-data@4.0.1:
     dependencies:
       asynckit: 0.4.0
       combined-stream: 1.0.8
@@ -12506,7 +12699,7 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -12811,7 +13004,7 @@ snapshots:
       jest-regex-util: 29.6.3
       jest-util: 29.7.0
       jest-worker: 29.7.0
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       walker: 1.0.8
     optionalDependencies:
       fsevents: 2.3.3
@@ -12823,7 +13016,7 @@ snapshots:
       '@types/stack-utils': 2.0.3
       chalk: 4.1.2
       graceful-fs: 4.2.11
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       pretty-format: 29.7.0
       slash: 3.0.0
       stack-utils: 2.0.6
@@ -12898,7 +13091,7 @@ snapshots:
       chalk: 4.1.2
       flow-parser: 0.250.0
       graceful-fs: 4.2.11
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       neo-async: 2.6.2
       node-dir: 0.1.17
       recast: 0.21.5
@@ -12952,7 +13145,7 @@ snapshots:
       lodash.isstring: 4.0.1
       lodash.once: 4.1.1
       ms: 2.1.3
-      semver: 7.6.2
+      semver: 7.6.3
 
   jsx-ast-utils@3.3.5:
     dependencies:
@@ -13080,7 +13273,7 @@ snapshots:
     dependencies:
       chalk: 5.3.0
       commander: 12.1.0
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.5
       execa: 8.0.1
       lilconfig: 3.1.1
       listr2: 8.2.3
@@ -13288,7 +13481,7 @@ snapshots:
       graceful-fs: 4.2.11
       invariant: 2.2.4
       jest-worker: 29.7.0
-      micromatch: 4.0.7
+      micromatch: 4.0.8
       node-abort-controller: 3.1.1
       nullthrows: 1.1.1
       walker: 1.0.8
@@ -13430,6 +13623,11 @@ snapshots:
       braces: 3.0.3
       picomatch: 2.3.1
 
+  micromatch@4.0.8:
+    dependencies:
+      braces: 3.0.3
+      picomatch: 2.3.1
+
   mime-db@1.52.0: {}
 
   mime-types@2.1.35:
@@ -13530,7 +13728,7 @@ snapshots:
 
   mquery@5.0.0:
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -13617,11 +13815,11 @@ snapshots:
   nodemon@3.1.7:
     dependencies:
       chokidar: 3.6.0
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.7(supports-color@5.5.0)
       ignore-by-default: 1.0.1
       minimatch: 3.1.2
       pstree.remy: 1.1.8
-      semver: 7.6.2
+      semver: 7.6.3
       simple-update-notifier: 2.0.0
       supports-color: 5.5.0
       touch: 3.1.1
@@ -13646,7 +13844,7 @@ snapshots:
     dependencies:
       hosted-git-info: 7.0.2
       proc-log: 4.2.0
-      semver: 7.6.2
+      semver: 7.6.3
       validate-npm-package-name: 5.0.1
 
   npm-package-arg@7.0.0:
@@ -14074,6 +14272,8 @@ snapshots:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
+  proxy-from-env@1.1.0: {}
+
   pstree.remy@1.1.8: {}
 
   pump@3.0.2:
@@ -14095,6 +14295,8 @@ snapshots:
       filter-obj: 1.1.0
       split-on-first: 1.1.0
       strict-uri-encode: 2.0.0
+
+  querystringify@2.2.0: {}
 
   queue-microtask@1.2.3: {}
 
@@ -14457,6 +14659,8 @@ snapshots:
 
   requireindex@1.1.0: {}
 
+  requires-port@1.0.0: {}
+
   resolve-from@3.0.0: {}
 
   resolve-from@4.0.0: {}
@@ -14676,7 +14880,7 @@ snapshots:
     dependencies:
       '@kwsites/file-exists': 1.1.1
       '@kwsites/promise-deferred': 1.1.1
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -14692,7 +14896,7 @@ snapshots:
 
   simple-update-notifier@2.0.0:
     dependencies:
-      semver: 7.6.2
+      semver: 7.6.3
 
   sisteransi@1.0.5: {}
 
@@ -14714,7 +14918,7 @@ snapshots:
 
   socket.io-adapter@2.5.5:
     dependencies:
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
       ws: 8.17.1
     transitivePeerDependencies:
       - bufferutil
@@ -14724,7 +14928,7 @@ snapshots:
   socket.io-client@4.8.1:
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.5
       engine.io-client: 6.6.2
       socket.io-parser: 4.2.4
     transitivePeerDependencies:
@@ -14735,7 +14939,7 @@ snapshots:
   socket.io-parser@4.2.4:
     dependencies:
       '@socket.io/component-emitter': 3.1.2
-      debug: 4.3.7
+      debug: 4.3.7(supports-color@5.5.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -14744,7 +14948,7 @@ snapshots:
       accepts: 1.3.8
       base64id: 2.0.0
       cors: 2.8.5
-      debug: 4.3.5(supports-color@5.5.0)
+      debug: 4.3.5
       engine.io: 6.6.2
       socket.io-adapter: 2.5.5
       socket.io-parser: 4.2.4
@@ -15301,6 +15505,11 @@ snapshots:
   uri-js@4.4.1:
     dependencies:
       punycode: 2.3.1
+
+  url-parse@1.5.10:
+    dependencies:
+      querystringify: 2.2.0
+      requires-port: 1.0.0
 
   use-latest-callback@0.2.1(react@18.3.1):
     dependencies:

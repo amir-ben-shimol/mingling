@@ -1,6 +1,6 @@
 {
 	"ignore": ["inflint.config.cjs", "cnb.config.ts", "intro.config.ts"],
-	"ignoreWorkspaces": ["packages/types", "packages/database", "packages/redis", "packages/socket"],
+	"ignoreWorkspaces": ["packages/types", "packages/database", "packages/redis", "packages/socket", "packages/rabbitmq"],
 	"ignoreDependencies": ["cnb"],
 	"workspaces": {
 		"apps/mobile": {
@@ -22,9 +22,21 @@
 			],
 			"ignoreBinaries": ["eas", "pod"]
 		},
-		"apps/backend": {
+		"apps/api-gateway": {
 			"ignoreDependencies": ["ts-node"],
-			"ignore": ["@types/**/*", "src/models/user.ts"]
+			"ignore": ["@types/**/*"]
+		},
+		"apps/user-service": {
+			"ignoreDependencies": ["ts-node"],
+			"ignore": ["@types/**/*"]
+		},
+		"apps/friend-service": {
+			"ignoreDependencies": ["ts-node"],
+			"ignore": ["@types/**/*"]
+		},
+		"apps/notification-service": {
+			"ignoreDependencies": ["ts-node"],
+			"ignore": ["@types/**/*"]
 		}
 	}
 }

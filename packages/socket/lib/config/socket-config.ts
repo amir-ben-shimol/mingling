@@ -75,8 +75,12 @@ export function configureSockets(io: Server) {
 		}
 
 		// User joins the playground
-		socket.on('joinPlayground', async (userId: string) => {
+		socket.on('joinPlayground', async () => {
+			const userId = await getUserIdBySocketId(socket.id);
+
 			console.log(`User ${userId} joined the playground with socket ${socket.id}`);
+
+			if (!userId) return;
 
 			const groupId = uuidv4();
 
@@ -395,7 +399,7 @@ export function configureSockets(io: Server) {
 			if (userId) {
 				await setUserOnlineStatus(userId, false);
 				await deleteUserSocket(userId);
-				emitFriendUpdate(io, userId, { isOnline: false });
+				emitFriendUpdate(userId, { isOnline: false });
 			}
 		});
 
@@ -404,7 +408,7 @@ export function configureSockets(io: Server) {
 			await setUserSocket(userId, socket.id); // Maps userId to socketId in Redis
 			await setSocketUser(socket.id, userId); // Maps socketId to userId in Redis
 			await setUserOnlineStatus(userId, true);
-			emitFriendUpdate(io, userId, { isOnline: true });
+			emitFriendUpdate(userId, { isOnline: true });
 		});
 
 		// Remove socket-user mapping from Redis on logout
@@ -416,20 +420,20 @@ export function configureSockets(io: Server) {
 			if (userId) {
 				await setUserOnlineStatus(userId, false);
 				await deleteUserSocket(userId);
-				emitFriendUpdate(io, userId, { isOnline: false });
+				emitFriendUpdate(userId, { isOnline: false });
 			}
 		});
 
 		// When app moves to background, set user as offline
 		socket.on('app-background', async (userId) => {
 			await setUserOnlineStatus(userId, false);
-			emitFriendUpdate(io, userId, { isOnline: false });
+			emitFriendUpdate(userId, { isOnline: false });
 		});
 
 		// When app moves to foreground, set user as online
 		socket.on('app-foreground', async (userId) => {
 			await setUserOnlineStatus(userId, true);
-			emitFriendUpdate(io, userId, { isOnline: true });
+			emitFriendUpdate(userId, { isOnline: true });
 		});
 	});
 }

@@ -48,7 +48,7 @@ const ProfilePage = () => {
 				'Content-Type': 'multipart/form-data',
 			};
 
-			const response = await BackendService.post('/api/users/upload-profile-picture', formData, options);
+			const response = await BackendService.post('/api/user/upload-profile-picture', formData, options);
 
 			if (response.ok) {
 				await refreshUser();
