@@ -14,12 +14,12 @@ const UserPage = () => {
 
 	useEffect(() => {
 		const fetchUser = async () => {
-			const response = await BackendService.get<UserDetails>(`/api/users/user/${userId}`);
+			const response = await BackendService.get<UserDetails>(`/api/user/${userId}`);
 
 			setUser(response.data);
 		};
 
-		fetchUser();
+		userId && fetchUser();
 	}, [userId]);
 
 	const removeFriend = async (friendId: string) => {
@@ -27,9 +27,9 @@ const UserPage = () => {
 		router.back();
 	};
 
-	if (!userId) {
-		router.replace('/');
-	}
+	// if (!userId) {
+	// 	router.navigate('/');
+	// }
 
 	return (
 		<ScrollView className="flex-1 bg-gray-900 px-4 py-6">

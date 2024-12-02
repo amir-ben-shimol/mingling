@@ -22,7 +22,7 @@ const PlaygroundPage: React.FC = () => {
 		useCallback(() => {
 			if (!socket || !user) return;
 
-			socket.emit('joinPlayground', user._id);
+			socket.emit('joinPlayground');
 
 			const handleMatched = ({ partnerSocketIds }: { partnerSocketIds: string[] }) => {
 				setupWebRTC(partnerSocketIds);
@@ -111,8 +111,6 @@ const PlaygroundPage: React.FC = () => {
 	};
 
 	const handleEndSession = () => {
-		socket?.emit('leavePlayground');
-		endCall();
 		setIsLookingForMatchTogether(false);
 		router.push('/');
 	};
