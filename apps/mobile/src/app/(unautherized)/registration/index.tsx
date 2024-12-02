@@ -22,7 +22,7 @@ const RegisterScreen = () => {
 		}
 
 		try {
-			await BackendService.post('/api/users/register', {
+			await BackendService.post('/api/user/register', {
 				firstName,
 				lastName,
 				email,

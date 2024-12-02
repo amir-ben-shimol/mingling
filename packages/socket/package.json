@@ -17,6 +17,7 @@
 	},
 	"dependencies": {
 		"@mingling/database": "workspace:*",
+		"@mingling/rabbitmq": "workspace:*",
 		"@mingling/redis": "workspace:*",
 		"@mingling/types": "workspace:*",
 		"socket.io": "4.8.1",

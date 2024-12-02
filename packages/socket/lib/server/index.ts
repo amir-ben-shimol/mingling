@@ -4,8 +4,10 @@ import { Server as SocketIOServer } from 'socket.io';
 
 type TServerInstance = http.Server | Http2SecureServer | Http2Server;
 
+let io: SocketIOServer | null = null;
+
 export const configureSocketServer = (server: TServerInstance) => {
-	const io = new SocketIOServer(server, {
+	io = new SocketIOServer(server, {
 		cors: {
 			origin: '*',
 			methods: ['GET', 'POST'],
@@ -13,4 +15,18 @@ export const configureSocketServer = (server: TServerInstance) => {
 	});
 
 	return io;
+};
+
+export const getSocketServer = (): SocketIOServer => {
+	if (!io) {
+		throw new Error('Socket.IO server is not configured. Call configureSocketServer first.');
+	}
+
+	return io;
+};
+
+export const emitToUser = (socketId: string, event: string, data: unknown) => {
+	const io = getSocketServer();
+
+	io.to(socketId).emit(event, data);
 };

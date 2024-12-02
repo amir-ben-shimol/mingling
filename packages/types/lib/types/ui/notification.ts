@@ -16,6 +16,7 @@ export type Notification = {
 	readonly timestamp: Date;
 	readonly varient?: NotificationVarient;
 	readonly fromUserId: string;
+	readonly toUserId?: string;
 	readonly duration?: number;
 	readonly isUnmounting?: boolean;
 };
