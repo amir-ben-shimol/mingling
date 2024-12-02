@@ -14,7 +14,7 @@ const LoginScreen = () => {
 
 	const handleLogin = async () => {
 		try {
-			const response = await BackendService.post<{ user: User }>('/api/users/login', { email, password });
+			const response = await BackendService.post<{ user: User }>('/api/user/login', { email, password });
 
 			if (response.ok) {
 				login(response.data.user);
