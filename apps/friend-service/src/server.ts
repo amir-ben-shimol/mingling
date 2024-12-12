@@ -7,7 +7,8 @@ dotenv.config();
 
 import express from 'express';
 import { connectToDatabase } from '@mingling/database';
-import { createFriendRoutes } from './routes/friend-routes';
+import friendRoutes from './routes/friend-routes';
+// import { errorHandler } from './middlewares/error-handler';
 
 const app = express();
 
@@ -35,7 +36,9 @@ const server = http.createServer(app);
 connectToDatabase();
 
 // Use user routes
-app.use('/api/friends', createFriendRoutes());
+app.use('/api/friends', friendRoutes);
+
+// app.use(errorHandler);
 
 const PORT = process.env.PORT;
 
