@@ -135,7 +135,7 @@ export const UINotifications = () => {
 	if (pushedNotifications.length === 0) return null;
 
 	return (
-		<View className="absolute bottom-0 z-30 flex w-full flex-col self-center px-2">
+		<View className="absolute bottom-6 z-30 flex w-full flex-col self-center px-2">
 			{pushedNotifications.map((notification) => {
 				if (!notification.id) return null;
 

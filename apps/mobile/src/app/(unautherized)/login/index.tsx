@@ -47,6 +47,7 @@ const LoginScreen = () => {
 						placeholder="Email"
 						placeholderTextColor="#6B7280" // gray-500
 						value={email}
+						autoCapitalize="none"
 						keyboardType="email-address"
 						onChangeText={setEmail}
 					/>
