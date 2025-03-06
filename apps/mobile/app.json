@@ -20,9 +20,6 @@
 			"forcesRTL": false,
 			"router": {
 				"origin": false
-			},
-			"eas": {
-				"projectId": "37d266a8-faad-47ae-bec2-466e30ee6c54"
 			}
 		},
 		"ios": {
@@ -36,9 +33,6 @@
 				},
 				"UIBackgroundModes": ["fetch", "remote-notification"],
 				"ExpoLocalization_forcesRTL": false
-			},
-			"config": {
-				"googleMapsApiKey": "AIzaSyBFm8NOrSpDOPPsBo_vnbg8uUmq3PNbjW0"
 			}
 		},
 		"android": {
