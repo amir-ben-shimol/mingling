@@ -17,7 +17,7 @@
 	},
 	"dependencies": {
 		"@mingling/types": "workspace:*",
-		"mongoose": "8.7.3"
+		"mongoose": "8.9.5"
 	},
 	"devDependencies": {
 		"@typescript-eslint/eslint-plugin": "6.18.1",
