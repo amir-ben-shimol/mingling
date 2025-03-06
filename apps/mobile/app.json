@@ -23,7 +23,7 @@
 			}
 		},
 		"ios": {
-			"bundleIdentifier": "leumit.co.il.mobile-dev",
+			"bundleIdentifier": "mingling.mobile.app",
 			"supportsTablet": true,
 			"infoPlist": {
 				"ExpoLocalization_supportsRTL": false,
@@ -36,7 +36,7 @@
 			}
 		},
 		"android": {
-			"package": "il.co.leumit.mobile",
+			"package": "mingling.mobile.app",
 			"adaptiveIcon": {
 				"foregroundImage": "./src/assets/images/global/app_logo.png",
 				"backgroundColor": "#111827"
